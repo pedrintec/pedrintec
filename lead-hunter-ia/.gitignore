@@ -6,3 +6,5 @@ exports/
 *.log
 .DS_Store
 drizzle/
+tmp.json
+*.tmp
