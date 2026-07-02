@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gravity • Lead Hunter — Inteligência Comercial Premium</title>
+<style>
+/* ============================================================
+   GRAVITY LEAD HUNTER — Design System
+   ============================================================ */
+:root{
+  /* Brand palette — refinado: índigo profundo + esmeralda + âmbar */
+  --bg-0:#070A18;
+  --bg-1:#0B1024;
+  --bg-2:#111733;
+  --surface:rgba(20,26,55,.72);
+  --surface-2:rgba(255,255,255,.04);
+  --surface-3:rgba(255,255,255,.08);
+  --line:rgba(255,255,255,.08);
+  --line-2:rgba(255,255,255,.14);
+  --text:#EAF0FF;
+  --text-dim:#A6B0CF;
+  --text-mute:#6E7A9E;
+
+  --indigo:#6366F1;
+  --indigo-2:#8B5CF6;
+  --cyan:#22D3EE;
+  --teal:#14B8A6;
+  --emerald:#10B981;
+  --amber:#F59E0B;
+  --gold:#FBBF24;
+  --rose:#F43F5E;
+  --orange:#FB923C;
+  --sky:#38BDF8;
+
+  --grad-brand:linear-gradient(135deg,#6366F1 0%,#22D3EE 100%);
+  --grad-warm:linear-gradient(135deg,#F59E0B 0%,#F43F5E 100%);
+  --grad-cool:linear-gradient(135deg,#0EA5E9 0%,#6366F1 100%);
+  --grad-success:linear-gradient(135deg,#10B981 0%,#22D3EE 100%);
+  --grad-surface:linear-gradient(160deg,rgba(99,102,241,.10),rgba(34,211,238,.06) 60%,rgba(255,255,255,0));
+
+  --shadow-sm:0 4px 12px rgba(0,0,0,.25);
+  --shadow-md:0 12px 32px rgba(0,0,0,.35);
+  --shadow-lg:0 30px 80px rgba(0,0,0,.45);
+  --shadow-glow:0 0 0 1px rgba(99,102,241,.35),0 18px 48px rgba(99,102,241,.25);
+
+  --radius-sm:10px;
+  --radius:14px;
+  --radius-lg:20px;
+  --radius-xl:26px;
+
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
+}
+body.light{
+  --bg-0:#F4F6FC;
+  --bg-1:#EEF1FA;
+  --bg-2:#E4E9F5;
+  --surface:rgba(255,255,255,.85);
+  --surface-2:rgba(15,23,42,.04);
+  --surface-3:rgba(15,23,42,.07);
+  --line:rgba(15,23,42,.10);
+  --line-2:rgba(15,23,42,.16);
+  --text:#0F172A;
+  --text-dim:#475569;
+  --text-mute:#64748B;
+  --shadow-md:0 12px 32px rgba(15,23,42,.08);
+  --shadow-lg:0 30px 60px rgba(15,23,42,.10);
+}
+
+/* Base */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  background:
+    radial-gradient(1200px 700px at -10% -10%,rgba(99,102,241,.28),transparent 60%),
+    radial-gradient(900px 600px at 110% 0%,rgba(34,211,238,.18),transparent 55%),
+    radial-gradient(800px 500px at 50% 110%,rgba(139,92,246,.18),transparent 60%),
+    linear-gradient(180deg,var(--bg-0),var(--bg-1));
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body.light{
+  background:
+    radial-gradient(1000px 600px at -10% -10%,rgba(99,102,241,.12),transparent 60%),
+    radial-gradient(800px 500px at 110% 0%,rgba(34,211,238,.10),transparent 55%),
+    linear-gradient(180deg,#F8FAFF,#EEF2FB);
+}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit;outline:none}
+button{cursor:pointer;border:0;background:transparent}
+input,select,textarea{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  color:var(--text);
+  border-radius:var(--radius-sm);
+  padding:10px 12px;
+  transition:.18s border-color, .18s box-shadow, .18s background;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--indigo);
+  box-shadow:0 0 0 4px rgba(99,102,241,.18);
+  background:var(--surface-3);
+}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.16)}
+body.light ::-webkit-scrollbar-thumb{background:rgba(15,23,42,.18)}
+
+/* Layout */
+.app{display:grid;grid-template-columns:264px minmax(0,1fr);min-height:100vh}
+.sidebar{
+  position:sticky;top:0;height:100vh;padding:20px 14px;
+  border-right:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(7,10,24,.88),rgba(11,16,36,.78));
+  backdrop-filter:blur(20px);
+  z-index:20;
+  display:flex;flex-direction:column;gap:18px;
+}
+body.light .sidebar{background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(248,250,255,.82))}
+
+.brand{display:flex;align-items:center;gap:12px;padding:8px 10px}
+.brand-logo{
+  width:42px;height:42px;border-radius:13px;
+  background:var(--grad-brand);
+  display:grid;place-items:center;
+  color:#fff;font-weight:900;font-size:18px;letter-spacing:-.04em;
+  box-shadow:0 12px 30px rgba(99,102,241,.45);
+  position:relative;overflow:hidden;
+}
+.brand-logo::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.45),transparent 55%)}
+.brand-name{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.brand-sub{font-size:11px;color:var(--text-mute);margin-top:3px;letter-spacing:.04em;text-transform:uppercase}
+
+.nav{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 13px;border-radius:12px;
+  color:var(--text-dim);font-size:14px;font-weight:500;
+  cursor:pointer;position:relative;
+  transition:.18s background,.18s color,.18s transform;
+}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item.active{
+  color:#fff;
+  background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(34,211,238,.12));
+  box-shadow:inset 0 0 0 1px rgba(99,102,241,.35);
+}
+.nav-item.active::before{
+  content:"";position:absolute;left:-14px;top:50%;transform:translateY(-50%);
+  width:3px;height:22px;border-radius:3px;background:var(--grad-brand);
+}
+.nav-ico{width:20px;height:20px;display:grid;place-items:center;font-size:16px}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--grad-warm);color:#fff;letter-spacing:.04em}
+
+.sidebar-footer{margin-top:auto;padding:12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);font-size:12px;color:var(--text-dim)}
+.sidebar-footer b{color:var(--text);display:block;margin-bottom:4px}
+
+/* Main */
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:15;
+  display:flex;align-items:center;gap:14px;
+  padding:14px 28px;
+  background:linear-gradient(180deg,rgba(7,10,24,.72),rgba(7,10,24,.40));
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line);
+}
+body.light .topbar{background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.55))}
+.page-title{font-size:18px;font-weight:700;letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--text-mute);margin-top:2px}
+.topbar-search{
+  flex:1;max-width:520px;margin-left:18px;position:relative;
+}
+.topbar-search input{width:100%;padding-left:38px}
+.topbar-search::before{
+  content:"⌕";position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--text-mute);font-size:16px;
+}
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.icon-btn{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--text-dim);
+  transition:.18s all;
+}
+.icon-btn:hover{color:var(--text);background:var(--surface-3);transform:translateY(-1px)}
+.avatar{
+  width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(135deg,#F59E0B,#F43F5E);
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;
+  box-shadow:0 8px 22px rgba(244,63,94,.35);
+}
+
+.content{padding:24px 28px 80px;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.section{display:none}
+.section.active{display:block;animation:fadeIn .35s ease}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 16px;border-radius:11px;font-weight:600;font-size:13px;
+  transition:.18s all;letter-spacing:-.005em;
+  border:1px solid transparent;
+}
+.btn-primary{background:var(--grad-brand);color:#fff;box-shadow:0 12px 28px rgba(99,102,241,.35)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(99,102,241,.45)}
+.btn-ghost{background:var(--surface-2);border-color:var(--line);color:var(--text)}
+.btn-ghost:hover{background:var(--surface-3);border-color:var(--line-2)}
+.btn-outline{background:transparent;border-color:var(--line-2);color:var(--text)}
+.btn-outline:hover{background:var(--surface-2)}
+.btn-success{background:linear-gradient(135deg,#10B981,#14B8A6);color:#fff}
+.btn-danger{background:linear-gradient(135deg,#F43F5E,#FB7185);color:#fff}
+.btn-warm{background:var(--grad-warm);color:#fff}
+.btn-sm{padding:6px 10px;font-size:12px;border-radius:9px}
+.btn-icon{padding:8px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);color:var(--text-dim)}
+.btn-icon:hover{color:var(--text);background:var(--surface-3);transform:translateY(-1px)}
+
+/* ============================================================
+   PREMIUM POLISH — efeitos universais + microinterações
+   ============================================================ */
+/* Hover/active em qualquer .btn (cobre os derivados sem regra própria) */
+.btn{cursor:pointer;will-change:transform;position:relative;overflow:hidden}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn:active{transform:translateY(0) scale(.98);filter:brightness(.96);transition:.08s all}
+.btn-success:hover{box-shadow:0 14px 32px rgba(16,185,129,.4)}
+.btn-danger:hover{box-shadow:0 14px 32px rgba(244,63,94,.45)}
+.btn-warm:hover{box-shadow:0 14px 32px rgba(245,158,11,.4)}
+/* Glow ao redor de botões primários */
+.btn-primary::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.2),transparent 60%);opacity:0;transition:.25s opacity}
+.btn-primary:hover::before{opacity:1}
+/* Foco acessível em todos os controles */
+.btn:focus-visible,.input:focus,.select:focus,input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(99,102,241,.35)}
+
+/* Cell de contatos na tabela (faltava!) */
+.cell-contacts{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--text-dim)}
+.cell-contacts a{color:var(--text-dim);transition:.15s color}
+.cell-contacts a:hover{color:var(--cyan)}
+
+/* Linhas da tabela com hover suave + cursor pointer */
+tbody tr{transition:.15s background, .15s transform;cursor:pointer}
+tbody tr:hover{background:rgba(255,255,255,.04)}
+tbody tr:hover td:first-child{box-shadow:inset 3px 0 0 var(--indigo)}
+
+/* Kanban cards com elevação ao hover */
+.kanban-card{transition:.2s transform,.2s box-shadow,.2s border-color;cursor:grab}
+.kanban-card:hover{transform:translateY(-2px);border-color:var(--line-2);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.kanban-card:active{cursor:grabbing}
+
+/* op-row do topOps (Dashboard) clicável e com hover */
+.op-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);margin-bottom:8px;cursor:pointer;transition:.15s all}
+.op-row:hover{background:var(--surface-3);border-color:var(--line-2);transform:translateX(2px)}
+
+/* Pílulas de status com glow sutil */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.02em}
+.badge .dot{width:6px;height:6px;border-radius:99px;background:currentColor;box-shadow:0 0 8px currentColor}
+.badge-hot{background:rgba(244,63,94,.16);color:#FB7185;border:1px solid rgba(244,63,94,.3)}
+.badge-warm{background:rgba(245,158,11,.16);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.badge-cold{background:rgba(34,211,238,.14);color:#67E8F9;border:1px solid rgba(34,211,238,.3)}
+.badge-stage{background:rgba(99,102,241,.16);color:#A5B4FC;border:1px solid rgba(99,102,241,.3)}
+.badge-mute{background:var(--surface-2);color:var(--text-mute);border:1px solid var(--line)}
+.badge-gold{background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(251,191,36,.12));color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+
+/* Skeleton de carregamento p/ percepção de velocidade */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skeleton{background:linear-gradient(90deg,var(--surface-2) 0%,var(--surface-3) 50%,var(--surface-2) 100%);background-size:200% 100%;animation:shimmer 1.4s linear infinite;border-radius:10px}
+
+/* Animação de entrada das views */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.section.active{animation:fadeUp .28s cubic-bezier(.2,.8,.2,1)}
+
+/* Stat cards com animação ao revelar */
+.stat{animation:fadeUp .35s ease both}
+.stat:nth-child(1){animation-delay:.02s}.stat:nth-child(2){animation-delay:.05s}.stat:nth-child(3){animation-delay:.08s}.stat:nth-child(4){animation-delay:.11s}
+.stat:nth-child(5){animation-delay:.14s}.stat:nth-child(6){animation-delay:.17s}.stat:nth-child(7){animation-delay:.20s}.stat:nth-child(8){animation-delay:.23s}
+
+/* Modal smooth */
+.modal-backdrop.active{animation:fadeUp .25s ease}
+.modal-backdrop.active .modal{animation:fadeUp .32s cubic-bezier(.2,.8,.2,1)}
+
+/* Score circle (fallback caso o CSS original esteja faltando) */
+.lead-score-circle{
+  width:72px;height:72px;border-radius:50%;
+  background:conic-gradient(from -90deg,var(--indigo) calc(var(--p,0)*1%),var(--surface-3) 0);
+  display:grid;place-items:center;position:relative;flex-shrink:0;
+}
+.lead-score-circle::before{content:"";position:absolute;inset:8px;background:var(--bg-1);border-radius:50%}
+.lead-score-circle span{position:relative;font-weight:900;font-size:18px;letter-spacing:-.04em}
+
+/* History items (linha do tempo) */
+.history{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow:auto}
+.history-item{font-size:12px;color:var(--text-dim);padding:8px 10px;border-left:2px solid var(--indigo);background:var(--surface-2);border-radius:0 8px 8px 0}
+.history-item time{display:block;font-size:10.5px;color:var(--text-mute);margin-bottom:3px}
+
+/* Sidebar nav: glow no item ativo */
+.nav-item.active{box-shadow:inset 3px 0 0 var(--indigo)}
+
+/* Cards header */
+.section-h{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.section-h h3{font-size:15px;font-weight:700;letter-spacing:-.02em}
+
+/* Scrollbar mais bonita */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.15)}
+::-webkit-scrollbar-track{background:transparent}
+
+/* Coluna de ações da tabela: botões SEMPRE visíveis e alinhados à direita */
+tbody td:last-child{text-align:right;white-space:nowrap}
+tbody td:last-child .btn{margin-left:6px;min-width:60px;justify-content:center}
+.table-wrap{overflow:auto;border-radius:14px;border:1px solid var(--line)}
+table.table{width:100%;border-collapse:separate;border-spacing:0;min-width:780px}
+table.table thead th{position:sticky;top:0;background:var(--bg-2);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);z-index:2}
+table.table tbody td{padding:14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+table.table tbody tr:last-child td{border-bottom:0}
+
+/* Cards / Glass */
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  padding:20px;
+  backdrop-filter:blur(18px);
+  position:relative;overflow:hidden;
+  transition:.22s transform,.22s box-shadow,.22s border-color;
+}
+.card::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:var(--grad-surface);opacity:.55;
+}
+.card>*{position:relative}
+.card:hover{transform:translateY(-2px);border-color:var(--line-2);box-shadow:var(--shadow-md)}
+
+/* Stats grid */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:20px}
+.stat{padding:18px}
+.stat-label{font-size:12px;color:var(--text-mute);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.stat-value{font-size:28px;font-weight:800;letter-spacing:-.03em;margin-top:6px;line-height:1}
+.stat-delta{margin-top:8px;display:inline-flex;gap:6px;align-items:center;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px}
+.delta-up{background:rgba(16,185,129,.14);color:#34D399}
+.delta-down{background:rgba(244,63,94,.14);color:#FB7185}
+.stat-ico{
+  position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:11px;
+  display:grid;place-items:center;font-size:18px;
+  background:rgba(99,102,241,.14);color:#A5B4FC;
+}
+.stat.warm .stat-ico{background:rgba(245,158,11,.14);color:#FCD34D}
+.stat.cool .stat-ico{background:rgba(34,211,238,.14);color:#67E8F9}
+.stat.success .stat-ico{background:rgba(16,185,129,.14);color:#6EE7B7}
+.stat.rose .stat-ico{background:rgba(244,63,94,.14);color:#FDA4AF}
+
+/* Grid layouts */
+.grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+
+/* Section header */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.section-head h2{margin:0;font-size:16px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.section-head h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--grad-brand);box-shadow:0 0 12px var(--indigo)}
+
+/* Funnel chart */
+.funnel{display:flex;flex-direction:column;gap:10px}
+.funnel-row{display:grid;grid-template-columns:140px 1fr 50px;gap:12px;align-items:center;font-size:13px}
+.funnel-row .lbl{color:var(--text-dim)}
+.funnel-bar{height:24px;background:var(--surface-2);border-radius:8px;overflow:hidden;position:relative;border:1px solid var(--line)}
+.funnel-fill{height:100%;border-radius:8px;background:var(--grad-brand);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.funnel-row.r-1 .funnel-fill{background:linear-gradient(135deg,#6366F1,#8B5CF6)}
+.funnel-row.r-2 .funnel-fill{background:linear-gradient(135deg,#0EA5E9,#22D3EE)}
+.funnel-row.r-3 .funnel-fill{background:linear-gradient(135deg,#14B8A6,#22D3EE)}
+.funnel-row.r-4 .funnel-fill{background:linear-gradient(135deg,#F59E0B,#FBBF24)}
+.funnel-row.r-5 .funnel-fill{background:linear-gradient(135deg,#F97316,#F59E0B)}
+.funnel-row.r-6 .funnel-fill{background:linear-gradient(135deg,#10B981,#34D399)}
+.funnel-row.r-7 .funnel-fill{background:linear-gradient(135deg,#F43F5E,#FB7185)}
+.funnel-row .val{text-align:right;font-weight:700;font-size:13px}
+
+/* Best ops list */
+.op-list{display:flex;flex-direction:column;gap:10px}
+.op-item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);transition:.18s all}
+.op-item:hover{background:var(--surface-3);border-color:var(--line-2);transform:translateX(2px)}
+.op-avatar{width:38px;height:38px;border-radius:10px;background:var(--grad-cool);display:grid;place-items:center;font-weight:800;color:#fff;font-size:13px;flex-shrink:0}
+.op-info{flex:1;min-width:0}
+.op-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-meta{font-size:11px;color:var(--text-mute);margin-top:2px}
+.op-score{font-weight:800;font-size:14px}
+
+/* Insights */
+.insight-card{padding:16px;display:flex;gap:14px;align-items:flex-start}
+.insight-ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex-shrink:0}
+.insight-card h4{margin:0 0 4px;font-size:13px;font-weight:700}
+.insight-card p{margin:0;font-size:12px;color:var(--text-dim);line-height:1.5}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.02em;border:1px solid transparent;line-height:1.4}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge-hot{background:rgba(244,63,94,.12);color:#FB7185;border-color:rgba(244,63,94,.28)}
+.badge-warm{background:rgba(245,158,11,.12);color:#FBBF24;border-color:rgba(245,158,11,.28)}
+.badge-cold{background:rgba(56,189,248,.12);color:#7DD3FC;border-color:rgba(56,189,248,.28)}
+.badge-stage{background:rgba(139,92,246,.12);color:#C4B5FD;border-color:rgba(139,92,246,.28)}
+.badge-success{background:rgba(16,185,129,.12);color:#6EE7B7;border-color:rgba(16,185,129,.28)}
+.badge-gold{background:rgba(251,191,36,.12);color:#FCD34D;border-color:rgba(251,191,36,.28)}
+.badge-mute{background:var(--surface-2);color:var(--text-dim);border-color:var(--line)}
+
+/* Kanban */
+.kanban-wrap{overflow-x:auto;padding-bottom:8px}
+.kanban{display:flex;gap:14px;min-width:max-content;padding-bottom:8px}
+.kcol{
+  width:300px;flex-shrink:0;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-lg);padding:14px;
+  display:flex;flex-direction:column;gap:12px;max-height:75vh;
+  backdrop-filter:blur(14px);
+}
+.kcol-head{display:flex;align-items:center;justify-content:space-between;padding:2px 4px}
+.kcol-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.kcol-title .pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-3);color:var(--text-dim)}
+.kcol-bar{height:3px;border-radius:3px;background:var(--grad-brand);margin-bottom:6px}
+.kcol[data-stage="Novo"] .kcol-bar{background:linear-gradient(90deg,#6366F1,#8B5CF6)}
+.kcol[data-stage="Qualificado"] .kcol-bar{background:linear-gradient(90deg,#0EA5E9,#22D3EE)}
+.kcol[data-stage="Em contato"] .kcol-bar{background:linear-gradient(90deg,#14B8A6,#22D3EE)}
+.kcol[data-stage="Reunião"] .kcol-bar{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
+.kcol[data-stage="Proposta"] .kcol-bar{background:linear-gradient(90deg,#F97316,#F59E0B)}
+.kcol[data-stage="Cliente"] .kcol-bar{background:linear-gradient(90deg,#10B981,#34D399)}
+.kcol[data-stage="Perdido"] .kcol-bar{background:linear-gradient(90deg,#F43F5E,#FB7185)}
+
+.kcol-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px}
+.kcol-body.drag-over{background:rgba(99,102,241,.06);border-radius:12px;outline:1px dashed rgba(99,102,241,.35)}
+
+.kcard{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:14px;padding:12px;cursor:grab;
+  transition:.18s all;position:relative;
+}
+.kcard:hover{transform:translateY(-2px);border-color:var(--line-2);background:var(--surface-3);box-shadow:var(--shadow-sm)}
+.kcard.dragging{opacity:.55;cursor:grabbing;transform:rotate(2deg) scale(1.02)}
+.kcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.kcard-name{font-weight:700;font-size:13px;line-height:1.3}
+.kcard-niche{font-size:11px;color:var(--text-mute);margin-top:2px}
+.kcard-meta{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.kcard-value{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);
+  font-size:12px;
+}
+.kcard-value .v-amount{font-weight:800;color:#FCD34D;font-size:13px;letter-spacing:-.01em}
+.kcard-value .v-amount .currency{font-size:10px;font-weight:600;color:var(--text-mute);margin-right:2px}
+.kcard-actions{display:flex;gap:6px;margin-top:10px}
+.kcard-actions .btn-icon{flex:1;padding:7px;font-size:13px}
+.kcard-next{font-size:11px;color:var(--text-dim);margin-top:6px;display:flex;align-items:center;gap:6px}
+.kcard-next::before{content:"›";color:var(--cyan);font-weight:700}
+
+.kcol-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:30px 12px;border:1px dashed var(--line);border-radius:12px;
+  color:var(--text-mute);font-size:12px;text-align:center;gap:8px;
+}
+.kcol-empty .em-ico{font-size:24px;opacity:.5}
+
+/* Table */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.toolbar input,.toolbar select{min-width:140px}
+.toolbar .grow{flex:1;min-width:200px}
+
+.table-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;backdrop-filter:blur(14px)}
+.table{width:100%;border-collapse:separate;border-spacing:0}
+.table th,.table td{padding:12px 14px;text-align:left;font-size:13px;border-bottom:1px solid var(--line)}
+.table th{font-size:11px;font-weight:700;color:var(--text-mute);text-transform:uppercase;letter-spacing:.06em;background:var(--surface-2);position:sticky;top:0}
+.table tr:last-child td{border-bottom:0}
+.table tbody tr{transition:.15s background}
+.table tbody tr:hover{background:var(--surface-2)}
+.cell-name{font-weight:600}
+.cell-name small{display:block;color:var(--text-mute);font-weight:400;font-size:11px;margin-top:2px}
+.row-actions{display:flex;gap:4px;justify-content:flex-end}
+
+/* Empty state */
+.empty{
+  padding:48px 24px;text-align:center;color:var(--text-mute);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.empty .em-ico{font-size:42px;opacity:.6}
+.empty h3{margin:6px 0 0;font-size:15px;color:var(--text)}
+.empty p{margin:0;font-size:13px;max-width:340px;line-height:1.5}
+
+/* Modal */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(3,6,18,.7);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;z-index:100;padding:20px;
+  animation:fadeIn .25s ease;
+}
+.modal-backdrop.active{display:flex}
+.modal{
+  background:linear-gradient(160deg,rgba(30,38,72,.96),rgba(15,20,45,.96));
+  border:1px solid var(--line-2);
+  border-radius:var(--radius-xl);
+  max-width:920px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:var(--shadow-lg);
+  animation:scaleIn .3s cubic-bezier(.2,.8,.2,1);
+  position:relative;
+}
+body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
+@keyframes scaleIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-head{padding:22px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;position:sticky;top:0;background:inherit;z-index:2}
+.modal-title{font-size:18px;font-weight:800;letter-spacing:-.02em}
+.modal-sub{font-size:12px;color:var(--text-mute);margin-top:4px}
+.modal-close{font-size:22px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;width:34px;height:34px;display:grid;place-items:center;color:var(--text-dim)}
+.modal-close:hover{color:var(--text);background:var(--surface-3)}
+.modal-body{padding:22px 26px}
+.modal-foot{padding:16px 26px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:12px;color:var(--text-dim);font-weight:600}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Lead modal layout */
+.lead-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+.lead-section{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px}
+.lead-section h4{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute)}
+.lead-score-circle{
+  width:84px;height:84px;border-radius:50%;
+  background:conic-gradient(var(--indigo) calc(var(--p) * 1%),var(--surface-2) 0);
+  display:grid;place-items:center;position:relative;flex-shrink:0;
+}
+.lead-score-circle::before{content:"";position:absolute;inset:6px;background:var(--bg-1);border-radius:50%}
+.lead-score-circle span{position:relative;font-weight:800;font-size:20px}
+.history{display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto}
+.history-item{font-size:12px;color:var(--text-dim);padding:8px 10px;background:var(--surface-3);border-radius:8px;border-left:2px solid var(--indigo)}
+.history-item time{display:block;font-size:10px;color:var(--text-mute);margin-bottom:2px}
+
+/* Lead Hunter */
+.lh-grid{display:grid;grid-template-columns:1fr;gap:18px}
+.hunter-form{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.hunter-form .field{margin:0}
+.hunter-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+.dork-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto}
+.dork-item{
+  display:flex;gap:10px;align-items:center;
+  padding:10px 12px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;
+}
+.dork-item code{flex:1;color:var(--cyan);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dork-desc{font-family:Inter,sans-serif;color:var(--text-mute);font-size:11px;display:block;margin-top:2px}
+.dork-actions{display:flex;gap:4px}
+
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.rcard{padding:16px}
+.rcard h4{margin:0;font-size:14px;font-weight:700}
+.rcard .rcard-meta{font-size:11px;color:var(--text-mute);margin-top:2px;margin-bottom:10px}
+.rcard-info{font-size:12px;color:var(--text-dim);line-height:1.5;margin:8px 0}
+.rcard-info b{color:var(--text)}
+.rcard-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+
+/* Tasks */
+.task-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.task-col h3{margin:0 0 12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.task-col .count{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--surface-3);color:var(--text-dim)}
+.task-list{display:flex;flex-direction:column;gap:8px}
+.task{padding:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;transition:.18s all;position:relative;overflow:hidden}
+.task::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--indigo)}
+.task.high::before{background:var(--rose)}
+.task.medium::before{background:var(--amber)}
+.task.low::before{background:var(--cyan)}
+.task.late{border-color:rgba(244,63,94,.35);background:rgba(244,63,94,.06)}
+.task.done{opacity:.55}
+.task.done .task-title{text-decoration:line-through}
+.task-title{font-weight:600;font-size:13px}
+.task-meta{font-size:11px;color:var(--text-mute);margin-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.task-actions{display:flex;gap:4px;margin-top:8px;justify-content:flex-end}
+
+/* Automations */
+.auto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.acard{padding:18px;display:flex;flex-direction:column;gap:12px}
+.acard-ico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:var(--grad-brand);color:#fff;box-shadow:0 12px 28px rgba(99,102,241,.30)}
+.acard-ico.warm{background:var(--grad-warm)}
+.acard-ico.success{background:var(--grad-success)}
+.acard-ico.cool{background:var(--grad-cool)}
+.acard h4{margin:0;font-size:14px;font-weight:700}
+.acard p{margin:0;font-size:12px;color:var(--text-dim);line-height:1.5;flex:1}
+.acard-foot{display:flex;justify-content:space-between;align-items:center}
+
+/* Settings */
+.settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.switch{position:relative;display:inline-block;width:46px;height:26px}
+.switch input{display:none}
+.switch span{position:absolute;cursor:pointer;inset:0;background:var(--surface-3);border-radius:14px;border:1px solid var(--line);transition:.2s}
+.switch span::before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.switch input:checked + span{background:var(--grad-brand);border-color:transparent}
+.switch input:checked + span::before{transform:translateX(20px)}
+
+/* Toast */
+.toast-wrap{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{
+  min-width:260px;max-width:360px;
+  padding:13px 16px;border-radius:13px;
+  background:linear-gradient(135deg,rgba(20,28,60,.95),rgba(15,22,50,.95));
+  border:1px solid var(--line-2);
+  box-shadow:var(--shadow-md);
+  color:var(--text);font-size:13px;
+  display:flex;gap:10px;align-items:flex-start;
+  animation:toastIn .3s cubic-bezier(.2,.8,.2,1);
+  backdrop-filter:blur(14px);
+  pointer-events:auto;
+}
+@keyframes toastIn{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+.toast.out{animation:toastOut .25s forwards}
+@keyframes toastOut{to{transform:translateX(20px);opacity:0}}
+.toast .t-ico{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:13px;flex-shrink:0}
+.toast.success .t-ico{background:rgba(16,185,129,.2);color:#34D399}
+.toast.error .t-ico{background:rgba(244,63,94,.2);color:#FB7185}
+.toast.info .t-ico{background:rgba(99,102,241,.2);color:#A5B4FC}
+.toast.warn .t-ico{background:rgba(245,158,11,.2);color:#FCD34D}
+.toast .t-body{flex:1;line-height:1.4}
+.toast .t-title{font-weight:700;font-size:13px}
+.toast .t-msg{font-size:12px;color:var(--text-dim);margin-top:2px}
+
+/* Mobile */
+.mobile-tabs{display:none}
+@media(max-width:1100px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+  .grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}
+  .hunter-form{grid-template-columns:repeat(2,1fr)}
+  .task-board{grid-template-columns:repeat(2,1fr)}
+  .lead-grid{grid-template-columns:1fr}
+  .settings-grid{grid-template-columns:1fr}
+}
+@media(max-width:780px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .topbar{padding:12px 16px}
+  .topbar-search{display:none}
+  .content{padding:16px 16px 100px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid-3,.grid-4{grid-template-columns:1fr}
+  .hunter-form{grid-template-columns:1fr}
+  .task-board{grid-template-columns:1fr}
+  .field-row{grid-template-columns:1fr}
+  .mobile-tabs{
+    display:flex;position:fixed;bottom:12px;left:12px;right:12px;
+    background:rgba(11,16,36,.92);backdrop-filter:blur(20px);
+    border:1px solid var(--line-2);border-radius:18px;padding:6px;z-index:30;
+    box-shadow:0 18px 40px rgba(0,0,0,.5);
+  }
+  .mobile-tabs .nav-item{flex:1;flex-direction:column;gap:2px;padding:8px 6px;font-size:10px;justify-content:center;text-align:center}
+  .mobile-tabs .nav-item .nav-ico{font-size:18px}
+  .mobile-tabs .nav-item.active::before{display:none}
+  .table th:nth-child(n+5),.table td:nth-child(n+5){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== APP SHELL ===================== -->
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">G</div>
+      <div>
+        <div class="brand-name" id="brandName">Gravity</div>
+        <div class="brand-sub">Lead Hunter</div>
+      </div>
+    </div>
+
+    <nav class="nav" id="mainNav">
+      <div class="nav-item active" data-view="dashboard"><span class="nav-ico">◉</span> Dashboard</div>
+      <div class="nav-item" data-view="hunter"><span class="nav-ico">⌖</span> Lead Hunter IA <span class="nav-badge">AI</span></div>
+      <div class="nav-item" data-view="crm"><span class="nav-ico">⎘</span> CRM Funil</div>
+      <div class="nav-item" data-view="leads"><span class="nav-ico">☰</span> Leads</div>
+      <div class="nav-item" data-view="tasks"><span class="nav-ico">✓</span> Tarefas</div>
+      <div class="nav-item" data-view="automations"><span class="nav-ico">⚡</span> Automações</div>
+      <div class="nav-item" data-view="settings"><span class="nav-ico">⚙</span> Configurações</div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <b>Plano Premium</b>
+      Demo local • Pronto para Supabase, SerpAPI e webhooks reais.
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <header class="topbar">
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-sub" id="pageSub">Visão executiva da sua operação comercial</div>
+      </div>
+      <div class="topbar-search">
+        <input id="globalSearch" placeholder="Buscar leads, empresas, nichos…" />
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="themeToggle" title="Alternar tema">☾</button>
+        <button class="btn btn-primary" id="quickAddLead">＋ Novo Lead</button>
+        <div class="avatar">GV</div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- =============== DASHBOARD =============== -->
+      <section class="section active" id="view-dashboard">
+        <div class="stats" id="dashStats"></div>
+
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Funil Comercial</h2>
+              <span class="badge badge-mute" id="funnelTotal">— leads</span>
+            </div>
+            <div class="funnel" id="funnelChart"></div>
+          </div>
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Melhores Oportunidades</h2>
+              <button class="btn btn-sm btn-ghost" onclick="switchView('leads')">Ver todas →</button>
+            </div>
+            <div class="op-list" id="topOps"></div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Próxima melhor ação</h2></div>
+            <div id="nextBestAction"></div>
+          </div>
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Saúde Comercial</h2></div>
+            <div id="healthBlock"></div>
+          </div>
+        </div>
+
+        <div class="section-head"><h2><span class="dot"></span> Insights da Operação</h2></div>
+        <div class="grid-3" id="insightsBlock"></div>
+      </section>
+
+      <!-- =============== LEAD HUNTER =============== -->
+      <section class="section" id="view-hunter">
+        <div class="card" style="margin-bottom:18px">
+          <div class="section-head"><h2><span class="dot"></span> Configuração da Caça</h2>
+            <span class="badge badge-success"><span class="dot"></span> Dorks 100% seguros</span>
+          </div>
+          <div class="hunter-form">
+            <div class="field"><label>Nicho</label>
+              <select id="hNicho">
+                <option>Clínica Odontológica</option><option>Estética</option><option>Energia Solar</option>
+                <option>Advocacia</option><option>Academia</option><option>Barbearia</option>
+                <option>Escola</option><option>Imobiliária</option><option>Clínica Médica</option>
+                <option>Restaurante</option><option>Pet Shop</option><option>Construtora</option>
+              </select>
+            </div>
+            <div class="field"><label>Cidade</label><input id="hCidade" value="São Paulo" /></div>
+            <div class="field"><label>Estado</label>
+              <select id="hEstado"><option>SP</option><option>RJ</option><option>MG</option><option>PR</option><option>RS</option><option>SC</option><option>BA</option><option>DF</option><option>GO</option></select>
+            </div>
+            <div class="field"><label>Oferta da agência</label>
+              <select id="hOferta">
+                <option>Captação de leads no Instagram</option>
+                <option>Tráfego pago Google Ads</option>
+                <option>CRM e automação comercial</option>
+                <option>Site profissional</option>
+                <option>Gestão de redes sociais</option>
+              </select>
+            </div>
+            <div class="field"><label>Tipo de busca</label>
+              <select id="hTipo">
+                <option>Site oficial</option><option>WhatsApp público</option><option>Instagram público</option>
+                <option>Página de contato</option><option>Página de orçamento</option><option>Página de agendamento</option>
+                <option>Negócio local completo</option>
+              </select>
+            </div>
+            <div class="field"><label>Profundidade</label>
+              <select id="hDepth"><option>Rápida</option><option>Média</option><option>Profunda</option></select>
+            </div>
+            <div class="field"><label>Score mínimo</label><input id="hScore" type="number" value="60" min="0" max="100" /></div>
+            <div class="field"><label>Máx. leads</label><input id="hMax" type="number" value="8" min="1" max="50" /></div>
+          </div>
+          <div class="hunter-actions">
+            <button class="btn btn-primary" id="btnGenDorks">⚡ Gerar Dorks</button>
+            <button class="btn btn-ghost" id="btnRunBrowser">🌐 Rodar no Navegador</button>
+            <button class="btn btn-ghost" id="btnImportUrls">⤓ Importar URLs</button>
+            <button class="btn btn-success" id="btnSaveAll">＋ Salvar Resultados no CRM</button>
+            <button class="btn btn-outline" id="btnExportDorks">↗ Exportar Dorks</button>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Dorks Gerados</h2>
+              <button class="btn btn-sm btn-ghost" id="btnCopyAll">Copiar todos</button>
+            </div>
+            <div class="dork-list" id="dorkList">
+              <div class="empty"><div class="em-ico">⌖</div><h3>Sem dorks gerados</h3><p>Configure os parâmetros e clique em Gerar Dorks para começar.</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Resultados Simulados</h2>
+              <span class="badge badge-mute" id="resultCount">0 leads</span>
+            </div>
+            <div id="resultsArea">
+              <div class="empty"><div class="em-ico">🎯</div><h3>Aguardando prospecção</h3><p>Gere dorks ou importe URLs para popular esta área.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============== CRM =============== -->
+      <section class="section" id="view-crm">
+        <div class="kanban-wrap">
+          <div class="kanban" id="kanban"></div>
+        </div>
+      </section>
+
+      <!-- =============== LEADS =============== -->
+      <section class="section" id="view-leads">
+        <div class="toolbar">
+          <input class="grow" id="fSearch" placeholder="🔍 Buscar por nome, nicho, cidade, site ou telefone…" />
+          <select id="fNicho"><option value="">Todos os nichos</option></select>
+          <select id="fCidade"><option value="">Todas cidades</option></select>
+          <select id="fTemp"><option value="">Todas temperaturas</option><option>Quente</option><option>Morno</option><option>Frio</option></select>
+          <select id="fStage"><option value="">Todas etapas</option><option>Novo</option><option>Qualificado</option><option>Em contato</option><option>Reunião</option><option>Proposta</option><option>Cliente</option><option>Perdido</option></select>
+          <select id="fSort"><option value="score">Ordenar por score</option><option value="value">Ordenar por valor</option><option value="last">Ordenar por último contato</option></select>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr>
+              <th>Empresa</th>
+              <th>Contato</th>
+              <th>Etapa</th>
+              <th>Score</th>
+              <th>Valor</th>
+              <th>Último contato</th>
+              <th style="text-align:right">Ações</th>
+            </tr></thead>
+            <tbody id="leadsBody"></tbody>
+          </table>
+          <div id="leadsEmpty" style="display:none"><div class="empty"><div class="em-ico">📭</div><h3>Nenhum lead encontrado</h3><p>Ajuste os filtros ou adicione novos leads ao sistema.</p></div></div>
+        </div>
+      </section>
+
+      <!-- =============== TASKS =============== -->
+      <section class="section" id="view-tasks">
+        <div class="card" style="margin-bottom:18px">
+          <div class="section-head"><h2><span class="dot"></span> Criar Nova Tarefa</h2></div>
+          <div class="hunter-form">
+            <div class="field"><label>Título</label><input id="tTitle" placeholder="Ex: Ligar para follow-up" /></div>
+            <div class="field"><label>Lead vinculado</label><select id="tLead"></select></div>
+            <div class="field"><label>Vencimento</label><input id="tDue" type="date" /></div>
+            <div class="field"><label>Prioridade</label><select id="tPri"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div>
+          </div>
+          <div style="margin-top:12px"><button class="btn btn-primary" id="btnCreateTask">＋ Criar tarefa</button></div>
+        </div>
+
+        <div class="task-board">
+          <div class="card task-col"><h3>📌 Hoje <span class="count" id="cToday">0</span></h3><div class="task-list" id="tToday"></div></div>
+          <div class="card task-col"><h3>⚠ Atrasadas <span class="count" id="cLate">0</span></h3><div class="task-list" id="tLate"></div></div>
+          <div class="card task-col"><h3>📅 Próximas <span class="count" id="cNext">0</span></h3><div class="task-list" id="tNext"></div></div>
+          <div class="card task-col"><h3>✓ Concluídas <span class="count" id="cDone">0</span></h3><div class="task-list" id="tDone"></div></div>
+        </div>
+      </section>
+
+      <!-- =============== AUTOMATIONS =============== -->
+      <section class="section" id="view-automations">
+        <div class="auto-grid" id="autoGrid"></div>
+      </section>
+
+      <!-- =============== SETTINGS =============== -->
+      <section class="section" id="view-settings">
+        <div class="settings-grid">
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Identidade</h2></div>
+            <div class="field"><label>Nome da agência</label><input id="sName" /></div>
+            <div class="field"><label>Mensagem padrão de abordagem</label><textarea id="sMsg" rows="5"></textarea></div>
+            <div class="field"><label>Nichos favoritos (separados por vírgula)</label><input id="sNiches" /></div>
+            <button class="btn btn-primary" id="btnSaveSettings">💾 Salvar configurações</button>
+          </div>
+
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Aparência</h2></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--surface-2);border-radius:12px;border:1px solid var(--line)">
+              <div>
+                <div style="font-weight:600;font-size:14px">Tema escuro</div>
+                <div style="font-size:12px;color:var(--text-mute);margin-top:2px">Recomendado para uso prolongado</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="sTheme" checked><span></span></label>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Integração futura</h2></div>
+            <div class="field"><label>Endpoint da API</label><input id="sApiUrl" placeholder="https://api.suaagencia.com" /></div>
+            <div class="field"><label>Chave de API</label><input id="sApiKey" type="password" placeholder="••••••••••••" /></div>
+            <button class="btn btn-ghost" onclick="toast('info','Função preparada para backend futuro','Conecte Supabase ou seu webhook aqui.')">Testar conexão</button>
+          </div>
+
+          <div class="card">
+            <div class="section-head"><h2><span class="dot"></span> Dados</h2></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button class="btn btn-ghost" id="btnExportJson">⬇ Exportar base em JSON</button>
+              <button class="btn btn-ghost" id="btnImportJson">⬆ Importar base em JSON</button>
+              <button class="btn btn-danger" id="btnResetData">🗑 Limpar base local</button>
+              <input type="file" id="importFile" accept="application/json" style="display:none" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Mobile nav -->
+<div class="mobile-tabs" id="mobileTabs">
+  <div class="nav-item active" data-view="dashboard"><span class="nav-ico">◉</span>Home</div>
+  <div class="nav-item" data-view="hunter"><span class="nav-ico">⌖</span>Hunter</div>
+  <div class="nav-item" data-view="crm"><span class="nav-ico">⎘</span>CRM</div>
+  <div class="nav-item" data-view="leads"><span class="nav-ico">☰</span>Leads</div>
+  <div class="nav-item" data-view="tasks"><span class="nav-ico">✓</span>Tarefas</div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Modal generic -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal" id="modalBox">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modalTitle">Título</div>
+        <div class="modal-sub" id="modalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   GRAVITY LEAD HUNTER — Bridge API (sem localStorage)
+   Tudo persistido no backend Express + SQLite.
+   ============================================================ */
+const STAGES = ['Novo','Qualificado','Em contato','Reunião','Proposta','Cliente','Perdido'];
+const PRIO_LBL = { atacar_hoje:'Atacar hoje', validar_manual:'Validar manual', nutrir:'Nutrir', descartar:'Descartar' };
+
+let state = {
+  leads: [], tasks: [],
+  settings: { agencyName:'Gravity', message:'', niches:'', theme:'dark' },
+  currentDorks: [], currentResults: [], currentLeadId: null,
+  provider: 'multi', activeView: 'dashboard',
+};
+
+function uid(){ return 'r'+Math.random().toString(36).slice(2,9) }
+function pick(a){ return a[Math.floor(Math.random()*a.length)] }
+function brl(n){ return (Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}) }
+function daysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString() }
+function daysAhead(n){ const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10) }
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) }
+
+async function api(path, method='GET', body){
+  const o={method,headers:{}};
+  if(body!==undefined){ o.headers['Content-Type']='application/json'; o.body=JSON.stringify(body); }
+  const r = await fetch(path,o);
+  const d = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(d.error || ('HTTP '+r.status));
+  return d;
+}
+function mapLead(b){
+  const score = b.finalScore != null ? b.finalScore : (b.score||0);
+  const temp = b.temperature || (score>=70?'Quente':score>=40?'Morno':'Frio');
+  return {
+    id: b.id, name: b.companyName||'', niche: b.niche||'', city: b.city||'', uf: b.region||'',
+    phone: b.phone||'', whatsapp: String(b.whatsapp||'').replace(/\D/g,''),
+    instagram: b.instagram||'', site: b.site||'', email: b.email||'',
+    stage: b.stage||'Novo', value: Number(b.dealValue)||Math.round(1200+score*40),
+    note: b.evidence||'', lastContact: b.lastContactAt||null, nextAction: b.nextAction||'',
+    history: (b.notes||[]).map(n=>({ at:n.date, text:(n.author?'['+n.author+'] ':'')+n.text })),
+    hasWhatsapp: !!b.whatsapp, hasSite: !!b.site, hasInsta: !!b.instagram,
+    score, temp,
+    reasons: (b.scoreEvidences||[]).map(e=>e.signal+' ('+(e.points>=0?'+':'')+e.points+')').slice(0,6),
+    pain: (b.websiteDiagnostic && b.websiteDiagnostic.summary) || '',
+    offer: b.commercialHook || (b.outreachMessage ? b.outreachMessage.slice(0,140)+'…' : ''),
+    priorityKey: b.commercialPriority||'',
+    outreachMessage: b.outreachMessage||'',
+    dataConfidence: b.dataConfidence,
+  };
+}
+function mapTask(t, leadById){
+  const l = leadById.get(t.leadId);
+  return { id:t.id, leadId:t.leadId, title:t.text, due:t.due, priority:t.priority||'Média', done:!!t.done, company:t.empresa||(l&&l.name)||'' };
+}
+
+function toast(type, title, msg){
+  const wrap = document.getElementById('toastWrap'); if(!wrap) return;
+  const el = document.createElement('div');
+  el.className = 'toast '+(type==='success'?'success':type==='warn'?'warning':type==='error'?'error':'info');
+  el.innerHTML = '<div class="t-ico">'+(type==='success'?'✓':type==='warn'?'!':type==='error'?'×':'i')+'</div><div><b>'+escapeHtml(title)+'</b>'+(msg?'<div style="font-size:11px;opacity:.8">'+escapeHtml(msg)+'</div>':'')+'</div>';
+  wrap.appendChild(el);
+  setTimeout(()=>el.classList.add('show'),10);
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),350); }, 3200);
+}
+
+function openModal(o){
+  document.getElementById('modalTitle').textContent = o.title||'';
+  document.getElementById('modalSub').textContent = o.sub||'';
+  document.getElementById('modalBody').innerHTML = o.body||'';
+  document.getElementById('modalFoot').innerHTML = o.footer||'';
+  document.getElementById('modal').classList.add('active');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('active'); }
+
+async function loadConfig(){ try{ const c=await api('/api/config'); state.provider=c.provider; }catch{} }
+async function loadSettings(){ try{ const r=await api('/api/settings'); state.settings={...state.settings,...r.settings}; }catch{} }
+async function loadLeads(){ try{ const r=await api('/api/leads'); state.leads=(r.leads||[]).map(mapLead); }catch(e){ toast('error','Erro ao carregar leads',e.message); } }
+async function loadTasks(){ try{ const r=await api('/api/tasks'); const idx=new Map(state.leads.map(l=>[l.id,l])); state.tasks=(r.tasks||[]).map(t=>mapTask(t,idx)); }catch{ state.tasks=[]; } }
+async function refreshAll(){
+  // Paralelo: leads + tasks numa única espera (≈2x mais rápido).
+  const [lR, tR] = await Promise.allSettled([
+    fetch('/api/leads',{cache:'no-store'}).then(r=>r.json()),
+    fetch('/api/tasks',{cache:'no-store'}).then(r=>r.json()),
+  ]);
+  if(lR.status==='fulfilled') state.leads = (lR.value.leads||[]).map(mapLead);
+  const idx = new Map(state.leads.map(l=>[l.id,l]));
+  if(tR.status==='fulfilled') state.tasks = (tR.value.tasks||[]).map(t=>mapTask(t,idx));
+  invalidateStatsCache();
+  if(state.activeView==='dashboard') renderDashboard();
+  if(state.activeView==='crm') renderKanban();
+  if(state.activeView==='leads'){ populateLeadFilters(); renderLeadsTable(); }
+  if(state.activeView==='tasks') renderTasks();
+  if(state.activeView==='automations') renderAutomations();
+  if(state.activeView==='settings') renderSettings();
+}
+
+const titles = {
+  dashboard:['Dashboard','Visão executiva da sua operação comercial'],
+  hunter:['Lead Hunter IA','Gere dorks reais e ative os robôs de busca'],
+  crm:['CRM Funil','Arraste os cards entre etapas — tudo salva no banco'],
+  leads:['Leads','Sua base completa, filtrável e auditável'],
+  tasks:['Tarefas','Follow-ups e ações em aberto'],
+  automations:['Automações','Playbooks de relacionamento sugeridos'],
+  settings:['Configurações','Personalize a operação']
+};
+function switchView(view){
+  state.activeView = view;
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active', s.id==='view-'+view));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.view===view));
+  document.getElementById('pageTitle').textContent = titles[view][0];
+  document.getElementById('pageSub').textContent = titles[view][1];
+  if(view==='dashboard') renderDashboard();
+  if(view==='hunter') renderHunter();
+  if(view==='crm') renderKanban();
+  if(view==='leads'){ populateLeadFilters(); renderLeadsTable(); }
+  if(view==='tasks') renderTasks();
+  if(view==='automations') renderAutomations();
+  if(view==='settings') renderSettings();
+}
+
+/* Cache de estatísticas — invalida quando state.leads / state.tasks mudam */
+let _statsCache = null;
+function invalidateStatsCache(){ _statsCache = null; }
+function getStats(){
+  if(_statsCache) return _statsCache;
+  const L = state.leads, T = state.tasks;
+  const todayIso = new Date().toISOString().slice(0,10);
+  const stageCounts = Object.fromEntries(STAGES.map(s=>[s,0]));
+  const niches = Object.create(null);
+  let hot=0, warm=0, cold=0, wa=0, clients=0, pipeline=0, attack=0;
+  // Único loop O(n) para tudo:
+  for(const l of L){
+    if(l.temp==='Quente') hot++; else if(l.temp==='Morno') warm++; else cold++;
+    if(l.whatsapp) wa++;
+    if(l.stage==='Cliente') clients++;
+    if(l.priorityKey==='atacar_hoje') attack++;
+    pipeline += (l.value||0);
+    if(stageCounts[l.stage]!=null) stageCounts[l.stage]++;
+    if(l.niche) niches[l.niche]=(niches[l.niche]||0)+1;
+  }
+  let tasksToday=0, tasksOpen=0;
+  const leadsWithOpenTask = new Set();
+  for(const t of T){
+    if(!t.done){ tasksOpen++; if(t.due && t.due.slice(0,10)===todayIso) tasksToday++; if(t.leadId) leadsWithOpenTask.add(t.leadId); }
+  }
+  const total = L.length;
+  const conv = total ? Math.round(clients/total*100) : 0;
+  const health = Math.min(100, Math.round(((hot*2 + wa + clients*3) / Math.max(1,total*3)) * 100));
+  const topNiche = Object.entries(niches).sort((a,b)=>b[1]-a[1])[0];
+  _statsCache = { total, hot, warm, cold, wa, clients, pipeline, attack, conv, health, tasksToday, tasksOpen, stageCounts, topNiche, leadsWithOpenTask };
+  return _statsCache;
+}
+
+function renderDashboard(){
+  const s = getStats();
+  const L = state.leads;
+
+  // --- KPIs (8 cards premium) ---
+  const kpis = [
+    ['Total de leads', s.total,             '👥', ''],
+    ['Quentes',        s.hot,               '🔥', 'rose'],
+    ['Pipeline',       brl(s.pipeline),     '💰', 'warm'],
+    ['Conversão',      s.conv+'%',          '📈', 'success'],
+    ['Tarefas hoje',   s.tasksToday,        '📅', 'cool'],
+    ['Com WhatsApp',   s.wa,                '💬', 'success'],
+    ['Clientes',       s.clients,           '⭐', 'warm'],
+    ['Robôs ativos',   state.provider==='multi'?3:1, '🤖', 'cool'],
+  ];
+  document.getElementById('dashStats').innerHTML =
+    kpis.map(([label,value,ico,kind])=>
+      '<div class="card stat '+kind+'" style="position:relative">'+
+        '<div class="stat-label">'+label+'</div>'+
+        '<div class="stat-value">'+value+'</div>'+
+        '<div class="stat-ico">'+ico+'</div>'+
+      '</div>'
+    ).join('');
+
+  // --- Funil colorido (usa .r-1..r-7, .lbl/.val/.funnel-fill — CSS já tem) ---
+  const fnEl = document.getElementById('funnelTotal'); if(fnEl) fnEl.textContent = s.total+' leads';
+  const fmax = Math.max(1, ...Object.values(s.stageCounts));
+  document.getElementById('funnelChart').innerHTML =
+    '<div class="funnel">'+ STAGES.map((st,i)=>{
+      const c = s.stageCounts[st]||0;
+      const pct = (c/fmax*100).toFixed(1);
+      return '<div class="funnel-row r-'+(i+1)+'"><div class="lbl">'+st+'</div><div class="funnel-bar"><div class="funnel-fill" style="width:'+pct+'%"></div></div><div class="val">'+c+'</div></div>';
+    }).join('') +'</div>';
+
+  // --- Top oportunidades (com avatar de iniciais + score em destaque) ---
+  const top = L.slice().sort((a,b)=>b.score-a.score).slice(0,6);
+  const initials = name => name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  document.getElementById('topOps').innerHTML = top.length
+    ? '<div class="op-list">'+ top.map(l=>
+        '<div class="op-item" onclick="openLeadModal('+l.id+')">'+
+          '<div class="op-avatar">'+escapeHtml(initials(l.name))+'</div>'+
+          '<div class="op-info">'+
+            '<div class="op-name">'+escapeHtml(l.name)+'</div>'+
+            '<div class="op-meta">'+escapeHtml(l.niche)+' · '+escapeHtml(l.city)+'/'+escapeHtml(l.uf)+' · '+brl(l.value)+'</div>'+
+          '</div>'+
+          tempBadge(l.temp)+
+          '<div class="op-score">'+l.score+'</div>'+
+        '</div>'
+      ).join('') +'</div>'
+    : emptyHtml('Sem oportunidades');
+
+  // --- Próxima melhor ação ---
+  const next = top.find(l=>l.priorityKey==='atacar_hoje' && !s.leadsWithOpenTask.has(l.id)) || top[0];
+  document.getElementById('nextBestAction').innerHTML = next
+    ? '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px"><div class="op-avatar" style="width:46px;height:46px;font-size:15px">'+escapeHtml(initials(next.name))+'</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px">'+escapeHtml(next.name)+'</div><div style="font-size:12px;color:var(--text-dim);margin-top:2px">'+escapeHtml(next.niche)+' · score '+next.score+' · '+brl(next.value)+'</div></div></div>'+
+      '<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)">💡 <b>Sugestão:</b> '+(next.priorityKey==='atacar_hoje'?'Lead prioritário sem tarefa em aberto. Hora de abordar.':'Lead com maior score da base — abra um diagnóstico hoje.')+'</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="openLeadModal('+next.id+')">Abrir lead</button>'+
+      (next.whatsapp?'<a class="btn btn-sm btn-success" target="_blank" href="https://wa.me/'+next.whatsapp+'?text='+encodeURIComponent(next.outreachMessage||'')+'">💬 WhatsApp</a>':'')+
+      '<button class="btn btn-sm btn-ghost" onclick="quickTaskForLead('+next.id+')">＋ Tarefa</button></div>'
+    : emptyHtml('Cadastre o primeiro lead');
+
+  // --- Saúde Comercial ---
+  document.getElementById('healthBlock').innerHTML =
+    '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px"><div style="font-size:32px;font-weight:900;letter-spacing:-.03em">'+s.health+'%</div><div style="font-size:11px;color:var(--text-mute);text-transform:uppercase;letter-spacing:.05em">organização</div></div>'+
+    '<div class="funnel-bar" style="height:10px"><div class="funnel-fill" style="width:'+s.health+'%;background:var(--grad-brand)"></div></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;font-size:12px">'+
+      '<div style="padding:10px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)"><div style="color:var(--text-mute);font-size:11px">Aguardando ativação</div><div style="font-weight:800;font-size:16px;margin-top:3px">'+(s.total-s.clients-s.hot)+'</div></div>'+
+      '<div style="padding:10px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)"><div style="color:var(--text-mute);font-size:11px">Tarefas em aberto</div><div style="font-weight:800;font-size:16px;margin-top:3px">'+s.tasksOpen+'</div></div>'+
+    '</div>';
+
+  // --- Insights ---
+  document.getElementById('insightsBlock').innerHTML = [
+    insightCard('💡','Nicho dominante', s.topNiche ? s.topNiche[0]+' · '+s.topNiche[1]+' leads' : 'Sem dados ainda', 'cool'),
+    insightCard('⚡','Atacar hoje', s.attack+' leads em prioridade máxima', 'warm'),
+    insightCard('🤖','Modo busca', state.provider==='multi' ? 'Multi-robô: SerpAPI + Serper + Places' : state.provider, 'success'),
+  ].join('');
+}
+function insightCard(ico,title,text,kind){
+  const bg = kind==='warm'?'rgba(245,158,11,.14)':kind==='success'?'rgba(16,185,129,.14)':'rgba(99,102,241,.14)';
+  const color = kind==='warm'?'#FCD34D':kind==='success'?'#6EE7B7':'#A5B4FC';
+  return '<div class="card insight-card">'+
+    '<div class="insight-ico" style="background:'+bg+';color:'+color+'">'+ico+'</div>'+
+    '<div><h4 style="color:'+color+'">'+title+'</h4><p>'+escapeHtml(text)+'</p></div>'+
+  '</div>';
+}
+function emptyHtml(msg,ico){ return '<div class="empty"><div class="em-ico">'+(ico||'∅')+'</div><p>'+msg+'</p></div>'; }
+
+function renderHunter(){
+  const sel = document.getElementById('hNicho');
+  if(sel && sel.options.length<=1){
+    const base = (state.settings.niches||'').split(',').map(x=>x.trim()).filter(Boolean);
+    const extra = ['clínica odontológica','clínica de estética','barbearia','petshop','imobiliária','academia','restaurante delivery','escritório de advocacia'];
+    const all = []; [].concat(base,extra).forEach(n=>{ if(n && !all.includes(n)) all.push(n); });
+    all.forEach(n=>sel.add(new Option(n,n)));
+  }
+  // Re-renderiza os dorks gerados (switchView re-monta o DOM da view).
+  if(state.currentDorks && state.currentDorks.length) renderDorks();
+}
+async function generateDorks(){
+  const n = document.getElementById('hNicho').value;
+  const city = document.getElementById('hCidade').value.trim();
+  const uf = document.getElementById('hEstado').value;
+  if(!n || !city){ toast('warn','Faltam dados','Informe nicho e cidade.'); return; }
+  try{
+    const r = await api('/api/preview','POST',{ city, region: uf, niche: n, searchType: 'completa', maxLeads: 30 });
+    state.currentDorks = r.queries.map(q=>({ q, d:'Dork real gerado pelo backend' }));
+    renderDorks();
+    toast('success','Dorks reais gerados', r.queries.length+' consultas do servidor.');
+  }catch(e){ toast('error','Falha ao gerar dorks', e.message); }
+}
+function renderDorks(){
+  const el = document.getElementById('dorkList');
+  if(!state.currentDorks.length){ el.innerHTML = '<div class="empty"><div class="em-ico">⌖</div><h3>Sem dorks gerados</h3><p>Configure os parâmetros e clique em Gerar Dorks.</p></div>'; return; }
+  el.innerHTML = state.currentDorks.map((d,i)=>'<div class="dork-item"><div style="flex:1;min-width:0"><code>'+escapeHtml(d.q)+'</code><span class="dork-desc">'+escapeHtml(d.d)+'</span></div><div class="dork-actions"><button class="btn-icon" title="Copiar" onclick="copyText('+i+')">📋</button><button class="btn-icon" title="Abrir no Google" onclick="openGoogle('+i+')">🌐</button></div></div>').join('');
+}
+function copyText(i){ navigator.clipboard.writeText(state.currentDorks[i].q); toast('success','Dork copiado'); }
+function openGoogle(i){ window.open('https://www.google.com/search?q='+encodeURIComponent(state.currentDorks[i].q),'_blank'); }
+
+function runProspect(){
+  const n = document.getElementById('hNicho').value;
+  const city = document.getElementById('hCidade').value.trim();
+  const uf = document.getElementById('hEstado').value;
+  const max = +document.getElementById('hMax').value || 12;
+  if(!n || !city){ toast('warn','Faltam dados','Informe nicho e cidade.'); return; }
+  const params = new URLSearchParams({ city, region: uf, niche: n, maxLeads: String(max), searchType: 'completa' });
+  toast('info','Prospecção iniciada','Robôs trabalhando…');
+  const el = document.getElementById('resultsArea');
+  el.innerHTML = '<div class="empty"><div class="em-ico">⏳</div><h3>Buscando leads</h3><p id="progMsg">Iniciando…</p></div>';
+  let found = 0;
+  const es = new EventSource('/api/search/stream?'+params.toString());
+  es.addEventListener('status', ev=>{ try{ document.getElementById('progMsg').textContent = JSON.parse(ev.data).message; }catch{} });
+  es.addEventListener('lead', ev=>{ found++; try{ const x = JSON.parse(ev.data); toast('success','Lead encontrado', (x.data && x.data.companyName)||x.message); }catch{} });
+  es.addEventListener('done', async ev=>{
+    es.close();
+    let stats = {}; try{ stats = JSON.parse(ev.data).data.stats; }catch{}
+    toast('success','Prospecção concluída', found+' encontrados · '+(stats.leads||0)+' novos salvos');
+    await refreshAll();
+    document.getElementById('resultCount').textContent = (stats.leads||0) + ' novos no CRM';
+    el.innerHTML = '<div class="empty"><div class="em-ico">✅</div><h3>Concluído</h3><p>'+(stats.leads||0)+' leads novos salvos no banco. Veja em Leads ou CRM.</p></div>';
+  });
+  es.addEventListener('error', ev=>{ let m='Erro'; try{m=JSON.parse(ev.data).message||m}catch{} es.close(); toast('error','Falha', m); });
+}
+
+function renderKanban(){
+  const k = document.getElementById('kanban');
+  k.innerHTML = STAGES.map(s=>{
+    const ls = state.leads.filter(l=>l.stage===s).sort((a,b)=>b.score-a.score);
+    const tot = ls.reduce((sum,l)=>sum+(l.value||0),0);
+    return ''+
+      '<div class="kcol" data-stage="'+s+'">'+
+        '<div class="kcol-bar"></div>'+
+        '<div class="kcol-head">'+
+          '<div class="kcol-title">'+s+'<span class="pill">'+ls.length+'</span></div>'+
+          '<div style="font-size:11px;color:#FCD34D;font-weight:700">'+brl(tot)+'</div>'+
+        '</div>'+
+        '<div class="kcol-body">'+
+          (ls.map(kanbanCard).join('') ||
+            '<div class="kcol-empty"><div class="em-ico">📋</div><div>Sem oportunidades nesta etapa</div></div>')+
+        '</div>'+
+      '</div>';
+  }).join('');
+  setupDnD();
+}
+function kanbanCard(l){
+  const next = l.nextAction ? '<div class="kcard-next">'+escapeHtml(l.nextAction)+'</div>' : '';
+  return ''+
+    '<div class="kcard" draggable="true" data-id="'+l.id+'" onclick="openLeadModal('+l.id+')">'+
+      '<div class="kcard-top">'+
+        '<div style="min-width:0;flex:1">'+
+          '<div class="kcard-name">'+escapeHtml(l.name)+'</div>'+
+          '<div class="kcard-niche">'+escapeHtml(l.niche)+' • '+escapeHtml(l.city)+'/'+escapeHtml(l.uf)+'</div>'+
+        '</div>'+
+        tempBadge(l.temp)+
+      '</div>'+
+      '<div class="kcard-meta"><span class="badge badge-stage"><span class="dot"></span>Score '+l.score+'</span></div>'+
+      next+
+      '<div class="kcard-value">'+
+        '<span style="color:var(--text-mute)">Valor</span>'+
+        '<span class="v-amount"><span class="currency">R$</span>'+(Number(l.value)||0).toLocaleString('pt-BR')+'</span>'+
+      '</div>'+
+      '<div class="kcard-actions" onclick="event.stopPropagation()">'+
+        '<button class="btn-icon" title="Abrir" onclick="openLeadModal('+l.id+')">👁</button>'+
+        (l.whatsapp ? '<a class="btn-icon" title="WhatsApp" target="_blank" href="https://wa.me/'+escapeHtml(l.whatsapp)+'?text='+encodeURIComponent(l.outreachMessage||'')+'">💬</a>' : '')+
+        (l.site ? '<a class="btn-icon" title="Site" target="_blank" href="'+escapeHtml(l.site)+'">🌐</a>' : '')+
+      '</div>'+
+    '</div>';
+}
+function setupDnD(){
+  let drag = null;
+  // Cards arrastáveis
+  document.querySelectorAll('.kcard').forEach(c=>{
+    c.addEventListener('dragstart', e=>{ drag = +c.dataset.id; c.classList.add('dragging'); e.stopPropagation(); });
+    c.addEventListener('dragend', ()=>c.classList.remove('dragging'));
+  });
+  // Áreas de drop: o BODY da coluna (não a coluna inteira)
+  document.querySelectorAll('.kcol').forEach(col=>{
+    const body = col.querySelector('.kcol-body');
+    if(!body) return;
+    body.addEventListener('dragover', e=>{ e.preventDefault(); body.classList.add('drag-over'); });
+    body.addEventListener('dragleave', ()=>body.classList.remove('drag-over'));
+    body.addEventListener('drop', async e=>{
+      e.preventDefault(); body.classList.remove('drag-over');
+      if(drag==null) return;
+      const stage = col.dataset.stage;
+      const l = state.leads.find(x=>x.id===drag);
+      if(!l || l.stage === stage){ drag = null; return; }
+      l.stage = stage;
+      renderKanban();
+      try{
+        await api('/api/leads/'+drag+'/stage','POST',{ stage, dealValue: l.value, owner: l.responsavel||null });
+        toast('success','Etapa atualizada', stage);
+      }catch(err){ toast('error','Erro ao salvar etapa', err.message); }
+      drag = null;
+    });
+  });
+}
+function tempBadge(t){
+  const c = t==='Quente'?'hot':t==='Morno'?'warm':'cold';
+  return '<span class="badge badge-'+c+'"><span class="dot"></span>'+t+'</span>';
+}
+
+function populateLeadFilters(){
+  const niches = []; state.leads.forEach(l=>{ if(l.niche && !niches.includes(l.niche)) niches.push(l.niche); });
+  const cidades = []; state.leads.forEach(l=>{ if(l.city && !cidades.includes(l.city)) cidades.push(l.city); });
+  niches.sort(); cidades.sort();
+  const nSel = document.getElementById('fNicho');
+  const cSel = document.getElementById('fCidade');
+  if(nSel) nSel.innerHTML = '<option value="">Todos os nichos</option>' + niches.map(n=>'<option>'+escapeHtml(n)+'</option>').join('');
+  if(cSel) cSel.innerHTML = '<option value="">Todas cidades</option>' + cidades.map(c=>'<option>'+escapeHtml(c)+'</option>').join('');
+}
+function renderLeadsTable(){
+  const q = (document.getElementById('fSearch')&&document.getElementById('fSearch').value||'').toLowerCase();
+  const fn = document.getElementById('fNicho')&&document.getElementById('fNicho').value || '';
+  const fc = document.getElementById('fCidade')&&document.getElementById('fCidade').value || '';
+  const ft = document.getElementById('fTemp')&&document.getElementById('fTemp').value || '';
+  const fs = document.getElementById('fStage')&&document.getElementById('fStage').value || '';
+  const sort = document.getElementById('fSort')&&document.getElementById('fSort').value || 'score';
+  let rows = state.leads.filter(l=>{
+    const hay = (l.name+' '+l.city+' '+l.niche+' '+l.site+' '+l.phone+' '+l.whatsapp).toLowerCase();
+    return (!q||hay.includes(q)) && (!fn||l.niche===fn) && (!fc||l.city===fc) && (!ft||l.temp===ft) && (!fs||l.stage===fs);
+  });
+  if(sort==='value') rows.sort((a,b)=>b.value-a.value);
+  else if(sort==='last') rows.sort((a,b)=> (new Date(b.lastContact||0)) - (new Date(a.lastContact||0)));
+  else rows.sort((a,b)=>b.score-a.score);
+  const tbody = document.getElementById('leadsBody');
+  document.getElementById('leadsEmpty').style.display = rows.length?'none':'block';
+  tbody.innerHTML = rows.map(l=>'<tr onclick="openLeadModal('+l.id+')"><td><div style="font-weight:700">'+escapeHtml(l.name)+'</div><div style="font-size:11px;color:var(--text-mute)">'+escapeHtml(l.niche)+' • '+escapeHtml(l.city)+'/'+escapeHtml(l.uf)+'</div></td><td><div class="cell-contacts">'+(l.whatsapp?'<a target="_blank" onclick="event.stopPropagation()" href="https://wa.me/'+escapeHtml(l.whatsapp)+'">💬 '+escapeHtml(l.whatsapp)+'</a>':'')+(l.email?'<div>✉ '+escapeHtml(l.email)+'</div>':'')+(l.site?'<a target="_blank" onclick="event.stopPropagation()" href="'+escapeHtml(l.site)+'">🌐 site</a>':'')+'</div></td><td>'+stageBadge(l.stage)+'</td><td><div style="font-weight:700">'+l.score+'</div><div style="margin-top:3px">'+tempBadge(l.temp)+'</div></td><td style="color:#FCD34D;font-weight:700">'+brl(l.value)+'</td><td>'+(l.lastContact ? new Date(l.lastContact).toLocaleDateString('pt-BR') : '<span style="color:var(--text-mute)">—</span>')+'</td><td onclick="event.stopPropagation()"><button class="btn btn-sm btn-primary" onclick="openLeadModal('+l.id+')">Abrir</button>'+(l.whatsapp?' <a class="btn btn-sm btn-success" target="_blank" href="https://wa.me/'+escapeHtml(l.whatsapp)+'?text='+encodeURIComponent(l.outreachMessage||'')+'">💬</a>':'')+'</td></tr>').join('');
+}
+function stageBadge(s){ return '<span class="badge badge-stage"><span class="dot"></span>'+escapeHtml(s)+'</span>'; }
+
+async function deleteLead(id){
+  if(!confirm('Excluir este lead? Esta ação NÃO pode ser desfeita.')) return;
+  try{ await api('/api/leads/'+id,'DELETE'); toast('success','Lead excluído'); closeModal(); refreshAll(); }
+  catch(e){ toast('error','Falha ao excluir', e.message); }
+}
+
+function buildWhatsappMsg(l){
+  const tpl = state.settings.message || '';
+  return tpl.replace(/{agencia}/g, state.settings.agencyName||'Gravity').replace(/{empresa}/g, l.name).replace(/{cidade}/g, l.city).replace(/{nicho}/g, l.niche).replace(/{dor}/g, l.pain||'').replace(/{oferta}/g, l.offer||'');
+}
+async function openLeadModal(id){
+  const l = state.leads.find(x=>x.id===id); if(!l) return;
+  state.currentLeadId = id;
+  try{ const d = await api('/api/leads/'+id); if(d.lead) Object.assign(l, mapLead(d.lead)); }catch{}
+  const baseMsg = l.outreachMessage || buildWhatsappMsg(l);
+  openModal({
+    title: l.name,
+    sub: l.niche+' • '+l.city+'/'+l.uf+' • Etapa: '+l.stage,
+    body: '<div class="lead-grid"><div><div class="lead-section"><h4>Informações</h4><div class="field-row"><div class="field"><label>Telefone</label><input id="leTel" value="'+escapeHtml(l.phone)+'"/></div><div class="field"><label>WhatsApp</label><input id="leWa" value="'+escapeHtml(l.whatsapp)+'"/></div></div><div class="field-row"><div class="field"><label>Instagram</label><input id="leIg" value="'+escapeHtml(l.instagram)+'"/></div><div class="field"><label>Email</label><input id="leMail" value="'+escapeHtml(l.email)+'"/></div></div><div class="field"><label>Site</label><input id="leSite" value="'+escapeHtml(l.site)+'"/></div><div class="field-row"><div class="field"><label>Valor estimado (R$)</label><input id="leVal" type="number" value="'+l.value+'"/></div><div class="field"><label>Próxima ação</label><input id="leNext" value="'+escapeHtml(l.nextAction)+'"/></div></div><div class="field"><label>Observações</label><textarea id="leNote" rows="3">'+escapeHtml(l.note)+'</textarea></div><div class="field"><label>Etapa</label><select id="leStage">'+STAGES.map(s=>'<option '+(s===l.stage?'selected':'')+'>'+s+'</option>').join('')+'</select></div></div><div class="lead-section" style="margin-top:14px"><h4>Mensagem pronta WhatsApp</h4><textarea id="leMsg" rows="8">'+escapeHtml(baseMsg)+'</textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn btn-sm btn-ghost" onclick="copyMsg()">📋 Copiar</button><button class="btn btn-sm btn-success" onclick="openWa('+l.id+')">💬 WhatsApp</button><button class="btn btn-sm btn-warm" onclick="markLastContact('+l.id+')">⏱ Marcar contato</button><button class="btn btn-sm btn-outline" onclick="quickTaskForLead('+l.id+')">＋ Tarefa</button></div></div></div><div><div class="lead-section" style="display:flex;gap:14px;align-items:center"><div class="lead-score-circle" style="--p:'+l.score+'"><span>'+l.score+'</span></div><div style="flex:1"><div style="font-weight:700;margin-bottom:4px">'+tempBadge(l.temp)+'</div><div style="font-size:11px;color:var(--text-mute);line-height:1.5">'+(l.reasons||[]).slice(0,4).map(escapeHtml).join(' • ')+'</div><div style="font-size:13px;font-weight:800;color:#FCD34D;margin-top:8px">'+brl(l.value)+'</div></div></div><div class="lead-section" style="margin-top:14px"><h4>Inteligência comercial</h4><div style="font-size:12px;line-height:1.6"><b>Dor digital:</b> '+escapeHtml(l.pain||'—')+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Oferta sugerida:</b> '+escapeHtml(l.offer||'—')+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Último contato:</b> '+(l.lastContact?new Date(l.lastContact).toLocaleDateString('pt-BR'):'—')+'</div>'+(l.priorityKey?'<div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Prioridade:</b> '+escapeHtml(PRIO_LBL[l.priorityKey]||l.priorityKey)+'</div>':'')+'</div><div class="lead-section" style="margin-top:14px"><h4>Histórico de interações</h4><div class="history">'+(l.history && l.history.length ? l.history.map(h=>'<div class="history-item"><time>'+new Date(h.at).toLocaleString('pt-BR')+'</time>'+escapeHtml(h.text)+'</div>').join('') : '<div style="color:var(--text-mute);font-size:12px">Sem interações registradas</div>')+'</div></div><div class="lead-section" style="margin-top:14px"><h4>Tarefas vinculadas</h4><div id="leadTasks">'+renderLeadTasks(l.id)+'</div></div></div></div>',
+    footer: '<button class="btn btn-ghost" onclick="closeModal()">Fechar</button><button class="btn btn-danger" onclick="deleteLead('+l.id+')">🗑 Excluir</button><button class="btn btn-primary" onclick="saveLeadChanges('+l.id+')">💾 Salvar</button>'
+  });
+}
+function renderLeadTasks(id){
+  const ts = state.tasks.filter(t=>t.leadId===id);
+  if(!ts.length) return '<div style="color:var(--text-mute);font-size:12px">Nenhuma tarefa vinculada</div>';
+  return ts.map(t=>'<div class="task '+(t.done?'done':'')+'" style="margin-bottom:6px"><div class="task-title">'+escapeHtml(t.title)+'</div><div class="task-meta">'+(t.due?new Date(t.due).toLocaleDateString('pt-BR'):'—')+' • '+escapeHtml(t.priority)+'</div></div>').join('');
+}
+async function saveLeadChanges(id){
+  const stage = document.getElementById('leStage').value;
+  const value = +document.getElementById('leVal').value || 0;
+  const next = document.getElementById('leNext').value;
+  try{ await api('/api/leads/'+id+'/stage','POST',{ stage, dealValue: value, nextAction: next }); toast('success','Lead salvo'); closeModal(); refreshAll(); }
+  catch(e){ toast('error','Erro ao salvar', e.message); }
+}
+function copyMsg(){ const t = document.getElementById('leMsg').value; navigator.clipboard.writeText(t); toast('success','Mensagem copiada'); }
+async function openWa(id){
+  const l = state.leads.find(x=>x.id===id); if(!l) return;
+  const msg = document.getElementById('leMsg').value;
+  window.open('https://wa.me/'+l.whatsapp+'?text='+encodeURIComponent(msg),'_blank');
+  try{ await api('/api/leads/'+id+'/contact','POST'); refreshAll(); }catch{}
+}
+async function markLastContact(id){
+  try{ await api('/api/leads/'+id+'/contact','POST'); toast('success','Contato registrado'); refreshAll(); }
+  catch(e){ toast('error','Erro', e.message); }
+}
+function quickTaskForLead(id){
+  openModal({
+    title:'Nova tarefa', sub:'Vinculada a este lead',
+    body:'<div class="field"><label>Descrição</label><input id="qtTxt" placeholder="Ex.: Ligar para apresentar proposta" autofocus></div><div class="field-row" style="margin-top:10px"><div class="field"><label>Prazo</label><input id="qtDue" type="date" value="'+daysAhead(2)+'"></div><div class="field"><label>Prioridade</label><select id="qtPrio"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div></div>',
+    footer:'<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="createQuickTask('+id+')">Criar tarefa</button>'
+  });
+}
+async function createQuickTask(id){
+  const text = document.getElementById('qtTxt').value.trim();
+  const due = document.getElementById('qtDue').value;
+  const priority = document.getElementById('qtPrio').value;
+  if(!text){ toast('warn','Descrição vazia'); return; }
+  try{ await api('/api/leads/'+id+'/tasks','POST',{ text, due, priority }); toast('success','Tarefa criada'); closeModal(); refreshAll(); }
+  catch(e){ toast('error','Erro', e.message); }
+}
+
+function renderTasks(){
+  const today = new Date().toISOString().slice(0,10);
+  const tToday = state.tasks.filter(t=>!t.done && t.due && t.due.slice(0,10)===today);
+  const tLate = state.tasks.filter(t=>!t.done && t.due && t.due.slice(0,10)<today);
+  const tNext = state.tasks.filter(t=>!t.done && t.due && t.due.slice(0,10)>today);
+  const tDone = state.tasks.filter(t=>t.done);
+  document.getElementById('cToday').textContent = tToday.length;
+  document.getElementById('cLate').textContent = tLate.length;
+  document.getElementById('cNext').textContent = tNext.length;
+  document.getElementById('cDone').textContent = tDone.length;
+  document.getElementById('tToday').innerHTML = tToday.map(taskCard).join('') || '<div style="color:var(--text-mute);font-size:12px;padding:8px">vazio</div>';
+  document.getElementById('tLate').innerHTML = tLate.map(taskCard).join('') || '<div style="color:var(--text-mute);font-size:12px;padding:8px">vazio</div>';
+  document.getElementById('tNext').innerHTML = tNext.map(taskCard).join('') || '<div style="color:var(--text-mute);font-size:12px;padding:8px">vazio</div>';
+  document.getElementById('tDone').innerHTML = tDone.map(taskCard).join('') || '<div style="color:var(--text-mute);font-size:12px;padding:8px">vazio</div>';
+}
+function taskCard(t){
+  const pCol = t.priority==='Alta'?'#F87171':t.priority==='Baixa'?'#67E8F9':'#FCD34D';
+  return '<div class="task '+(t.done?'done':'')+'"><div class="task-title">'+escapeHtml(t.title)+'</div><div class="task-meta">'+escapeHtml(t.company||'')+' • '+(t.due?new Date(t.due).toLocaleDateString('pt-BR'):'—')+' • <span style="color:'+pCol+'">'+escapeHtml(t.priority)+'</span></div><div style="display:flex;gap:6px;margin-top:8px">'+(!t.done?'<button class="btn btn-sm btn-success" onclick="completeTask('+t.id+')">✓ Concluir</button>':'<button class="btn btn-sm btn-ghost" onclick="completeTask('+t.id+')">↺ Reabrir</button>')+'<button class="btn btn-sm btn-ghost" onclick="openLeadModal('+t.leadId+')">Ver lead</button><button class="btn btn-sm btn-danger" onclick="deleteTask('+t.id+')">🗑</button></div></div>';
+}
+async function completeTask(id){
+  const t = state.tasks.find(x=>x.id===id); if(!t) return;
+  try{ await api('/api/tasks/'+id+'/toggle','POST',{ done: !t.done }); refreshAll(); }
+  catch(e){ toast('error','Erro', e.message); }
+}
+async function deleteTask(id){
+  if(!confirm('Excluir esta tarefa?')) return;
+  try{ await api('/api/tasks/'+id,'DELETE'); toast('success','Tarefa excluída'); refreshAll(); }
+  catch(e){ toast('error','Erro', e.message); }
+}
+function openNewTask(){
+  if(!state.leads.length){ toast('warn','Sem leads','Crie um lead primeiro.'); return; }
+  openModal({
+    title:'Nova tarefa', sub:'',
+    body:'<div class="field"><label>Lead</label><select id="ntLead">'+state.leads.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(l=>'<option value="'+l.id+'">'+escapeHtml(l.name)+'</option>').join('')+'</select></div><div class="field" style="margin-top:10px"><label>Descrição</label><input id="ntTxt" placeholder="Ex.: Enviar proposta" autofocus></div><div class="field-row" style="margin-top:10px"><div class="field"><label>Prazo</label><input id="ntDue" type="date" value="'+daysAhead(1)+'"></div><div class="field"><label>Prioridade</label><select id="ntPrio"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div></div>',
+    footer:'<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="submitNewTask()">Criar</button>'
+  });
+}
+async function submitNewTask(){
+  const leadId = +document.getElementById('ntLead').value;
+  const text = document.getElementById('ntTxt').value.trim();
+  const due = document.getElementById('ntDue').value;
+  const priority = document.getElementById('ntPrio').value;
+  if(!leadId||!text){ toast('warn','Preencha lead e descrição'); return; }
+  try{ await api('/api/leads/'+leadId+'/tasks','POST',{ text, due, priority }); toast('success','Tarefa criada'); closeModal(); refreshAll(); }
+  catch(e){ toast('error','Erro', e.message); }
+}
+
+const AUTOMATIONS = [
+  { ico:'⚡', titulo:'Speed-to-Lead', desc:'Mensagem automática enviada em até 5 minutos após captura.' },
+  { ico:'🔁', titulo:'Follow-up Inteligente', desc:'Sequência de 3 toques em 7 dias para leads sem resposta.' },
+  { ico:'⭐', titulo:'Nurturing Mensal', desc:'Conteúdo educativo programado para leads "Nutrir".' },
+  { ico:'🎯', titulo:'Qualificação SDR', desc:'Roteiro automático para qualificar interessados.' },
+  { ico:'📊', titulo:'Score Dinâmico', desc:'Recalcula o score a cada interação do lead.' },
+  { ico:'🔔', titulo:'Alerta Quente', desc:'Notifica quando um lead vira "Quente".' },
+];
+function renderAutomations(){
+  document.getElementById('autoGrid').innerHTML = AUTOMATIONS.map(a=>'<div class="card auto-card"><div class="auto-ico">'+a.ico+'</div><h3>'+a.titulo+'</h3><p>'+a.desc+'</p><div style="margin-top:auto;display:flex;gap:8px"><button class="btn btn-sm btn-ghost">Em breve</button></div></div>').join('');
+}
+
+function renderSettings(){
+  const s = state.settings;
+  if(document.getElementById('setName')) document.getElementById('setName').value = s.agencyName || '';
+  if(document.getElementById('setNiches')) document.getElementById('setNiches').value = s.niches || '';
+  if(document.getElementById('setMsg')) document.getElementById('setMsg').value = s.message || '';
+}
+async function saveSettings(){
+  const patch = {
+    agencyName: document.getElementById('setName').value.trim(),
+    niches: document.getElementById('setNiches').value.trim(),
+    message: document.getElementById('setMsg').value,
+  };
+  try{ const r = await api('/api/settings','PUT', patch); state.settings = { ...state.settings, ...r.settings }; document.getElementById('brandName') && (document.getElementById('brandName').textContent = state.settings.agencyName||'Gravity'); toast('success','Configurações salvas'); }
+  catch(e){ toast('error','Erro', e.message); }
+}
+
+function openQuickAdd(){
+  openModal({
+    title:'Novo lead', sub:'Cadastro manual',
+    body:'<div class="field"><label>Empresa</label><input id="nlName" autofocus></div><div class="field-row" style="margin-top:10px"><div class="field"><label>Nicho</label><input id="nlNiche"></div><div class="field"><label>Cidade</label><input id="nlCity"></div></div><div class="field-row" style="margin-top:10px"><div class="field"><label>UF</label><input id="nlUf" maxlength="2"></div><div class="field"><label>Valor R$</label><input id="nlVal" type="number" value="3000"></div></div><div class="field-row" style="margin-top:10px"><div class="field"><label>WhatsApp</label><input id="nlWa"></div><div class="field"><label>Site</label><input id="nlSite"></div></div><div class="field" style="margin-top:10px"><label>Email</label><input id="nlMail"></div>',
+    footer:'<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="submitNewLead()">Criar lead</button>'
+  });
+}
+async function submitNewLead(){
+  const name = document.getElementById('nlName').value.trim();
+  if(!name){ toast('warn','Nome obrigatório'); return; }
+  try{
+    await api('/api/leads','POST',{
+      companyName: name,
+      niche: document.getElementById('nlNiche').value.trim(),
+      city: document.getElementById('nlCity').value.trim(),
+      region: document.getElementById('nlUf').value.trim().toUpperCase(),
+      whatsapp: document.getElementById('nlWa').value.trim(),
+      site: document.getElementById('nlSite').value.trim(),
+      email: document.getElementById('nlMail').value.trim(),
+      dealValue: +document.getElementById('nlVal').value || 0,
+    });
+    toast('success','Lead criado'); closeModal(); refreshAll();
+  }catch(e){ toast('error','Erro', e.message); }
+}
+
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  state.settings.theme = document.body.classList.contains('light') ? 'light' : 'dark';
+  api('/api/settings','PUT',{ theme: state.settings.theme }).catch(()=>{});
+}
+function applyTheme(){ if(state.settings.theme==='light') document.body.classList.add('light'); }
+
+function bindEvents(){
+  document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click', ()=>switchView(n.dataset.view)));
+  document.getElementById('themeToggle')&&document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+  document.getElementById('quickAddLead')&&document.getElementById('quickAddLead').addEventListener('click', openQuickAdd);
+  document.getElementById('btnGenDorks')&&document.getElementById('btnGenDorks').addEventListener('click', generateDorks);
+  document.getElementById('btnRunBrowser')&&document.getElementById('btnRunBrowser').addEventListener('click', runProspect);
+  document.getElementById('btnSaveAll')&&document.getElementById('btnSaveAll').addEventListener('click', runProspect);
+  document.getElementById('btnSaveSettings')&&document.getElementById('btnSaveSettings').addEventListener('click', saveSettings);
+  document.getElementById('btnCreateTask')&&document.getElementById('btnCreateTask').addEventListener('click', openNewTask);
+  document.getElementById('btnExportJson')&&document.getElementById('btnExportJson').addEventListener('click', ()=>{ location.href='/api/export/json'; });
+  document.getElementById('btnResetData')&&document.getElementById('btnResetData').addEventListener('click', ()=>{ toast('info','Use o backend','Apague data/lead-hunter.db e refaça a migração para zerar.'); });
+  document.getElementById('btnCopyAll')&&document.getElementById('btnCopyAll').addEventListener('click', ()=>{
+    const txt = state.currentDorks.map(d=>d.q).join('\n'); navigator.clipboard.writeText(txt); toast('success','Todos dorks copiados');
+  });
+  document.getElementById('btnExportDorks')&&document.getElementById('btnExportDorks').addEventListener('click', ()=>{
+    const txt = state.currentDorks.map(d=>d.q).join('\n');
+    const blob = new Blob([txt],{type:'text/plain'}); const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'dorks.txt'; a.click();
+  });
+  ['fSearch','fNicho','fCidade','fTemp','fStage','fSort'].forEach(id=>{
+    const el = document.getElementById(id); if(el){ el.addEventListener('input',renderLeadsTable); el.addEventListener('change',renderLeadsTable); }
+  });
+  document.getElementById('globalSearch')&&document.getElementById('globalSearch').addEventListener('input', (e)=>{
+    if(state.activeView!=='leads') switchView('leads');
+    const fs = document.getElementById('fSearch'); if(fs){ fs.value = e.target.value; renderLeadsTable(); }
+  });
+  document.getElementById('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape') closeModal();
+    if(e.ctrlKey && e.key.toLowerCase()==='k'){ e.preventDefault(); document.getElementById('globalSearch')&&document.getElementById('globalSearch').focus(); }
+  });
+}
+
+async function initApp(){
+  // Boot rápido: 4 requests em paralelo + leads/tasks no mesmo lote.
+  const [cR, sR, lR, tR] = await Promise.allSettled([
+    fetch('/api/config').then(r=>r.json()),
+    fetch('/api/settings').then(r=>r.json()),
+    fetch('/api/leads').then(r=>r.json()),
+    fetch('/api/tasks').then(r=>r.json()),
+  ]);
+  if(cR.status==='fulfilled') state.provider = cR.value.provider;
+  if(sR.status==='fulfilled') state.settings = {...state.settings, ...sR.value.settings};
+  if(lR.status==='fulfilled') state.leads = (lR.value.leads||[]).map(mapLead);
+  const idx = new Map(state.leads.map(l=>[l.id,l]));
+  if(tR.status==='fulfilled') state.tasks = (tR.value.tasks||[]).map(t=>mapTask(t,idx));
+  invalidateStatsCache();
+  applyTheme();
+  bindEvents();
+  installPremiumFx();
+  switchView('dashboard');
+  if(document.getElementById('brandName')) document.getElementById('brandName').textContent = state.settings.agencyName || 'Gravity';
+}
+
+/* Microinterações: mouse glow nos botões primários (efeito "spotlight") */
+function installPremiumFx(){
+  document.addEventListener('mousemove', e=>{
+    const btn = e.target.closest && e.target.closest('.btn-primary');
+    if(!btn) return;
+    const r = btn.getBoundingClientRect();
+    btn.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100)+'%');
+    btn.style.setProperty('--my', ((e.clientY-r.top)/r.height*100)+'%');
+  }, { passive:true });
+}
+
+initApp();
+
+</script>
+</body>
+</html>
