@@ -6,6 +6,7 @@ import { config } from "../config/index.js";
 import { logger } from "../utils/logger.js";
 import { runPipeline } from "../pipeline.js";
 import { buildDorks } from "../search/dorks.js";
+import { listActiveProviders } from "../search/index.js";
 import {
   addLeadNote,
   addLeadTask,
@@ -70,13 +71,20 @@ const searchSchema = z.object({
 /** Configuração atual (provedor + se está pronto para coleta automática). */
 app.get("/api/config", (_req, res) => {
   const provider = config.SEARCH_PROVIDER;
+  const activeProviders = listActiveProviders();
   const ready =
-    provider === "serpapi"
-      ? Boolean(config.SERPAPI_KEY)
-      : provider === "google_cse"
-        ? Boolean(config.GOOGLE_CSE_KEY && config.GOOGLE_CSE_CX)
-        : false;
-  res.json({ provider, ready, defaultCountry: config.DEFAULT_COUNTRY, ai: aiEnabled() });
+    provider === "multi"
+      ? activeProviders.length > 0
+      : provider === "serpapi"
+        ? Boolean(config.SERPAPI_KEY)
+        : provider === "serper" || provider === "serper_places"
+          ? Boolean(config.SERPER_API_KEY)
+          : provider === "exa"
+            ? Boolean(config.EXA_API_KEY)
+            : provider === "google_cse"
+              ? Boolean(config.GOOGLE_CSE_KEY && config.GOOGLE_CSE_CX)
+              : false;
+  res.json({ provider, ready, activeProviders, defaultCountry: config.DEFAULT_COUNTRY, ai: aiEnabled() });
 });
 
 /** Pré-visualização das consultas (dorks) sem gastar API. */

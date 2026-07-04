@@ -20,10 +20,12 @@ const intFromEnv = (def: number) =>
 const envSchema = z.object({
   DATABASE_PATH: z.string().default("./data/lead-hunter.db"),
   SEARCH_PROVIDER: z
-    .enum(["serpapi", "google_cse", "manual", "serper", "serper_places", "multi"])
+    .enum(["serpapi", "google_cse", "manual", "serper", "serper_places", "exa", "multi"])
     .default("manual"),
   SERPAPI_KEY: z.string().optional(),
   SERPER_API_KEY: z.string().optional(),
+  // Exa (https://exa.ai) — motor de busca neural, robô adicional do modo multi.
+  EXA_API_KEY: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
   GOOGLE_CSE_KEY: z.string().optional(),
   GOOGLE_CSE_CX: z.string().optional(),
   USER_AGENT: z

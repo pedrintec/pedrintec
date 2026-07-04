@@ -6,6 +6,7 @@ export type SearchProviderName =
   | "manual"
   | "serper"
   | "serper_places"
+  | "exa"
   | "multi";
 
 export type LeadTemperature = "Quente" | "Morno" | "Frio";

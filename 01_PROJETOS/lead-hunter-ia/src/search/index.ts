@@ -6,6 +6,7 @@ import { SerpApiProvider } from "./providers/serpapi.js";
 import { GoogleCustomSearchProvider } from "./providers/googleCustomSearch.js";
 import { ManualProvider } from "./providers/manual.js";
 import { SerperProvider, SerperPlacesProvider, MultiSearchProvider } from "./providers/serper.js";
+import { ExaProvider } from "./providers/exa.js";
 
 // Fábrica de provedor + orquestração das buscas (gera dorks, consulta, agrega).
 
@@ -19,12 +20,24 @@ export function getProvider(): SearchProvider {
       return new SerperProvider();
     case "serper_places":
       return new SerperPlacesProvider();
+    case "exa":
+      return new ExaProvider();
     case "multi":
       return buildMultiProvider();
     case "manual":
     default:
       return new ManualProvider();
   }
+}
+
+/** Nomes dos robôs que entrariam em ação no modo multi, dado o .env atual (sem instanciar nada). */
+export function listActiveProviders(): string[] {
+  const names: string[] = [];
+  if (config.SERPAPI_KEY) names.push("serpapi");
+  if (config.SERPER_API_KEY) names.push("serper", "serper_places");
+  if (config.EXA_API_KEY) names.push("exa");
+  if (config.GOOGLE_CSE_KEY && config.GOOGLE_CSE_CX) names.push("google_cse");
+  return names;
 }
 
 /** Modo multi-robô: usa todos os provedores com chave configurada, em paralelo. */
@@ -35,6 +48,7 @@ function buildMultiProvider(): SearchProvider {
     providers.push(new SerperProvider());
     providers.push(new SerperPlacesProvider()); // empresas locais (telefone/endereço)
   }
+  if (config.EXA_API_KEY) providers.push(new ExaProvider());
   if (config.GOOGLE_CSE_KEY && config.GOOGLE_CSE_CX) providers.push(new GoogleCustomSearchProvider());
 
   if (providers.length === 0) {

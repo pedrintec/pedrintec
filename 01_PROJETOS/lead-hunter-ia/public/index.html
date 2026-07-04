@@ -1229,7 +1229,12 @@ function openModal(o){
 }
 function closeModal(){ document.getElementById('modal').classList.remove('active'); }
 
-async function loadConfig(){ try{ const c=await api('/api/config'); state.provider=c.provider; state.ai=!!c.ai; }catch{} }
+const PROVIDER_LABELS = { serpapi:'SerpAPI', serper:'Serper', serper_places:'Places', exa:'Exa', google_cse:'Google CSE', manual:'Manual' };
+function activeProvidersLabel(){
+  const list = (state.activeProviders||[]).map(function(p){ return PROVIDER_LABELS[p]||p; });
+  return list.length ? list.join(' + ') : 'Nenhum robô configurado';
+}
+async function loadConfig(){ try{ const c=await api('/api/config'); state.provider=c.provider; state.ai=!!c.ai; state.activeProviders=c.activeProviders||[]; }catch{} }
 async function loadSettings(){ try{ const r=await api('/api/settings'); state.settings={...state.settings,...r.settings}; }catch{} }
 async function loadLeads(){ try{ const r=await api('/api/leads'); state.leads=(r.leads||[]).map(mapLead); }catch(e){ toast('error','Erro ao carregar leads',e.message); } }
 async function loadTasks(){ try{ const r=await api('/api/tasks'); const idx=new Map(state.leads.map(l=>[l.id,l])); state.tasks=(r.tasks||[]).map(t=>mapTask(t,idx)); }catch{ state.tasks=[]; } }
@@ -1333,7 +1338,7 @@ function renderDashboard(){
     ['Tarefas hoje',   s.tasksToday,        '📅', 'cool'],
     ['Com WhatsApp',   s.wa,                '💬', 'success'],
     ['Clientes',       s.clients,           '⭐', 'warm'],
-    ['Robôs ativos',   state.provider==='multi'?3:1, '🤖', 'cool'],
+    ['Robôs ativos',   state.provider==='multi'?((state.activeProviders||[]).length||1):1, '🤖', 'cool'],
   ];
   document.getElementById('dashStats').innerHTML =
     kpis.map(([label,value,ico,kind])=>
@@ -1394,7 +1399,7 @@ function renderDashboard(){
   document.getElementById('insightsBlock').innerHTML = [
     insightCard('💡','Nicho dominante', s.topNiche ? s.topNiche[0]+' · '+s.topNiche[1]+' leads' : 'Sem dados ainda', 'cool'),
     insightCard('⚡','Atacar hoje', s.attack+' leads em prioridade máxima', 'warm'),
-    insightCard('🤖','Modo busca', state.provider==='multi' ? 'Multi-robô: SerpAPI + Serper + Places' : state.provider, 'success'),
+    insightCard('🤖','Modo busca', state.provider==='multi' ? ('Multi-robô: '+activeProvidersLabel()) : state.provider, 'success'),
   ].join('');
 }
 /** Card de KPI (usado pelas páginas Lançamentos e afins). */
@@ -2506,7 +2511,7 @@ async function initApp(){
     fetch('/api/leads').then(r=>r.json()),
     fetch('/api/tasks').then(r=>r.json()),
   ]);
-  if(cR.status==='fulfilled') state.provider = cR.value.provider;
+  if(cR.status==='fulfilled'){ state.provider = cR.value.provider; state.ai = !!cR.value.ai; state.activeProviders = cR.value.activeProviders||[]; }
   if(sR.status==='fulfilled') state.settings = {...state.settings, ...sR.value.settings};
   if(lR.status==='fulfilled') state.leads = (lR.value.leads||[]).map(mapLead);
   const idx = new Map(state.leads.map(l=>[l.id,l]));
