@@ -9,40 +9,52 @@
    GRAVITY LEAD HUNTER — Design System
    ============================================================ */
 :root{
-  /* Brand palette — refinado: índigo profundo + esmeralda + âmbar */
-  --bg-0:#070A18;
-  --bg-1:#0B1024;
-  --bg-2:#111733;
-  --surface:rgba(20,26,55,.72);
-  --surface-2:rgba(255,255,255,.04);
-  --surface-3:rgba(255,255,255,.08);
-  --line:rgba(255,255,255,.08);
-  --line-2:rgba(255,255,255,.14);
-  --text:#EAF0FF;
-  --text-dim:#A6B0CF;
-  --text-mute:#6E7A9E;
+  /* ============================================================
+     GRAVITY — identidade premium: AZUL SAFIRA + DOURADO + BRANCO
+     Paleta enxuta (menos poluição): azul = ação, dourado = prestígio,
+     verde/vermelho reservados só para semântica (ganho/perda).
+     Nomes de variáveis mantidos p/ compatibilidade com o CSS existente.
+     ============================================================ */
+  --bg-0:#050A18;
+  --bg-1:#081026;
+  --bg-2:#0E1A38;
+  --surface:rgba(16,26,56,.72);
+  --surface-2:rgba(255,255,255,.035);
+  --surface-3:rgba(255,255,255,.07);
+  --line:rgba(148,178,255,.10);
+  --line-2:rgba(148,178,255,.20);
+  --text:#EDF2FF;
+  --text-dim:#A8B4D6;
+  --text-mute:#6A78A0;
 
-  --indigo:#6366F1;
-  --indigo-2:#8B5CF6;
-  --cyan:#22D3EE;
+  /* Azul safira (primário) — "--indigo" mantido como alias do azul */
+  --blue:#2E6BFF;
+  --blue-2:#5B8DEF;
+  --blue-deep:#1E4FD6;
+  --indigo:#2E6BFF;
+  --indigo-2:#1E4FD6;
+  --cyan:#7FA9FF;      /* repontado p/ azul-claro (mantém a família) */
+  --sky:#5B8DEF;
   --teal:#14B8A6;
   --emerald:#10B981;
-  --amber:#F59E0B;
-  --gold:#FBBF24;
+  --amber:#E0A93B;
+  /* Dourado (prestígio) */
+  --gold:#F2C14E;
+  --gold-2:#D9A93C;
   --rose:#F43F5E;
-  --orange:#FB923C;
-  --sky:#38BDF8;
+  --orange:#F0A742;
 
-  --grad-brand:linear-gradient(135deg,#6366F1 0%,#22D3EE 100%);
-  --grad-warm:linear-gradient(135deg,#F59E0B 0%,#F43F5E 100%);
-  --grad-cool:linear-gradient(135deg,#0EA5E9 0%,#6366F1 100%);
-  --grad-success:linear-gradient(135deg,#10B981 0%,#22D3EE 100%);
-  --grad-surface:linear-gradient(160deg,rgba(99,102,241,.10),rgba(34,211,238,.06) 60%,rgba(255,255,255,0));
+  --grad-brand:linear-gradient(135deg,#1E4FD6 0%,#2E6BFF 55%,#5B8DEF 100%);
+  --grad-gold:linear-gradient(135deg,#D9A93C 0%,#F2C14E 100%);
+  --grad-warm:linear-gradient(135deg,#E0A93B 0%,#F2C14E 100%);
+  --grad-cool:linear-gradient(135deg,#1E4FD6 0%,#5B8DEF 100%);
+  --grad-success:linear-gradient(135deg,#10B981 0%,#34D399 100%);
+  --grad-surface:linear-gradient(160deg,rgba(46,107,255,.10),rgba(242,193,78,.05) 65%,rgba(255,255,255,0));
 
-  --shadow-sm:0 4px 12px rgba(0,0,0,.25);
-  --shadow-md:0 12px 32px rgba(0,0,0,.35);
-  --shadow-lg:0 30px 80px rgba(0,0,0,.45);
-  --shadow-glow:0 0 0 1px rgba(99,102,241,.35),0 18px 48px rgba(99,102,241,.25);
+  --shadow-sm:0 4px 12px rgba(0,0,0,.28);
+  --shadow-md:0 12px 32px rgba(4,10,28,.42);
+  --shadow-lg:0 30px 80px rgba(4,10,28,.52);
+  --shadow-glow:0 0 0 1px rgba(46,107,255,.35),0 18px 48px rgba(46,107,255,.28);
 
   --radius-sm:10px;
   --radius:14px;
@@ -76,18 +88,19 @@ body{
   color:var(--text);
   min-height:100vh;
   background:
-    radial-gradient(1200px 700px at -10% -10%,rgba(99,102,241,.28),transparent 60%),
-    radial-gradient(900px 600px at 110% 0%,rgba(34,211,238,.18),transparent 55%),
-    radial-gradient(800px 500px at 50% 110%,rgba(139,92,246,.18),transparent 60%),
+    radial-gradient(1200px 720px at -8% -12%,rgba(46,107,255,.22),transparent 58%),
+    radial-gradient(820px 520px at 112% 4%,rgba(242,193,78,.08),transparent 54%),
     linear-gradient(180deg,var(--bg-0),var(--bg-1));
+  background-attachment:fixed;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
 body.light{
   background:
-    radial-gradient(1000px 600px at -10% -10%,rgba(99,102,241,.12),transparent 60%),
-    radial-gradient(800px 500px at 110% 0%,rgba(34,211,238,.10),transparent 55%),
+    radial-gradient(1000px 600px at -10% -10%,rgba(46,107,255,.10),transparent 60%),
+    radial-gradient(800px 500px at 110% 0%,rgba(242,193,78,.10),transparent 55%),
     linear-gradient(180deg,#F8FAFF,#EEF2FB);
+  background-attachment:fixed;
 }
 a{color:inherit;text-decoration:none}
 button,input,select,textarea{font:inherit;color:inherit;outline:none}
@@ -190,9 +203,9 @@ body.light .topbar{background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(
 .icon-btn:hover{color:var(--text);background:var(--surface-3);transform:translateY(-1px)}
 .avatar{
   width:38px;height:38px;border-radius:11px;
-  background:linear-gradient(135deg,#F59E0B,#F43F5E);
-  display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;
-  box-shadow:0 8px 22px rgba(244,63,94,.35);
+  background:var(--grad-gold);
+  display:grid;place-items:center;color:#1a1206;font-weight:800;font-size:14px;
+  box-shadow:0 8px 22px rgba(242,193,78,.32);
 }
 
 .content{padding:24px 28px 80px;animation:fadeIn .35s ease}
@@ -403,10 +416,10 @@ table.table tbody tr:last-child td{border-bottom:0}
 .stat-ico{
   position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:11px;
   display:grid;place-items:center;font-size:18px;
-  background:rgba(99,102,241,.14);color:#A5B4FC;
+  background:rgba(46,107,255,.16);color:#8FB2FF;
 }
-.stat.warm .stat-ico{background:rgba(245,158,11,.14);color:#FCD34D}
-.stat.cool .stat-ico{background:rgba(34,211,238,.14);color:#67E8F9}
+.stat.warm .stat-ico{background:rgba(242,193,78,.16);color:#F2C14E}
+.stat.cool .stat-ico{background:rgba(91,141,239,.16);color:#9DBBFF}
 .stat.success .stat-ico{background:rgba(16,185,129,.14);color:#6EE7B7}
 .stat.rose .stat-ico{background:rgba(244,63,94,.14);color:#FDA4AF}
 
@@ -426,11 +439,11 @@ table.table tbody tr:last-child td{border-bottom:0}
 .funnel-row .lbl{color:var(--text-dim)}
 .funnel-bar{height:24px;background:var(--surface-2);border-radius:8px;overflow:hidden;position:relative;border:1px solid var(--line)}
 .funnel-fill{height:100%;border-radius:8px;background:var(--grad-brand);transition:width .6s cubic-bezier(.2,.8,.2,1)}
-.funnel-row.r-1 .funnel-fill{background:linear-gradient(135deg,#6366F1,#8B5CF6)}
-.funnel-row.r-2 .funnel-fill{background:linear-gradient(135deg,#0EA5E9,#22D3EE)}
-.funnel-row.r-3 .funnel-fill{background:linear-gradient(135deg,#14B8A6,#22D3EE)}
-.funnel-row.r-4 .funnel-fill{background:linear-gradient(135deg,#F59E0B,#FBBF24)}
-.funnel-row.r-5 .funnel-fill{background:linear-gradient(135deg,#F97316,#F59E0B)}
+.funnel-row.r-1 .funnel-fill{background:linear-gradient(135deg,#1E4FD6,#2E6BFF)}
+.funnel-row.r-2 .funnel-fill{background:linear-gradient(135deg,#2E6BFF,#5B8DEF)}
+.funnel-row.r-3 .funnel-fill{background:linear-gradient(135deg,#5B8DEF,#7FA9FF)}
+.funnel-row.r-4 .funnel-fill{background:linear-gradient(135deg,#B99A66,#E0A93B)}
+.funnel-row.r-5 .funnel-fill{background:linear-gradient(135deg,#E0A93B,#F2C14E)}
 .funnel-row.r-6 .funnel-fill{background:linear-gradient(135deg,#10B981,#34D399)}
 .funnel-row.r-7 .funnel-fill{background:linear-gradient(135deg,#F43F5E,#FB7185)}
 .funnel-row .val{text-align:right;font-weight:700;font-size:13px}
@@ -476,11 +489,11 @@ table.table tbody tr:last-child td{border-bottom:0}
 .kcol-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
 .kcol-title .pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-3);color:var(--text-dim)}
 .kcol-bar{height:3px;border-radius:3px;background:var(--grad-brand);margin-bottom:6px}
-.kcol[data-stage="Novo"] .kcol-bar{background:linear-gradient(90deg,#6366F1,#8B5CF6)}
-.kcol[data-stage="Qualificado"] .kcol-bar{background:linear-gradient(90deg,#0EA5E9,#22D3EE)}
-.kcol[data-stage="Em contato"] .kcol-bar{background:linear-gradient(90deg,#14B8A6,#22D3EE)}
-.kcol[data-stage="Reunião"] .kcol-bar{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
-.kcol[data-stage="Proposta"] .kcol-bar{background:linear-gradient(90deg,#F97316,#F59E0B)}
+.kcol[data-stage="Novo"] .kcol-bar{background:linear-gradient(90deg,#1E4FD6,#2E6BFF)}
+.kcol[data-stage="Qualificado"] .kcol-bar{background:linear-gradient(90deg,#2E6BFF,#5B8DEF)}
+.kcol[data-stage="Em contato"] .kcol-bar{background:linear-gradient(90deg,#5B8DEF,#7FA9FF)}
+.kcol[data-stage="Reunião"] .kcol-bar{background:linear-gradient(90deg,#B99A66,#E0A93B)}
+.kcol[data-stage="Proposta"] .kcol-bar{background:linear-gradient(90deg,#E0A93B,#F2C14E)}
 .kcol[data-stage="Cliente"] .kcol-bar{background:linear-gradient(90deg,#10B981,#34D399)}
 .kcol[data-stage="Perdido"] .kcol-bar{background:linear-gradient(90deg,#F43F5E,#FB7185)}
 
@@ -533,14 +546,32 @@ table.table tbody tr:last-child td{border-bottom:0}
 .cell-name small{display:block;color:var(--text-mute);font-weight:400;font-size:11px;margin-top:2px}
 .row-actions{display:flex;gap:4px;justify-content:flex-end}
 
-/* Empty state */
+/* Empty / loading / error states */
 .empty{
   padding:48px 24px;text-align:center;color:var(--text-mute);
   display:flex;flex-direction:column;align-items:center;gap:10px;
 }
-.empty .em-ico{font-size:42px;opacity:.6}
-.empty h3{margin:6px 0 0;font-size:15px;color:var(--text)}
-.empty p{margin:0;font-size:13px;max-width:340px;line-height:1.5}
+.empty .em-ico{
+  font-size:34px;opacity:.9;width:64px;height:64px;border-radius:18px;
+  display:grid;place-items:center;margin-bottom:2px;
+  background:var(--surface-2);border:1px solid var(--line);
+}
+.empty h3{margin:6px 0 0;font-size:15px;color:var(--text);font-weight:700}
+.empty p{margin:0;font-size:13px;max-width:360px;line-height:1.5}
+.empty.state-error .em-ico{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.28);color:#FB7185}
+.empty.state-ok .em-ico{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.28);color:#34D399}
+.empty.state-loading .em-ico{background:rgba(46,107,255,.12);border-color:rgba(46,107,255,.28)}
+
+/* Spinner premium (loading) */
+.spinner{
+  width:34px;height:34px;border-radius:50%;
+  border:3px solid rgba(148,178,255,.15);
+  border-top-color:var(--blue);
+  animation:spin .7s linear infinite;
+}
+.spinner.sm{width:18px;height:18px;border-width:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.state-loading .em-ico{position:relative}
 
 /* Modal */
 .modal-backdrop{
@@ -592,6 +623,40 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
 .hunter-form{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .hunter-form .field{margin:0}
 .hunter-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+/* Caça — formulário reorganizado em grupos lógicos */
+.hunter-groups{display:flex;flex-direction:column;gap:18px}
+.hunter-group{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius);padding:16px 16px 18px;position:relative;
+}
+.hunter-group-head{
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+.hunter-group-num{
+  width:22px;height:22px;border-radius:7px;flex-shrink:0;
+  display:grid;place-items:center;font-size:11px;font-weight:800;
+  background:rgba(46,107,255,.16);color:#8FB2FF;border:1px solid rgba(46,107,255,.28);
+}
+.hunter-group.gold .hunter-group-num{background:rgba(242,193,78,.16);color:#F2C14E;border-color:rgba(242,193,78,.3)}
+.hunter-group-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim)}
+.hunter-group-hint{margin-left:auto;font-size:11px;color:var(--text-mute)}
+.hunter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.hunter-grid .field{margin:0}
+.hunter-grid .field label{display:flex;align-items:center;gap:6px}
+.hunter-grid.cols-3-params{grid-template-columns:1fr 1fr 1fr}
+.hunter-grid.cols-2{grid-template-columns:1fr 1fr}
+
+/* Barra de ações da caça: hero primário + secundários agrupados */
+.hunter-cta{
+  display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px;
+  padding-top:16px;border-top:1px solid var(--line);
+}
+.hunter-cta .btn-primary{font-size:14px;padding:12px 22px}
+.hunter-cta-sep{flex:1;min-width:8px}
+.hunter-cta-group{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:1100px){ .hunter-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media(max-width:640px){ .hunter-grid,.hunter-grid.cols-3-params,.hunter-grid.cols-2{grid-template-columns:1fr} .hunter-cta{flex-direction:column;align-items:stretch} .hunter-cta-group{flex-direction:column} .hunter-cta .btn{width:100%;justify-content:center} }
 
 .dork-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto}
 .dork-item{
@@ -802,101 +867,177 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
           <div class="section-head"><h2><span class="dot"></span> Configuração da Caça</h2>
             <span class="badge badge-success"><span class="dot"></span> Dorks 100% seguros</span>
           </div>
-          <div class="hunter-form">
-            <div class="field"><label>Nicho</label>
-              <select id="hNicho">
-                <optgroup label="🚀 Digital / Lançamentos">
-                  <option>Lançamentos Digitais</option><option>Infoprodutores</option><option>Mentores</option>
-                  <option>Experts</option><option>Palestrantes</option><option>Treinadores</option>
-                  <option>Consultores</option><option>Produtores Digitais</option><option>Cursos Online</option>
-                  <option>Comunidades Pagas</option><option>Coachs</option>
-                </optgroup>
-                <optgroup label="📈 Marketing / Tráfego">
-                  <option>Agências de Marketing</option><option>Gestores de Tráfego</option>
-                </optgroup>
-                <optgroup label="🏥 Saúde / Bem-estar">
-                  <option>Clínicas Odontológicas</option><option>Clínicas de Estética</option>
-                  <option>Clínicas Médicas</option><option>Nutricionistas</option><option>Personal Trainers</option>
-                  <option>Psicólogos</option><option>Academias</option>
-                </optgroup>
-                <optgroup label="🏢 Negócios locais">
-                  <option>Imobiliárias</option><option>Construtoras</option><option>Energia Solar</option>
-                  <option>Advocacia</option><option>Restaurantes</option><option>Barbearias</option>
-                  <option>Pet Shops</option><option>Escolas</option><option>Franquias</option>
-                </optgroup>
-                <optgroup label="🛒 E-commerce / Produto">
-                  <option>E-commerce</option><option>Moda</option><option>Suplementos</option>
-                </optgroup>
-                <optgroup label="⛪ Comunidade / Eventos">
-                  <option>Igrejas e Ministérios</option><option>Eventos e Congressos</option>
-                </optgroup>
-              </select>
+          <div class="hunter-groups">
+
+            <!-- Grupo 1 — Alvo -->
+            <div class="hunter-group">
+              <div class="hunter-group-head">
+                <span class="hunter-group-num">1</span>
+                <span class="hunter-group-title">Alvo da caça</span>
+                <span class="hunter-group-hint">Quem e onde você quer prospectar</span>
+              </div>
+              <div class="hunter-grid">
+                <div class="field"><label>🎯 Nicho</label>
+                  <select id="hNicho">
+                    <optgroup label="🏥 Saúde &amp; Estética">
+                      <option>Clínicas Odontológicas</option><option>Clínicas de Estética</option>
+                      <option>Harmonização Facial</option><option>Clínicas Médicas</option>
+                      <option>Dermatologia</option><option>Fisioterapia</option>
+                      <option>Nutricionistas</option><option>Psicólogos</option>
+                    </optgroup>
+                    <optgroup label="💪 Fitness &amp; Bem-estar">
+                      <option>Academias</option><option>Estúdios de Pilates</option>
+                      <option>CrossFit</option><option>Personal Trainers</option><option>Studios de Yoga</option>
+                    </optgroup>
+                    <optgroup label="🏢 Imóveis &amp; Construção">
+                      <option>Imobiliárias</option><option>Corretores de Imóveis</option>
+                      <option>Construtoras</option><option>Incorporadoras</option><option>Arquitetura</option>
+                    </optgroup>
+                    <optgroup label="☀️ Energia &amp; Serviços">
+                      <option>Energia Solar</option><option>Climatização</option>
+                      <option>Segurança Eletrônica</option><option>Reformas</option>
+                    </optgroup>
+                    <optgroup label="⚖️ Serviços Profissionais">
+                      <option>Advocacia</option><option>Contabilidade</option>
+                      <option>Consultorias</option><option>Odontologia</option>
+                    </optgroup>
+                    <optgroup label="🍽️ Alimentação &amp; Local">
+                      <option>Restaurantes</option><option>Delivery</option><option>Pizzarias</option>
+                      <option>Cafeterias</option><option>Barbearias</option>
+                      <option>Salões de Beleza</option><option>Pet Shops</option>
+                    </optgroup>
+                    <optgroup label="🚀 Digital &amp; Lançamentos">
+                      <option>Lançamentos Digitais</option><option>Infoprodutores</option>
+                      <option>Mentores</option><option>Experts</option><option>Coprodutores</option>
+                      <option>Cursos Online</option><option>Coachs</option>
+                    </optgroup>
+                    <optgroup label="📣 Marketing &amp; Tráfego">
+                      <option>Agências de Marketing</option><option>Gestores de Tráfego</option><option>Social Media</option>
+                    </optgroup>
+                    <optgroup label="🎟️ Eventos &amp; Comunidades">
+                      <option>Eventos e Congressos</option><option>Produtores de Eventos</option>
+                      <option>Comunidades Pagas</option><option>Grupos e Mentorias</option>
+                    </optgroup>
+                    <optgroup label="🏪 Franquias &amp; Varejo">
+                      <option>Franquias</option><option>E-commerce</option><option>Concessionárias</option>
+                      <option>Moda</option><option>Suplementos</option>
+                    </optgroup>
+                    <optgroup label="🎓 Educação">
+                      <option>Escolas</option><option>Cursos Profissionalizantes</option><option>Autoescolas</option>
+                    </optgroup>
+                  </select>
+                </div>
+                <div class="field"><label>📍 Cidade</label><input id="hCidade" value="São Paulo" placeholder="Ex.: Goiânia" /></div>
+                <div class="field"><label>🗺️ Estado</label>
+                  <select id="hEstado"><option>SP</option><option>RJ</option><option>MG</option><option>PR</option><option>RS</option><option>SC</option><option>BA</option><option>DF</option><option>GO</option><option>ES</option><option>CE</option><option>PE</option><option>PA</option><option>MT</option><option>MS</option></select>
+                </div>
+              </div>
             </div>
-            <div class="field"><label>Cidade</label><input id="hCidade" value="São Paulo" /></div>
-            <div class="field"><label>Estado</label>
-              <select id="hEstado"><option>SP</option><option>RJ</option><option>MG</option><option>PR</option><option>RS</option><option>SC</option><option>BA</option><option>DF</option><option>GO</option></select>
+
+            <!-- Grupo 2 — Oferta & estratégia -->
+            <div class="hunter-group gold">
+              <div class="hunter-group-head">
+                <span class="hunter-group-num">2</span>
+                <span class="hunter-group-title">Oferta &amp; estratégia</span>
+                <span class="hunter-group-hint">O que você vende e onde encontrar</span>
+              </div>
+              <div class="hunter-grid cols-2">
+                <div class="field"><label>💼 Oferta da agência</label>
+                  <select id="hOferta">
+                    <optgroup label="🤖 IA &amp; Automação">
+                      <option>Agente de IA / SDR IA</option>
+                      <option>Atendimento 24/7 no WhatsApp</option>
+                      <option>Qualificação automática de leads</option>
+                      <option>Chatbot de vendas</option>
+                      <option>Automação de agendamento</option>
+                      <option>Automação de WhatsApp</option>
+                      <option>Follow-up automático</option>
+                      <option>Sequência automática de mensagens</option>
+                    </optgroup>
+                    <optgroup label="📈 Comercial &amp; CRM">
+                      <option>Automação para vender mais</option>
+                      <option>CRM comercial</option>
+                      <option>Gestão de leads</option>
+                      <option>Gestão de relacionamento com leads</option>
+                      <option>Recuperação de leads perdidos</option>
+                      <option>Recuperação de vendas</option>
+                      <option>Diagnóstico comercial</option>
+                    </optgroup>
+                    <optgroup label="🚀 Aquisição &amp; Funil">
+                      <option>Funil de vendas</option>
+                      <option>Tráfego pago</option>
+                      <option>Remarketing</option>
+                      <option>Página de captura</option>
+                      <option>Página de vendas</option>
+                      <option>Captação de leads no Instagram</option>
+                      <option>Lançamento digital</option>
+                      <option>Automação para eventos</option>
+                      <option>Automação para grupos de WhatsApp</option>
+                      <option>Automação para lançamentos digitais</option>
+                    </optgroup>
+                  </select>
+                </div>
+                <div class="field"><label>🔎 Tipo de busca</label>
+                  <select id="hTipo">
+                    <optgroup label="🌐 Presença digital">
+                      <option>Site oficial</option><option>Página de contato</option>
+                      <option>Página de serviços</option><option>Página institucional</option>
+                    </optgroup>
+                    <optgroup label="💰 Conversão">
+                      <option>Página de orçamento</option><option>Página de agendamento</option>
+                      <option>Página de vendas</option><option>Página de captura</option>
+                      <option>Página de checkout</option><option>WhatsApp Business</option>
+                      <option>Página de obrigado</option>
+                    </optgroup>
+                    <optgroup label="🚀 Lançamentos / Eventos">
+                      <option>Página de lançamento digital</option><option>Página de evento online</option>
+                      <option>Página de webinar</option><option>Página de aula gratuita</option>
+                    </optgroup>
+                    <optgroup label="📱 Redes &amp; Grupos">
+                      <option>Instagram público</option><option>WhatsApp público</option>
+                      <option>Grupo de WhatsApp</option><option>Grupo de Telegram</option><option>Comunidade paga</option>
+                    </optgroup>
+                    <optgroup label="🎯 Decisores">
+                      <option>Procurar dono da empresa</option><option>Sócio / CEO</option>
+                      <option>Gestor de marketing</option><option>Procurar gestor de tráfego</option>
+                      <option>Procurar agência responsável</option>
+                    </optgroup>
+                    <optgroup label="🧠 Inteligência">
+                      <option>Procurar anúncios ativos</option><option>Avaliações no Google</option>
+                      <option>Reclame Aqui</option><option>Negócio local completo</option>
+                    </optgroup>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div class="field"><label>Oferta da agência</label>
-              <select id="hOferta">
-                <option>Automação para vender mais</option>
-                <option>Automação de WhatsApp</option>
-                <option>Follow-up automático</option>
-                <option>Recuperação de leads perdidos</option>
-                <option>CRM comercial</option>
-                <option>Funil de vendas</option>
-                <option>Lançamento digital</option>
-                <option>Página de captura</option>
-                <option>Página de vendas</option>
-                <option>Gestão de leads</option>
-                <option>Remarketing</option>
-                <option>Tráfego pago</option>
-                <option>Diagnóstico comercial</option>
-                <option>Captação de leads no Instagram</option>
-                <option>Gestão de relacionamento com leads</option>
-                <option>Sequência automática de mensagens</option>
-                <option>Automação para eventos</option>
-                <option>Automação para grupos de WhatsApp</option>
-                <option>Automação para lançamentos digitais</option>
-              </select>
+
+            <!-- Grupo 3 — Parâmetros -->
+            <div class="hunter-group">
+              <div class="hunter-group-head">
+                <span class="hunter-group-num">3</span>
+                <span class="hunter-group-title">Parâmetros da busca</span>
+                <span class="hunter-group-hint">Ajuste fino do volume e da qualidade</span>
+              </div>
+              <div class="hunter-grid cols-3-params">
+                <div class="field"><label>⚡ Profundidade</label>
+                  <select id="hDepth"><option>Rápida</option><option>Média</option><option>Profunda</option></select>
+                </div>
+                <div class="field"><label>⭐ Score mínimo</label><input id="hScore" type="number" value="60" min="0" max="100" /></div>
+                <div class="field"><label>📊 Máx. leads</label><input id="hMax" type="number" value="8" min="1" max="50" /></div>
+              </div>
             </div>
-            <div class="field"><label>Tipo de busca</label>
-              <select id="hTipo">
-                <optgroup label="Páginas">
-                  <option>Site oficial</option><option>Página de contato</option><option>Página de orçamento</option>
-                  <option>Página de agendamento</option><option>Página de vendas</option><option>Página de captura</option>
-                  <option>Página de obrigado</option><option>Página de checkout</option>
-                </optgroup>
-                <optgroup label="🚀 Lançamentos / Eventos">
-                  <option>Página de lançamento digital</option><option>Página de evento online</option>
-                  <option>Página de webinar</option><option>Página de aula gratuita</option>
-                </optgroup>
-                <optgroup label="Canais / Grupos">
-                  <option>WhatsApp público</option><option>Instagram público</option>
-                  <option>Grupo de WhatsApp</option><option>Grupo de Telegram</option><option>Comunidade paga</option>
-                </optgroup>
-                <optgroup label="Pessoas / Decisores">
-                  <option>Perfil do expert</option><option>Perfil do produtor</option>
-                  <option>Procurar dono da empresa</option><option>Procurar dono do lançamento</option>
-                  <option>Procurar gestor de tráfego</option><option>Procurar agência responsável</option>
-                </optgroup>
-                <optgroup label="Inteligência">
-                  <option>Procurar anúncios ativos</option><option>Procurar infoproduto</option>
-                  <option>Procurar curso online</option><option>Negócio local completo</option>
-                </optgroup>
-              </select>
-            </div>
-            <div class="field"><label>Profundidade</label>
-              <select id="hDepth"><option>Rápida</option><option>Média</option><option>Profunda</option></select>
-            </div>
-            <div class="field"><label>Score mínimo</label><input id="hScore" type="number" value="60" min="0" max="100" /></div>
-            <div class="field"><label>Máx. leads</label><input id="hMax" type="number" value="8" min="1" max="50" /></div>
+
           </div>
-          <div class="hunter-actions">
+
+          <div class="hunter-cta">
             <button class="btn btn-primary" id="btnGenDorks">⚡ Gerar Dorks</button>
-            <button class="btn btn-ghost" id="btnRunBrowser">🌐 Rodar no Navegador</button>
-            <button class="btn btn-ghost" id="btnImportUrls">⤓ Importar URLs</button>
             <button class="btn btn-success" id="btnSaveAll">＋ Salvar Resultados no CRM</button>
-            <button class="btn btn-outline" id="btnExportDorks">↗ Exportar Dorks</button>
+            <span class="hunter-cta-sep"></span>
+            <div class="hunter-cta-group">
+              <button class="btn btn-ghost" id="btnRunBrowser">🌐 Rodar no Navegador</button>
+              <button class="btn btn-ghost" id="btnImportUrls">⤓ Importar URLs</button>
+              <button class="btn btn-outline" id="btnExportDorks">↗ Exportar Dorks</button>
+            </div>
           </div>
         </div>
 
@@ -1461,20 +1602,20 @@ function runProspect(){
   const params = new URLSearchParams({ city, region: uf, niche: n, maxLeads: String(max), searchType: 'completa' });
   toast('info','Prospecção iniciada','Robôs trabalhando…');
   const el = document.getElementById('resultsArea');
-  el.innerHTML = '<div class="empty"><div class="em-ico">⏳</div><h3>Buscando leads</h3><p id="progMsg">Iniciando…</p></div>';
+  el.innerHTML = '<div class="empty state-loading"><div class="em-ico"><div class="spinner"></div></div><h3>Buscando leads</h3><p id="progMsg">Iniciando os robôs…</p></div>';
   let found = 0;
   const es = new EventSource('/api/search/stream?'+params.toString());
-  es.addEventListener('status', ev=>{ try{ document.getElementById('progMsg').textContent = JSON.parse(ev.data).message; }catch{} });
-  es.addEventListener('lead', ev=>{ found++; try{ const x = JSON.parse(ev.data); toast('success','Lead encontrado', (x.data && x.data.companyName)||x.message); }catch{} });
+  es.addEventListener('status', ev=>{ try{ const el2=document.getElementById('progMsg'); if(el2) el2.textContent = JSON.parse(ev.data).message; }catch{} });
+  es.addEventListener('lead', ev=>{ found++; try{ const x = JSON.parse(ev.data); const el2=document.getElementById('progMsg'); if(el2) el2.textContent = found+' lead(s) encontrado(s)…'; toast('success','Lead encontrado', (x.data && x.data.companyName)||x.message); }catch{} });
   es.addEventListener('done', async ev=>{
     es.close();
     let stats = {}; try{ stats = JSON.parse(ev.data).data.stats; }catch{}
     toast('success','Prospecção concluída', found+' encontrados · '+(stats.leads||0)+' novos salvos');
     await refreshAll();
     document.getElementById('resultCount').textContent = (stats.leads||0) + ' novos no CRM';
-    el.innerHTML = '<div class="empty"><div class="em-ico">✅</div><h3>Concluído</h3><p>'+(stats.leads||0)+' leads novos salvos no banco. Veja em Leads ou CRM.</p></div>';
+    el.innerHTML = '<div class="empty state-ok"><div class="em-ico">✓</div><h3>Prospecção concluída</h3><p><b>'+(stats.leads||0)+'</b> leads novos salvos no banco. Veja em Leads ou CRM.</p></div>';
   });
-  es.addEventListener('error', ev=>{ let m='Erro'; try{m=JSON.parse(ev.data).message||m}catch{} es.close(); toast('error','Falha', m); });
+  es.addEventListener('error', ev=>{ let m='Não foi possível concluir a busca'; try{m=JSON.parse(ev.data).message||m}catch{} es.close(); toast('error','Falha na prospecção', m); el.innerHTML = '<div class="empty state-error"><div class="em-ico">!</div><h3>Falha na prospecção</h3><p>'+escapeHtml(m)+'</p></div>'; });
 }
 
 function renderKanban(){
