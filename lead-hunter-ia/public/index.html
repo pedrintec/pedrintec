@@ -1229,7 +1229,7 @@ function openModal(o){
 }
 function closeModal(){ document.getElementById('modal').classList.remove('active'); }
 
-const PROVIDER_LABELS = { serpapi:'SerpAPI', serper:'Serper', serper_places:'Places', exa:'Exa', google_cse:'Google CSE', manual:'Manual' };
+const PROVIDER_LABELS = { serpapi:'SerpAPI', serper:'Serper', serper_places:'Places', exa:'Exa', duckduckgo:'DuckDuckGo', google_cse:'Google CSE', manual:'Manual' };
 function activeProvidersLabel(){
   const list = (state.activeProviders||[]).map(function(p){ return PROVIDER_LABELS[p]||p; });
   return list.length ? list.join(' + ') : 'Nenhum robô configurado';

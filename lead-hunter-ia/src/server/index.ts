@@ -73,8 +73,8 @@ app.get("/api/config", (_req, res) => {
   const provider = config.SEARCH_PROVIDER;
   const activeProviders = listActiveProviders();
   const ready =
-    provider === "multi"
-      ? activeProviders.length > 0
+    provider === "multi" || provider === "duckduckgo"
+      ? activeProviders.length > 0 || provider === "duckduckgo" // DDG não precisa de chave
       : provider === "serpapi"
         ? Boolean(config.SERPAPI_KEY)
         : provider === "serper" || provider === "serper_places"

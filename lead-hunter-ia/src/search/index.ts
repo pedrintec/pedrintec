@@ -7,6 +7,7 @@ import { GoogleCustomSearchProvider } from "./providers/googleCustomSearch.js";
 import { ManualProvider } from "./providers/manual.js";
 import { SerperProvider, SerperPlacesProvider, MultiSearchProvider } from "./providers/serper.js";
 import { ExaProvider } from "./providers/exa.js";
+import { DuckDuckGoProvider } from "./providers/duckduckgo.js";
 
 // Fábrica de provedor + orquestração das buscas (gera dorks, consulta, agrega).
 
@@ -22,6 +23,8 @@ export function getProvider(): SearchProvider {
       return new SerperPlacesProvider();
     case "exa":
       return new ExaProvider();
+    case "duckduckgo":
+      return new DuckDuckGoProvider();
     case "multi":
       return buildMultiProvider();
     case "manual":
@@ -32,7 +35,8 @@ export function getProvider(): SearchProvider {
 
 /** Nomes dos robôs que entrariam em ação no modo multi, dado o .env atual (sem instanciar nada). */
 export function listActiveProviders(): string[] {
-  const names: string[] = [];
+  // DuckDuckGo não exige chave — sempre entra no modo multi (robô gratuito garantido).
+  const names: string[] = ["duckduckgo"];
   if (config.SERPAPI_KEY) names.push("serpapi");
   if (config.SERPER_API_KEY) names.push("serper", "serper_places");
   if (config.EXA_API_KEY) names.push("exa");
@@ -42,7 +46,8 @@ export function listActiveProviders(): string[] {
 
 /** Modo multi-robô: usa todos os provedores com chave configurada, em paralelo. */
 function buildMultiProvider(): SearchProvider {
-  const providers: SearchProvider[] = [];
+  // DuckDuckGo é gratuito e sem chave — sempre participa do multi-robô.
+  const providers: SearchProvider[] = [new DuckDuckGoProvider()];
   if (config.SERPAPI_KEY) providers.push(new SerpApiProvider());
   if (config.SERPER_API_KEY) {
     providers.push(new SerperProvider());
@@ -51,10 +56,6 @@ function buildMultiProvider(): SearchProvider {
   if (config.EXA_API_KEY) providers.push(new ExaProvider());
   if (config.GOOGLE_CSE_KEY && config.GOOGLE_CSE_CX) providers.push(new GoogleCustomSearchProvider());
 
-  if (providers.length === 0) {
-    logger.warn("Modo multi sem nenhuma chave configurada — caindo para modo manual.");
-    return new ManualProvider();
-  }
   logger.info(`Modo multi-robô: ${providers.map((p) => p.name).join(" + ")}`);
   return new MultiSearchProvider(providers);
 }

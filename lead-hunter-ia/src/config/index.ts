@@ -20,7 +20,7 @@ const intFromEnv = (def: number) =>
 const envSchema = z.object({
   DATABASE_PATH: z.string().default("./data/lead-hunter.db"),
   SEARCH_PROVIDER: z
-    .enum(["serpapi", "google_cse", "manual", "serper", "serper_places", "exa", "multi"])
+    .enum(["serpapi", "google_cse", "manual", "serper", "serper_places", "exa", "duckduckgo", "multi"])
     .default("manual"),
   SERPAPI_KEY: z.string().optional(),
   SERPER_API_KEY: z.string().optional(),
