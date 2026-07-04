@@ -56,7 +56,8 @@ const envSchema = z.object({
   GENERATE_ROI_ESTIMATE: boolFromEnv(true),
 
   // --- Integrações (opcional): webhook n8n disparado na mudança de etapa ---
-  N8N_WEBHOOK_URL: z.string().url().optional(),
+  // "" (chave presente mas vazia no .env) conta como desativado.
+  N8N_WEBHOOK_URL: z.preprocess((v) => (v === "" ? undefined : v), z.string().url().optional()),
 });
 
 const parsed = envSchema.safeParse(process.env);

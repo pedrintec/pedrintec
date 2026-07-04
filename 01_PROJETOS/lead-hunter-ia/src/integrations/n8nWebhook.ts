@@ -24,10 +24,12 @@ export function fireStageChangeWebhook(payload: StageChangePayload): void {
   if (!url) return; // integração desativada
 
   // fetch global (Node 20+). Fire-and-forget: erros só viram log.
+  // Timeout de 8s: um n8n travado não pode segurar promises indefinidamente.
   void fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(8000),
   })
     .then((r) => {
       if (!r.ok) logger.warn(`Webhook n8n respondeu ${r.status} para lead #${payload.lead_id}.`);

@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { db, schema, sqlite } from "./client.js";
 import type { CommercialStatus, Lead, ScoreEvidence, SearchInput } from "../types/index.js";
 import { rootDomain } from "../utils/text.js";
@@ -287,8 +287,12 @@ export function getAllLeadRecords(): LeadRecord[] {
   const rows = db.select().from(schema.leads).orderBy(desc(schema.leads.score)).all();
   // Batch-load notas (atividades type 'note') e tarefas, agrupando por lead.
   const notesByLead = new Map<number, CrmNote[]>();
-  for (const a of db.select().from(schema.leadActivities).all()) {
-    if (a.leadId == null || (a.type !== "note" && a.type !== "stage_change")) continue;
+  for (const a of db
+    .select()
+    .from(schema.leadActivities)
+    .where(inArray(schema.leadActivities.type, ["note", "stage_change"]))
+    .all()) {
+    if (a.leadId == null) continue;
     (notesByLead.get(a.leadId) ?? notesByLead.set(a.leadId, []).get(a.leadId)!).push(rowToNote(a));
   }
   const tasksByLead = new Map<number, CrmTask[]>();
@@ -535,13 +539,16 @@ const STAGE_AUTO_TASK: Record<
 function dueInDays(days: number): string {
   const d = new Date();
   d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  // Data LOCAL (não UTC): com toISOString(), à noite (UTC-3) o prazo pularia um dia.
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
 export function updateLeadCrm(leadId: number, data: CrmUpdate): LeadRecord | undefined {
   // Estado atual: detecta transição de etapa e alimenta tarefa/histórico/webhook.
   const current = db.select().from(schema.leads).where(eq(schema.leads.id, leadId)).get();
-  const oldStage = current?.stage ?? "Novo";
+  if (!current) return undefined; // sem lead: nada de task/atividade/webhook fantasma
+  const oldStage = current.stage ?? "Novo";
   const stageChanged = data.stage !== undefined && data.stage !== oldStage;
 
   const now = new Date().toISOString();
@@ -558,7 +565,7 @@ export function updateLeadCrm(leadId: number, data: CrmUpdate): LeadRecord | und
 
   if (stageChanged && data.stage) {
     // Histórico imutável: "Movido de X para Y" (§2.2).
-    addLeadActivity(leadId, "stage_change", `Movido de ${oldStage} para ${data.stage}`);
+    addLeadActivity(leadId, "stage_change", `Movido de ${oldStage} para ${data.stage}`, { author: "Sistema" });
 
     // Tarefa automática por etapa de destino (§2.2).
     const rule = STAGE_AUTO_TASK[data.stage];
@@ -641,10 +648,19 @@ export function toggleLeadTask(taskId: number, done?: boolean): CrmTask | undefi
 /** Todas as tarefas (para a aba Tarefas), com o nome da empresa do lead. */
 export function getAllLeadTasks(): Array<CrmTask & { leadId: number; empresa: string }> {
   const tasks = db.select().from(schema.leadTasks).all();
-  return tasks.map((t) => {
-    const lead = t.leadId != null ? db.select().from(schema.leads).where(eq(schema.leads.id, t.leadId)).get() : null;
-    return { ...rowToTask(t), leadId: t.leadId ?? 0, empresa: lead?.companyName ?? "" };
-  });
+  // 1 query para os nomes das empresas (evita N+1: 1 SELECT por tarefa).
+  const names = new Map(
+    db
+      .select({ id: schema.leads.id, name: schema.leads.companyName })
+      .from(schema.leads)
+      .all()
+      .map((l) => [l.id, l.name]),
+  );
+  return tasks.map((t) => ({
+    ...rowToTask(t),
+    leadId: t.leadId ?? 0,
+    empresa: (t.leadId != null ? names.get(t.leadId) : "") ?? "",
+  }));
 }
 
 // ---------------------------------------------------------------------

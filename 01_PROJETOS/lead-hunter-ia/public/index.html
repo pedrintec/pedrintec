@@ -1744,7 +1744,9 @@ function commercialIntel(l){
 }
 // §2.1 — Score aditivo simples do spec, exibido junto do 3-blocos ("rodar os dois").
 function simpleScore(l){
-  const budget = /or[çc]ament|agenda/i.test(((l.reasons||[]).join(' '))+' '+(l.pain||'')+' '+(l.nextAction||''));
+  // Só evidências POSITIVAS contam ("Não possui agendamento online" não é sinal de orçamento).
+  const posTxt = (l.reasons||[]).filter(function(r){ return !/^\s*(n[ãa]o|sem)\b/i.test(r); }).join(' ')+' '+(l.nextAction||'');
+  const budget = /or[çc]ament|agend/i.test(posTxt);
   const sig = [
     { label:'WhatsApp ativo', pts:25, on:!!(l.hasWhatsapp||l.whatsapp) },
     { label:'Site profissional', pts:20, on:!!(l.hasSite||l.site) },
