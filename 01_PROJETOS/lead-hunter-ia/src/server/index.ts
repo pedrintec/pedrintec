@@ -24,12 +24,17 @@ import {
   listSearches,
   markLeadContact,
   registerOptOut,
+  saveResearchReport,
+  setSdrStatus,
   setSettings,
   toggleLeadTask,
   updateLeadCrm,
   updateLeadStatus,
   type LeadsPageFilters,
 } from "../database/repository.js";
+import { generateResearchReport, type ResearchReport } from "../prospecting/researcher.js";
+import { assessReply, buildSdrSequence, localDateInDays } from "../prospecting/sdr.js";
+import { aiEnabled } from "../integrations/claudeClient.js";
 import { exportCsv, exportJson, exportXlsx } from "../exporters/index.js";
 import type { CommercialStatus, SearchInput } from "../types/index.js";
 
@@ -71,7 +76,7 @@ app.get("/api/config", (_req, res) => {
       : provider === "google_cse"
         ? Boolean(config.GOOGLE_CSE_KEY && config.GOOGLE_CSE_CX)
         : false;
-  res.json({ provider, ready, defaultCountry: config.DEFAULT_COUNTRY });
+  res.json({ provider, ready, defaultCountry: config.DEFAULT_COUNTRY, ai: aiEnabled() });
 });
 
 /** Pré-visualização das consultas (dorks) sem gastar API. */
@@ -347,6 +352,105 @@ app.delete("/api/leads/:id", (req, res) => {
     return;
   }
   res.json({ ok: true });
+});
+
+// ---------------------------------------------------------------------
+// Pipeline Pesquisador / SDR IA
+// ---------------------------------------------------------------------
+
+/** Nome da agência configurado (fallback: Gravity). */
+function agencyName(): string {
+  const s = getSettings() as Record<string, unknown>;
+  return typeof s.agencyName === "string" && s.agencyName.trim() ? s.agencyName.trim() : "Gravity";
+}
+
+/** PESQUISADOR: gera (ou regenera com {force:true}) o relatório empresarial do lead. */
+app.post("/api/leads/:id/research", async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    res.status(400).json({ error: "ID inválido." });
+    return;
+  }
+  const lead = getLeadById(id);
+  if (!lead) {
+    res.status(404).json({ error: `Lead #${id} não encontrado.` });
+    return;
+  }
+  if (lead.researchReport && !req.body?.force) {
+    res.json({ report: lead.researchReport, cached: true, lead });
+    return;
+  }
+  const report = await generateResearchReport(lead);
+  saveResearchReport(id, report);
+  res.json({ report, cached: false, lead: getLeadById(id) });
+});
+
+/** SDR IA: inicia a cadência (abordagem + tarefas D0/D+2/D+5) e move p/ Qualificado. */
+app.post("/api/leads/:id/sdr/start", async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    res.status(400).json({ error: "ID inválido." });
+    return;
+  }
+  const lead = getLeadById(id);
+  if (!lead) {
+    res.status(404).json({ error: `Lead #${id} não encontrado.` });
+    return;
+  }
+  if (lead.optOutAt) {
+    res.status(403).json({ error: "Lead registrou opt-out — prospecção bloqueada (LGPD)." });
+    return;
+  }
+  // Garante o relatório do Pesquisador antes da abordagem (é a alma do SDR).
+  let report = lead.researchReport as ResearchReport | null;
+  if (!report) {
+    report = await generateResearchReport(lead);
+    saveResearchReport(id, report);
+  }
+  const seq = await buildSdrSequence(lead, report, agencyName());
+  for (const t of seq.tasks) addLeadTask(id, t.text, t.due, t.priority);
+  updateLeadCrm(
+    id,
+    { stage: "Qualificado", nextAction: "SDR D0 — enviar abordagem inicial via WhatsApp" },
+    { skipAutoTask: true }, // a cadência D0/D+2/D+5 substitui a auto-tarefa da etapa
+  );
+  setSdrStatus(id, "ativo");
+  addLeadNote(id, "SDR IA iniciado: cadência D0/D+2/D+5 criada", "Sistema");
+  res.json({ message: seq.message, tasks: seq.tasks, lead: getLeadById(id) });
+});
+
+/** SDR IA: registra a resposta do lead, classifica e aplica a próxima ação. */
+app.post("/api/leads/:id/sdr/reply", async (req, res) => {
+  const id = Number(req.params.id);
+  const text = String(req.body?.text ?? "").trim();
+  if (!Number.isInteger(id) || !text) {
+    res.status(400).json({ error: "Informe um id válido e o texto da resposta." });
+    return;
+  }
+  const lead = getLeadById(id);
+  if (!lead) {
+    res.status(404).json({ error: `Lead #${id} não encontrado.` });
+    return;
+  }
+  const result = await assessReply(lead, lead.researchReport as ResearchReport | null, text);
+
+  addLeadNote(id, `Resposta do lead: "${text}"`, "Lead");
+  if (result.nova_etapa && result.nova_etapa !== lead.stage) {
+    // Mudança de etapa usa o fluxo normal (auto-tarefa + webhook do §2.2/§6c).
+    updateLeadCrm(id, { stage: result.nova_etapa });
+  }
+  if (result.followup_em_dias) {
+    addLeadTask(id, `SDR — retomar contato: ${lead.companyName}`, localDateInDays(result.followup_em_dias), "Média");
+  }
+  const status =
+    result.classificacao === "interessado"
+      ? "qualificado"
+      : result.classificacao === "sem_interesse"
+        ? "encerrado"
+        : "aguardando_resposta";
+  setSdrStatus(id, status);
+  addLeadNote(id, `SDR classificou a resposta como: ${result.classificacao}`, "Sistema");
+  res.json({ result, lead: getLeadById(id) });
 });
 
 /** Marca "último contato" do lead (botão "Marcar contato"). */

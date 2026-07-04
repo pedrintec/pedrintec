@@ -164,6 +164,11 @@ const leadColumnsToAdd: Array<{ name: string; ddl: string }> = [
   { name: "owner", ddl: "owner TEXT" },
   { name: "next_action", ddl: "next_action TEXT" },
   { name: "last_contact_at", ddl: "last_contact_at TEXT" },
+  // --- Pipeline Pesquisador/SDR IA ---
+  { name: "research_report", ddl: "research_report TEXT" },
+  { name: "researched_at", ddl: "researched_at TEXT" },
+  { name: "sdr_status", ddl: "sdr_status TEXT" },
+  { name: "sdr_started_at", ddl: "sdr_started_at TEXT" },
 ];
 
 // Coluna adicionada à tabela `lead_tasks` (idempotente).

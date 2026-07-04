@@ -252,6 +252,11 @@ export type LeadRecord = Lead & {
   lastContactAt: string | null;
   notes: CrmNote[];
   tasks: CrmTask[];
+  // Pipeline Pesquisador/SDR IA
+  researchReport: unknown | null; // JSON já parseado do relatório
+  researchedAt: string | null;
+  sdrStatus: string | null;
+  sdrStartedAt: string | null;
 };
 
 function buildRecord(
@@ -269,6 +274,10 @@ function buildRecord(
     lastContactAt: r.lastContactAt ?? null,
     notes,
     tasks,
+    researchReport: parseJson<unknown>(r.researchReport) ?? null,
+    researchedAt: r.researchedAt ?? null,
+    sdrStatus: r.sdrStatus ?? null,
+    sdrStartedAt: r.sdrStartedAt ?? null,
   };
 }
 
@@ -358,6 +367,15 @@ function dateUpperBound(range?: LeadsPageFilters["dateRange"]): string | null {
   return d.toISOString();
 }
 
+/** Converte chaves snake_case (linhas cruas do SELECT *) para o camelCase do schema. */
+function camelizeRow(row: Record<string, unknown>): typeof schema.leads.$inferSelect {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(row)) {
+    out[k.replace(/_([a-z])/g, (_m, c: string) => c.toUpperCase())] = v;
+  }
+  return out as typeof schema.leads.$inferSelect;
+}
+
 /** Coluna de ordenação aceita (whitelist para evitar injeção). */
 const SORT_COLUMNS: Record<NonNullable<LeadsPageFilters["sort"]>, string> = {
   created: "collected_at",
@@ -434,9 +452,11 @@ export function getLeadsPage(
   const rowsStmt = sqlite.prepare(
     `SELECT * FROM leads ${whereSql} ${orderSql} LIMIT ? OFFSET ?`,
   );
-  const rows = rowsStmt.all(...params, limit, offset) as Array<
-    typeof schema.leads.$inferSelect
-  >;
+  // SELECT * cru devolve chaves snake_case; buildRecord espera o camelCase do
+  // schema — sem converter, company_name etc. viram undefined no painel.
+  const rows = (rowsStmt.all(...params, limit, offset) as Array<Record<string, unknown>>).map(
+    (r) => camelizeRow(r),
+  );
 
   // Batch-load notas + tarefas só dos leads desta página (super leve).
   const ids = rows.map((r) => r.id);
@@ -544,7 +564,11 @@ function dueInDays(days: number): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
-export function updateLeadCrm(leadId: number, data: CrmUpdate): LeadRecord | undefined {
+export function updateLeadCrm(
+  leadId: number,
+  data: CrmUpdate,
+  opts: { skipAutoTask?: boolean } = {},
+): LeadRecord | undefined {
   // Estado atual: detecta transição de etapa e alimenta tarefa/histórico/webhook.
   const current = db.select().from(schema.leads).where(eq(schema.leads.id, leadId)).get();
   if (!current) return undefined; // sem lead: nada de task/atividade/webhook fantasma
@@ -567,8 +591,9 @@ export function updateLeadCrm(leadId: number, data: CrmUpdate): LeadRecord | und
     // Histórico imutável: "Movido de X para Y" (§2.2).
     addLeadActivity(leadId, "stage_change", `Movido de ${oldStage} para ${data.stage}`, { author: "Sistema" });
 
-    // Tarefa automática por etapa de destino (§2.2).
-    const rule = STAGE_AUTO_TASK[data.stage];
+    // Tarefa automática por etapa de destino (§2.2). O SDR cria a própria
+    // cadência, então pode pedir para pular (evita tarefa duplicada).
+    const rule = opts.skipAutoTask ? undefined : STAGE_AUTO_TASK[data.stage];
     if (rule) {
       const name = current?.companyName ?? "lead";
       addLeadTask(leadId, rule.text(name), dueInDays(rule.dueDays), rule.priority);
@@ -587,6 +612,22 @@ export function updateLeadCrm(leadId: number, data: CrmUpdate): LeadRecord | und
   }
 
   return getLeadById(leadId);
+}
+
+/** Salva o relatório do Pesquisador no lead (JSON) e registra a atividade. */
+export function saveResearchReport(leadId: number, report: unknown): void {
+  db.update(schema.leads)
+    .set({ researchReport: JSON.stringify(report), researchedAt: new Date().toISOString() })
+    .where(eq(schema.leads.id, leadId))
+    .run();
+  addLeadActivity(leadId, "research", "Relatório do Pesquisador gerado", { author: "Sistema" });
+}
+
+/** Atualiza o status da cadência SDR do lead. */
+export function setSdrStatus(leadId: number, status: string | null): void {
+  const set: Record<string, unknown> = { sdrStatus: status };
+  if (status === "ativo") set.sdrStartedAt = new Date().toISOString();
+  db.update(schema.leads).set(set).where(eq(schema.leads.id, leadId)).run();
 }
 
 /** Marca o "último contato" do lead (botão "Marcar contato" da UI). */

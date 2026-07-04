@@ -727,6 +727,7 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
     <nav class="nav" id="mainNav">
       <div class="nav-item active" data-view="dashboard"><span class="nav-ico">◉</span> Dashboard</div>
       <div class="nav-item" data-view="hunter"><span class="nav-ico">⌖</span> Lead Hunter IA <span class="nav-badge">AI</span></div>
+      <div class="nav-item" data-view="sdr"><span class="nav-ico">🤖</span> SDR IA</div>
       <div class="nav-item" data-view="crm"><span class="nav-ico">⎘</span> CRM Funil</div>
       <div class="nav-item" data-view="leads"><span class="nav-ico">☰</span> Leads</div>
       <div class="nav-item" data-view="launches"><span class="nav-ico">🚀</span> Lançamentos</div>
@@ -1031,6 +1032,26 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
         </div>
       </section>
 
+      <!-- =============== SDR IA =============== -->
+      <section class="section" id="view-sdr">
+        <div class="stats" id="sdrStats" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+        <div class="card" style="margin-top:18px">
+          <div class="section-head"><h2><span class="dot"></span> Leads em cadência SDR</h2>
+            <span class="badge badge-success" id="sdrAiBadge" style="display:none"><span class="dot"></span> IA ativa (Claude)</span>
+          </div>
+          <div class="table-wrap" style="border:none;background:transparent">
+            <table class="table">
+              <thead><tr>
+                <th>Empresa</th><th>Nicho</th><th>Etapa</th><th>Status SDR</th>
+                <th>Próxima ação</th><th style="text-align:right">Ações</th>
+              </tr></thead>
+              <tbody id="sdrBody"></tbody>
+            </table>
+            <div id="sdrEmpty" style="display:none"><div class="empty"><div class="em-ico">🤖</div><h3>Nenhuma cadência ativa</h3><p>Abra um lead e clique em "Iniciar SDR" — o Pesquisador gera o dossiê e a cadência D0/D+2/D+5 é criada sozinha.</p></div></div>
+          </div>
+        </div>
+      </section>
+
       <!-- =============== TASKS =============== -->
       <section class="section" id="view-tasks">
         <div class="card" style="margin-bottom:18px">
@@ -1106,6 +1127,7 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
 <div class="mobile-tabs" id="mobileTabs">
   <div class="nav-item active" data-view="dashboard"><span class="nav-ico">◉</span>Home</div>
   <div class="nav-item" data-view="hunter"><span class="nav-ico">⌖</span>Hunter</div>
+  <div class="nav-item" data-view="sdr"><span class="nav-ico">🤖</span>SDR</div>
   <div class="nav-item" data-view="crm"><span class="nav-ico">⎘</span>CRM</div>
   <div class="nav-item" data-view="leads"><span class="nav-ico">☰</span>Leads</div>
   <div class="nav-item" data-view="launches"><span class="nav-ico">🚀</span>Lanç.</div>
@@ -1178,6 +1200,9 @@ function mapLead(b){
     priorityKey: b.commercialPriority||'',
     outreachMessage: b.outreachMessage||'',
     dataConfidence: b.dataConfidence,
+    research: b.researchReport||null,
+    researchedAt: b.researchedAt||null,
+    sdrStatus: b.sdrStatus||null,
   };
 }
 function mapTask(t, leadById){
@@ -1204,7 +1229,7 @@ function openModal(o){
 }
 function closeModal(){ document.getElementById('modal').classList.remove('active'); }
 
-async function loadConfig(){ try{ const c=await api('/api/config'); state.provider=c.provider; }catch{} }
+async function loadConfig(){ try{ const c=await api('/api/config'); state.provider=c.provider; state.ai=!!c.ai; }catch{} }
 async function loadSettings(){ try{ const r=await api('/api/settings'); state.settings={...state.settings,...r.settings}; }catch{} }
 async function loadLeads(){ try{ const r=await api('/api/leads'); state.leads=(r.leads||[]).map(mapLead); }catch(e){ toast('error','Erro ao carregar leads',e.message); } }
 async function loadTasks(){ try{ const r=await api('/api/tasks'); const idx=new Map(state.leads.map(l=>[l.id,l])); state.tasks=(r.tasks||[]).map(t=>mapTask(t,idx)); }catch{ state.tasks=[]; } }
@@ -1229,6 +1254,7 @@ async function refreshAll(){
 const titles = {
   dashboard:['Dashboard','Visão executiva da sua operação comercial'],
   hunter:['Lead Hunter IA','Gere dorks reais e ative os robôs de busca'],
+  sdr:['SDR IA','Pesquisa, cadência e qualificação automática de leads'],
   crm:['CRM Funil','Arraste os cards entre etapas — tudo salva no banco'],
   leads:['Leads','Sua base completa, filtrável e auditável'],
   launches:['Lançamentos','Encontre, organize e acompanhe lançamentos digitais'],
@@ -1254,6 +1280,7 @@ function switchView(view){
     }
     loadLeadsPage();
   }
+  if(view==='sdr') renderSdr();
   if(view==='launches') renderLaunches();
   if(view==='tasks') renderTasks();
   if(view==='automations') renderAutomations();
@@ -1760,6 +1787,143 @@ function simpleScore(l){
   return { score, temp, signals:sig };
 }
 
+// =============== PIPELINE PESQUISADOR / SDR IA ===============
+const SDR_LABEL = { ativo:'🟢 Em cadência', aguardando_resposta:'🟡 Aguardando resposta', qualificado:'🔥 Qualificado', encerrado:'⚫ Encerrado' };
+
+function renderSdr(){
+  const L = state.leads.filter(function(l){ return l.sdrStatus; });
+  const count = function(s){ return L.filter(function(l){ return l.sdrStatus===s; }).length; };
+  document.getElementById('sdrStats').innerHTML =
+    stat('Em cadência', count('ativo'), '🤖') +
+    stat('Aguardando resposta', count('aguardando_resposta'), '🟡') +
+    stat('Qualificados', count('qualificado'), '🔥', null, null, 'gold') +
+    stat('Encerrados', count('encerrado'), '⚫');
+  const badge = document.getElementById('sdrAiBadge');
+  if(badge) badge.style.display = state.ai ? '' : 'none';
+  const body = document.getElementById('sdrBody');
+  const empty = document.getElementById('sdrEmpty');
+  if(!L.length){ body.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display='none';
+  body.innerHTML = L.map(function(l){
+    return '<tr>'+
+      '<td><b>'+escapeHtml(l.name)+'</b><div style="font-size:11px;color:var(--text-mute)">'+escapeHtml(l.city||'')+(l.uf?'/'+escapeHtml(l.uf):'')+'</div></td>'+
+      '<td>'+escapeHtml(l.niche||'—')+'</td>'+
+      '<td>'+escapeHtml(l.stage)+'</td>'+
+      '<td style="white-space:nowrap">'+(SDR_LABEL[l.sdrStatus]||escapeHtml(l.sdrStatus))+'</td>'+
+      '<td style="font-size:12px">'+escapeHtml(l.nextAction||'—')+'</td>'+
+      '<td style="text-align:right;white-space:nowrap">'+
+        '<button class="btn btn-sm btn-ghost" onclick="openLeadModal('+l.id+')">Abrir</button> '+
+        '<button class="btn btn-sm btn-outline" onclick="openReplyModal('+l.id+')">📩 Resposta</button>'+
+      '</td></tr>';
+  }).join('');
+}
+
+async function researchLead(id, force){
+  toast('info','Pesquisador rodando…', state.ai ? 'Analisando com IA (Claude)' : 'Análise heurística local');
+  try{
+    const r = await api('/api/leads/'+id+'/research','POST',{ force: !!force });
+    toast('success','Relatório pronto', r.cached ? 'Relatório existente carregado' : 'Dossiê comercial gerado');
+    await refreshAll();
+    openLeadModal(id);
+  }catch(e){ toast('error','Erro na pesquisa', e.message); }
+}
+
+function copySdrMsg(){ const el=document.getElementById('sdrMsg'); if(!el) return; navigator.clipboard.writeText(el.value); toast('success','Mensagem copiada'); }
+function openWaSdr(id){
+  const l = state.leads.find(function(x){ return x.id===id; }); if(!l||!l.whatsapp) return;
+  const el = document.getElementById('sdrMsg');
+  window.open('https://wa.me/'+l.whatsapp+(el?'?text='+encodeURIComponent(el.value):''),'_blank');
+  api('/api/leads/'+id+'/contact','POST').catch(function(){});
+}
+
+async function startSdr(id){
+  toast('info','SDR IA iniciando…','Pesquisando a empresa e montando a cadência');
+  try{
+    const r = await api('/api/leads/'+id+'/sdr/start','POST',{});
+    await refreshAll();
+    const l = state.leads.find(function(x){ return x.id===id; });
+    openModal({
+      title:'🤖 SDR IA ativado',
+      sub:(l?l.name:'')+' • cadência D0 / D+2 / D+5 criada • etapa: Qualificado',
+      body:'<div class="lead-section"><h4>Mensagem de abordagem (D0)</h4><textarea id="sdrMsg" rows="9">'+escapeHtml(r.message)+'</textarea>'+
+        '<div style="font-size:11px;color:var(--text-mute);margin-top:8px">Tarefas criadas: '+r.tasks.map(function(t){ return escapeHtml(t.due); }).join(' • ')+'</div></div>',
+      footer:'<button class="btn btn-ghost" onclick="closeModal()">Fechar</button>'+
+        '<button class="btn btn-sm btn-ghost" onclick="copySdrMsg()">📋 Copiar</button>'+
+        (l&&l.whatsapp?'<button class="btn btn-success" onclick="openWaSdr('+id+')">💬 Enviar no WhatsApp</button>':'')
+    });
+  }catch(e){ toast('error','Erro ao iniciar SDR', e.message); }
+}
+
+function openReplyModal(id){
+  const l = state.leads.find(function(x){ return x.id===id; }); if(!l) return;
+  openModal({
+    title:'📩 Registrar resposta do lead',
+    sub:l.name+' — cole abaixo o que o lead respondeu no WhatsApp',
+    body:'<div class="field"><label>Resposta recebida</label><textarea id="sdrReplyText" rows="5" placeholder="Ex: Tenho interesse sim! Quanto custa?"></textarea></div>',
+    footer:'<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="submitSdrReply('+id+')">🤖 Qualificar resposta</button>'
+  });
+}
+
+async function submitSdrReply(id){
+  const el = document.getElementById('sdrReplyText');
+  const text = (el && el.value || '').trim();
+  if(!text){ toast('warn','Cole a resposta do lead antes de qualificar'); return; }
+  try{
+    const r = await api('/api/leads/'+id+'/sdr/reply','POST',{ text });
+    await refreshAll();
+    const res = r.result;
+    const l = state.leads.find(function(x){ return x.id===id; });
+    const CL = { interessado:'🔥 Interessado', sem_interesse:'⛔ Sem interesse', depois:'⏳ Quer depois', duvida:'❓ Dúvida' };
+    openModal({
+      title:'Qualificação do SDR',
+      sub:(l?l.name:'')+' • '+(state.ai?'classificado com IA':'classificado por heurística'),
+      body:'<div class="lead-section"><h4>Classificação</h4>'+
+        '<div style="font-size:18px;font-weight:800;margin-bottom:6px">'+(CL[res.classificacao]||escapeHtml(res.classificacao))+'</div>'+
+        '<div style="font-size:12px;line-height:1.6"><b>Próxima ação:</b> '+escapeHtml(res.proxima_acao)+'</div>'+
+        (res.nova_etapa?'<div style="font-size:12px;line-height:1.6"><b>Etapa movida para:</b> '+escapeHtml(res.nova_etapa)+'</div>':'')+
+        (res.followup_em_dias?'<div style="font-size:12px;line-height:1.6"><b>Follow-up criado:</b> daqui a '+res.followup_em_dias+' dias</div>':'')+
+        (res.sugerir_opt_out?'<div style="font-size:12px;color:#FB7185;margin-top:6px"><b>⚠ LGPD:</b> considere registrar opt-out deste lead.</div>':'')+
+      '</div>'+
+      '<div class="lead-section" style="margin-top:14px"><h4>Resposta sugerida</h4><textarea id="sdrMsg" rows="6">'+escapeHtml(res.sugestao_resposta)+'</textarea></div>',
+      footer:'<button class="btn btn-ghost" onclick="closeModal()">Fechar</button>'+
+        '<button class="btn btn-sm btn-ghost" onclick="copySdrMsg()">📋 Copiar</button>'+
+        (l&&l.whatsapp?'<button class="btn btn-success" onclick="openWaSdr('+id+')">💬 WhatsApp</button>':'')
+    });
+  }catch(e){ toast('error','Erro ao qualificar', e.message); }
+}
+
+function rpList(arr){
+  return '<ul style="margin:4px 0 0 16px;padding:0;font-size:12px;line-height:1.7">'+(arr||[]).map(function(x){ return '<li>'+escapeHtml(x)+'</li>'; }).join('')+'</ul>';
+}
+function researchPanelHtml(l){
+  const r = l.research;
+  const btns = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+
+    '<button class="btn btn-sm btn-outline" onclick="researchLead('+l.id+','+(r?'true':'false')+')">🔬 '+(r?'Atualizar pesquisa':'Pesquisar empresa')+'</button>'+
+    (l.sdrStatus
+      ? '<button class="btn btn-sm btn-outline" onclick="openReplyModal('+l.id+')">📩 Registrar resposta</button>'
+      : '<button class="btn btn-sm btn-primary" onclick="startSdr('+l.id+')">🤖 Iniciar SDR</button>')+
+    '</div>';
+  if(!r){
+    return '<div class="lead-section" style="margin-top:14px"><h4>Pesquisador IA</h4>'+
+      '<div style="font-size:12px;color:var(--text-mute)">Nenhum dossiê ainda. Rode o Pesquisador para analisar site, redes e sinais públicos desta empresa.</div>'+btns+'</div>';
+  }
+  const m = r.nivel_maturidade_digital || { score:0, label:'Baixa', sinais:[] };
+  return '<div class="lead-section" style="margin-top:14px"><h4>Pesquisador IA '+
+      (r.gerado_por==='ia' ? '<span style="font-size:10px;color:var(--cyan)">🧠 gerado com IA</span>' : '<span style="font-size:10px;color:var(--text-mute)">⚙ heurístico</span>')+
+      (l.sdrStatus ? ' <span style="font-size:10px">'+(SDR_LABEL[l.sdrStatus]||'')+'</span>' : '')+'</h4>'+
+    '<div style="font-size:12px;line-height:1.6">'+escapeHtml(r.resumo_da_empresa||'')+'</div>'+
+    '<div style="font-size:12px;margin-top:8px"><b>Público-alvo:</b> '+escapeHtml(r.publico_alvo||'')+'</div>'+
+    '<div style="font-size:12px;margin-top:8px"><b>Dores prováveis:</b>'+rpList(r.possiveis_dores)+'</div>'+
+    '<div style="font-size:12px;margin-top:8px"><b>Serviços:</b>'+rpList(r.servicos)+'</div>'+
+    '<div style="font-size:12px;margin-top:8px"><b>Problemas identificados:</b>'+rpList(r.possiveis_problemas)+'</div>'+
+    '<div style="font-size:12px;margin-top:8px"><b>Oportunidades de automação:</b>'+rpList(r.oportunidades_de_automacao)+'</div>'+
+    '<div style="font-size:12px;margin-top:8px"><b>Possibilidade de uso de IA:</b>'+rpList(r.possibilidade_uso_ia)+'</div>'+
+    '<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><b>Maturidade digital</b><span>'+(m.score||0)+'/100 • '+escapeHtml(m.label||'')+'</span></div>'+
+      '<div class="funnel-bar" style="height:8px"><div class="funnel-fill" style="width:'+(m.score||0)+'%;background:var(--grad-brand)"></div></div></div>'+
+    (r.fontes && r.fontes.length ? '<div style="font-size:10px;color:var(--text-mute);margin-top:8px">Fontes: '+r.fontes.map(escapeHtml).join(' • ')+'</div>' : '')+
+    btns+'</div>';
+}
+
 function buildWhatsappMsg(l){
   const tpl = state.settings.message || '';
   const ci = commercialIntel(l);
@@ -1784,7 +1948,7 @@ async function openLeadModal(id){
   openModal({
     title: l.name,
     sub: l.niche+' • '+l.city+'/'+l.uf+' • Etapa: '+l.stage,
-    body: '<div class="lead-grid"><div><div class="lead-section"><h4>Informações</h4><div class="field-row"><div class="field"><label>Telefone</label><input id="leTel" value="'+escapeHtml(l.phone)+'"/></div><div class="field"><label>WhatsApp</label><input id="leWa" value="'+escapeHtml(l.whatsapp)+'"/></div></div><div class="field-row"><div class="field"><label>Instagram</label><input id="leIg" value="'+escapeHtml(l.instagram)+'"/></div><div class="field"><label>Email</label><input id="leMail" value="'+escapeHtml(l.email)+'"/></div></div><div class="field"><label>Site</label><input id="leSite" value="'+escapeHtml(l.site)+'"/></div><div class="field-row"><div class="field"><label>Valor estimado (R$)</label><input id="leVal" type="number" value="'+l.value+'"/></div><div class="field"><label>Próxima ação</label><input id="leNext" value="'+escapeHtml(l.nextAction)+'"/></div></div><div class="field"><label>Observações</label><textarea id="leNote" rows="3">'+escapeHtml(l.note)+'</textarea></div><div class="field"><label>Etapa</label><select id="leStage">'+STAGES.map(s=>'<option '+(s===l.stage?'selected':'')+'>'+s+'</option>').join('')+'</select></div></div><div class="lead-section" style="margin-top:14px"><h4>Mensagem pronta WhatsApp</h4><textarea id="leMsg" rows="8">'+escapeHtml(baseMsg)+'</textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn btn-sm btn-ghost" onclick="copyMsg()">📋 Copiar</button><button class="btn btn-sm btn-success" onclick="openWa('+l.id+')">💬 WhatsApp</button><button class="btn btn-sm btn-warm" onclick="markLastContact('+l.id+')">⏱ Marcar contato</button><button class="btn btn-sm btn-outline" onclick="quickTaskForLead('+l.id+')">＋ Tarefa</button></div></div></div><div><div class="lead-section" style="display:flex;gap:14px;align-items:center"><div class="lead-score-circle" style="--p:'+l.score+'"><span>'+l.score+'</span></div><div style="flex:1"><div style="font-weight:700;margin-bottom:4px">'+tempBadge(l.temp)+'</div><div style="font-size:11px;color:var(--text-mute);line-height:1.5">'+(l.reasons||[]).slice(0,4).map(escapeHtml).join(' • ')+'</div><div style="font-size:13px;font-weight:800;color:#FCD34D;margin-top:8px">'+brl(l.value)+'</div></div></div><div class="lead-section" style="margin-top:14px"><h4>Inteligência comercial</h4><div style="font-size:12px;line-height:1.6"><b>Dor digital:</b> '+escapeHtml(ci.pain)+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Oferta sugerida:</b> '+escapeHtml(ci.offer)+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Último contato:</b> '+(l.lastContact?new Date(l.lastContact).toLocaleDateString('pt-BR'):'—')+'</div>'+(l.priorityKey?'<div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Prioridade:</b> '+escapeHtml(PRIO_LBL[l.priorityKey]||l.priorityKey)+'</div>':'')+'</div>'+ssPanel+'<div class="lead-section" style="margin-top:14px"><h4>Histórico de interações</h4><div class="history">'+(l.history && l.history.length ? l.history.map(h=>'<div class="history-item"><time>'+new Date(h.at).toLocaleString('pt-BR')+'</time>'+escapeHtml(h.text)+'</div>').join('') : '<div style="color:var(--text-mute);font-size:12px">Sem interações registradas</div>')+'</div></div><div class="lead-section" style="margin-top:14px"><h4>Tarefas vinculadas</h4><div id="leadTasks">'+renderLeadTasks(l.id)+'</div></div></div></div>',
+    body: '<div class="lead-grid"><div><div class="lead-section"><h4>Informações</h4><div class="field-row"><div class="field"><label>Telefone</label><input id="leTel" value="'+escapeHtml(l.phone)+'"/></div><div class="field"><label>WhatsApp</label><input id="leWa" value="'+escapeHtml(l.whatsapp)+'"/></div></div><div class="field-row"><div class="field"><label>Instagram</label><input id="leIg" value="'+escapeHtml(l.instagram)+'"/></div><div class="field"><label>Email</label><input id="leMail" value="'+escapeHtml(l.email)+'"/></div></div><div class="field"><label>Site</label><input id="leSite" value="'+escapeHtml(l.site)+'"/></div><div class="field-row"><div class="field"><label>Valor estimado (R$)</label><input id="leVal" type="number" value="'+l.value+'"/></div><div class="field"><label>Próxima ação</label><input id="leNext" value="'+escapeHtml(l.nextAction)+'"/></div></div><div class="field"><label>Observações</label><textarea id="leNote" rows="3">'+escapeHtml(l.note)+'</textarea></div><div class="field"><label>Etapa</label><select id="leStage">'+STAGES.map(s=>'<option '+(s===l.stage?'selected':'')+'>'+s+'</option>').join('')+'</select></div></div><div class="lead-section" style="margin-top:14px"><h4>Mensagem pronta WhatsApp</h4><textarea id="leMsg" rows="8">'+escapeHtml(baseMsg)+'</textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn btn-sm btn-ghost" onclick="copyMsg()">📋 Copiar</button><button class="btn btn-sm btn-success" onclick="openWa('+l.id+')">💬 WhatsApp</button><button class="btn btn-sm btn-warm" onclick="markLastContact('+l.id+')">⏱ Marcar contato</button><button class="btn btn-sm btn-outline" onclick="quickTaskForLead('+l.id+')">＋ Tarefa</button></div></div></div><div><div class="lead-section" style="display:flex;gap:14px;align-items:center"><div class="lead-score-circle" style="--p:'+l.score+'"><span>'+l.score+'</span></div><div style="flex:1"><div style="font-weight:700;margin-bottom:4px">'+tempBadge(l.temp)+'</div><div style="font-size:11px;color:var(--text-mute);line-height:1.5">'+(l.reasons||[]).slice(0,4).map(escapeHtml).join(' • ')+'</div><div style="font-size:13px;font-weight:800;color:#FCD34D;margin-top:8px">'+brl(l.value)+'</div></div></div><div class="lead-section" style="margin-top:14px"><h4>Inteligência comercial</h4><div style="font-size:12px;line-height:1.6"><b>Dor digital:</b> '+escapeHtml(ci.pain)+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Oferta sugerida:</b> '+escapeHtml(ci.offer)+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Último contato:</b> '+(l.lastContact?new Date(l.lastContact).toLocaleDateString('pt-BR'):'—')+'</div>'+(l.priorityKey?'<div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Prioridade:</b> '+escapeHtml(PRIO_LBL[l.priorityKey]||l.priorityKey)+'</div>':'')+'</div>'+researchPanelHtml(l)+ssPanel+'<div class="lead-section" style="margin-top:14px"><h4>Histórico de interações</h4><div class="history">'+(l.history && l.history.length ? l.history.map(h=>'<div class="history-item"><time>'+new Date(h.at).toLocaleString('pt-BR')+'</time>'+escapeHtml(h.text)+'</div>').join('') : '<div style="color:var(--text-mute);font-size:12px">Sem interações registradas</div>')+'</div></div><div class="lead-section" style="margin-top:14px"><h4>Tarefas vinculadas</h4><div id="leadTasks">'+renderLeadTasks(l.id)+'</div></div></div></div>',
     footer: '<button class="btn btn-ghost" onclick="closeModal()">Fechar</button><button class="btn btn-danger" onclick="deleteLead('+l.id+')">🗑 Excluir</button><button class="btn btn-primary" onclick="saveLeadChanges('+l.id+')">💾 Salvar</button>'
   });
 }

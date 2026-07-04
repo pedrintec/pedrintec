@@ -58,6 +58,10 @@ const envSchema = z.object({
   // --- Integrações (opcional): webhook n8n disparado na mudança de etapa ---
   // "" (chave presente mas vazia no .env) conta como desativado.
   N8N_WEBHOOK_URL: z.preprocess((v) => (v === "" ? undefined : v), z.string().url().optional()),
+
+  // --- IA (opcional): Pesquisador e SDR usam a API do Claude se houver chave ---
+  ANTHROPIC_API_KEY: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
+  ANTHROPIC_MODEL: z.string().default("claude-sonnet-5"),
 });
 
 const parsed = envSchema.safeParse(process.env);

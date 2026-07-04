@@ -74,6 +74,12 @@ export const leads = sqliteTable("leads", {
   owner: text("owner"), // responsável comercial
   nextAction: text("next_action"), // próxima ação sugerida
   lastContactAt: text("last_contact_at"), // último contato registrado
+
+  // --- Pipeline Pesquisador/SDR IA ---
+  researchReport: text("research_report"), // JSON do relatório do Pesquisador
+  researchedAt: text("researched_at"),
+  sdrStatus: text("sdr_status"), // ativo | aguardando_resposta | qualificado | encerrado
+  sdrStartedAt: text("sdr_started_at"),
 });
 
 /** Tarefas/follow-ups por lead (CRM). */

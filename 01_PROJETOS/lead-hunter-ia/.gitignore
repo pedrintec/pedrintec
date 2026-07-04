@@ -2,7 +2,9 @@ node_modules/
 dist/
 data/
 exports/
-.env
+# qualquer arquivo de env (ex.: .env, hermers.env) — nunca versionar chaves
+*.env
+!.env.example
 *.log
 .DS_Store
 drizzle/
