@@ -21,11 +21,12 @@
   --surface:rgba(16,26,56,.72);
   --surface-2:rgba(255,255,255,.035);
   --surface-3:rgba(255,255,255,.07);
-  --line:rgba(148,178,255,.10);
-  --line-2:rgba(148,178,255,.20);
-  --text:#EDF2FF;
-  --text-dim:#A8B4D6;
-  --text-mute:#6A78A0;
+  --line:rgba(148,178,255,.12);
+  --line-2:rgba(148,178,255,.22);
+  --text:#F1F4FC;
+  --text-dim:#BAC5E2;
+  --text-mute:#8A97BD;
+  color-scheme:dark;
 
   /* Azul safira (primário) — "--indigo" mantido como alias do azul */
   --blue:#2E6BFF;
@@ -64,6 +65,7 @@
   --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
 }
 body.light{
+  color-scheme:light;
   --bg-0:#F4F6FC;
   --bg-1:#EEF1FA;
   --bg-2:#E4E9F5;
@@ -115,9 +117,14 @@ input,select,textarea{
 }
 input:focus,select:focus,textarea:focus{
   border-color:var(--indigo);
-  box-shadow:0 0 0 4px rgba(99,102,241,.18);
+  box-shadow:0 0 0 4px rgba(46,107,255,.20);
   background:var(--surface-3);
 }
+select{cursor:pointer}
+select option,select optgroup{background:#0E1A38;color:var(--text)}
+select optgroup{font-weight:700;color:#9DB0DE;padding:6px 0}
+select option{font-weight:500;padding:6px 8px}
+body.light select option,body.light select optgroup{background:#fff;color:var(--text)}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:8px}
@@ -624,39 +631,57 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
 .hunter-form .field{margin:0}
 .hunter-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 
-/* Caça — formulário reorganizado em grupos lógicos */
-.hunter-groups{display:flex;flex-direction:column;gap:18px}
+/* ============================================================
+   CAÇA — console de prospecção (seções numeradas, sem emoji)
+   ============================================================ */
+.hunter-groups{display:flex;flex-direction:column;gap:22px}
 .hunter-group{
   background:var(--surface-2);border:1px solid var(--line);
-  border-radius:var(--radius);padding:16px 16px 18px;position:relative;
+  border-radius:var(--radius-lg);padding:22px 22px 24px;position:relative;
 }
 .hunter-group-head{
-  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  display:flex;align-items:baseline;gap:12px;margin-bottom:20px;
+  padding-bottom:14px;border-bottom:1px solid var(--line);
 }
 .hunter-group-num{
-  width:22px;height:22px;border-radius:7px;flex-shrink:0;
-  display:grid;place-items:center;font-size:11px;font-weight:800;
-  background:rgba(46,107,255,.16);color:#8FB2FF;border:1px solid rgba(46,107,255,.28);
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:12px;font-weight:700;color:var(--blue-2);
+  letter-spacing:.06em;flex-shrink:0;
 }
-.hunter-group.gold .hunter-group-num{background:rgba(242,193,78,.16);color:#F2C14E;border-color:rgba(242,193,78,.3)}
-.hunter-group-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim)}
-.hunter-group-hint{margin-left:auto;font-size:11px;color:var(--text-mute)}
-.hunter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.hunter-group.gold .hunter-group-num{color:var(--gold)}
+.hunter-group-title{font-size:14px;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+.hunter-group-hint{margin-left:auto;font-size:12px;color:var(--text-dim);text-align:right}
+.hunter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 18px}
 .hunter-grid .field{margin:0}
-.hunter-grid .field label{display:flex;align-items:center;gap:6px}
+.hunter-grid .field label{font-size:12px;font-weight:600;color:var(--text-dim);letter-spacing:.01em}
+.hunter-grid .field input,.hunter-grid .field select{padding:11px 13px;font-size:13.5px}
 .hunter-grid.cols-3-params{grid-template-columns:1fr 1fr 1fr}
 .hunter-grid.cols-2{grid-template-columns:1fr 1fr}
 
-/* Barra de ações da caça: hero primário + secundários agrupados */
+/* Painel de estratégia — reage ao nicho (assinatura) */
+.strategy{
+  grid-column:1/-1;margin-top:4px;
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  background:var(--line);border:1px solid rgba(242,193,78,.28);
+  border-radius:var(--radius);overflow:hidden;
+}
+.strategy-cell{background:linear-gradient(180deg,rgba(242,193,78,.06),rgba(242,193,78,.02));padding:14px 16px}
+.strategy-cell.pain{background:linear-gradient(180deg,rgba(46,107,255,.06),rgba(46,107,255,.02))}
+.strategy-k{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-mute);display:flex;align-items:center;gap:7px}
+.strategy-k::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.strategy-cell.pain .strategy-k::before{background:var(--blue-2)}
+.strategy-v{font-size:13.5px;font-weight:600;color:var(--text);margin-top:6px;line-height:1.45}
+
+/* Barra de ações da caça: primário + secundários agrupados */
 .hunter-cta{
-  display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px;
-  padding-top:16px;border-top:1px solid var(--line);
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:22px;
+  padding-top:20px;border-top:1px solid var(--line);
 }
 .hunter-cta .btn-primary{font-size:14px;padding:12px 22px}
 .hunter-cta-sep{flex:1;min-width:8px}
 .hunter-cta-group{display:flex;gap:8px;flex-wrap:wrap}
 @media(max-width:1100px){ .hunter-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
-@media(max-width:640px){ .hunter-grid,.hunter-grid.cols-3-params,.hunter-grid.cols-2{grid-template-columns:1fr} .hunter-cta{flex-direction:column;align-items:stretch} .hunter-cta-group{flex-direction:column} .hunter-cta .btn{width:100%;justify-content:center} }
+@media(max-width:640px){ .hunter-grid,.hunter-grid.cols-3-params,.hunter-grid.cols-2,.strategy{grid-template-columns:1fr} .hunter-cta{flex-direction:column;align-items:stretch} .hunter-cta-group{flex-direction:column} .hunter-cta .btn{width:100%;justify-content:center} }
 
 .dork-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto}
 .dork-item{
@@ -869,193 +894,187 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
           </div>
           <div class="hunter-groups">
 
-            <!-- Grupo 1 — Alvo -->
+            <!-- Seção 01 — Alvo -->
             <div class="hunter-group">
               <div class="hunter-group-head">
-                <span class="hunter-group-num">1</span>
-                <span class="hunter-group-title">Alvo da caça</span>
-                <span class="hunter-group-hint">Quem e onde você quer prospectar</span>
+                <span class="hunter-group-num">01</span>
+                <span class="hunter-group-title">Alvo</span>
+                <span class="hunter-group-hint">O segmento e a praça que você quer atacar</span>
               </div>
               <div class="hunter-grid">
-                <div class="field"><label>🎯 Nicho</label>
+                <div class="field"><label>Nicho</label>
                   <select id="hNicho">
-                    <optgroup label="🏥 Saúde &amp; Estética">
-                      <option>Clínicas Odontológicas</option><option>Clínicas de Estética</option>
-                      <option>Harmonização Facial</option><option>Clínicas Médicas</option>
-                      <option>Dermatologia</option><option>Fisioterapia</option>
-                      <option>Nutricionistas</option><option>Psicólogos</option>
+                    <optgroup label="Saúde e bem-estar">
+                      <option>Odontologia</option><option>Estética</option><option>Dermatologia</option>
+                      <option>Fisioterapia</option><option>Nutrição</option><option>Psicologia</option>
+                      <option>Clínica Médica</option><option>Oftalmologia</option><option>Veterinária</option>
                     </optgroup>
-                    <optgroup label="💪 Fitness &amp; Bem-estar">
-                      <option>Academias</option><option>Estúdios de Pilates</option>
-                      <option>CrossFit</option><option>Personal Trainers</option><option>Studios de Yoga</option>
+                    <optgroup label="Fitness">
+                      <option>Academia</option><option>Pilates</option><option>CrossFit</option>
+                      <option>Personal Trainer</option><option>Artes Marciais</option>
                     </optgroup>
-                    <optgroup label="🏢 Imóveis &amp; Construção">
-                      <option>Imobiliárias</option><option>Corretores de Imóveis</option>
-                      <option>Construtoras</option><option>Incorporadoras</option><option>Arquitetura</option>
+                    <optgroup label="Beleza">
+                      <option>Barbearia</option><option>Salão de Beleza</option>
+                      <option>Estúdio de Sobrancelha</option><option>Depilação</option><option>Tatuagem</option>
                     </optgroup>
-                    <optgroup label="☀️ Energia &amp; Serviços">
-                      <option>Energia Solar</option><option>Climatização</option>
-                      <option>Segurança Eletrônica</option><option>Reformas</option>
+                    <optgroup label="Imóveis e construção">
+                      <option>Imobiliária</option><option>Corretor de Imóveis</option><option>Construtora</option>
+                      <option>Arquitetura</option><option>Engenharia</option><option>Reforma e Pintura</option>
                     </optgroup>
-                    <optgroup label="⚖️ Serviços Profissionais">
-                      <option>Advocacia</option><option>Contabilidade</option>
-                      <option>Consultorias</option><option>Odontologia</option>
+                    <optgroup label="Casa e serviços">
+                      <option>Energia Solar</option><option>Ar-condicionado</option><option>Segurança Eletrônica</option>
+                      <option>Marcenaria</option><option>Dedetização</option><option>Piscina</option><option>Limpeza</option>
                     </optgroup>
-                    <optgroup label="🍽️ Alimentação &amp; Local">
-                      <option>Restaurantes</option><option>Delivery</option><option>Pizzarias</option>
-                      <option>Cafeterias</option><option>Barbearias</option>
-                      <option>Salões de Beleza</option><option>Pet Shops</option>
+                    <optgroup label="Serviços profissionais">
+                      <option>Advocacia</option><option>Contabilidade</option><option>Consultoria</option>
+                      <option>Corretora de Seguros</option><option>Despachante</option>
                     </optgroup>
-                    <optgroup label="🚀 Digital &amp; Lançamentos">
-                      <option>Lançamentos Digitais</option><option>Infoprodutores</option>
-                      <option>Mentores</option><option>Experts</option><option>Coprodutores</option>
-                      <option>Cursos Online</option><option>Coachs</option>
+                    <optgroup label="Alimentação">
+                      <option>Restaurante</option><option>Pizzaria</option><option>Hamburgueria</option>
+                      <option>Cafeteria</option><option>Padaria</option><option>Confeitaria</option><option>Açaí</option>
                     </optgroup>
-                    <optgroup label="📣 Marketing &amp; Tráfego">
-                      <option>Agências de Marketing</option><option>Gestores de Tráfego</option><option>Social Media</option>
+                    <optgroup label="Automotivo">
+                      <option>Oficina Mecânica</option><option>Funilaria e Pintura</option><option>Auto Elétrica</option>
+                      <option>Estética Automotiva</option><option>Lava-rápido</option><option>Concessionária</option>
                     </optgroup>
-                    <optgroup label="🎟️ Eventos &amp; Comunidades">
-                      <option>Eventos e Congressos</option><option>Produtores de Eventos</option>
-                      <option>Comunidades Pagas</option><option>Grupos e Mentorias</option>
+                    <optgroup label="Educação">
+                      <option>Escola</option><option>Curso Profissionalizante</option><option>Escola de Idiomas</option>
+                      <option>Autoescola</option><option>Educação Infantil</option>
                     </optgroup>
-                    <optgroup label="🏪 Franquias &amp; Varejo">
-                      <option>Franquias</option><option>E-commerce</option><option>Concessionárias</option>
-                      <option>Moda</option><option>Suplementos</option>
+                    <optgroup label="Comércio e varejo">
+                      <option>Loja de Roupas</option><option>Ótica</option><option>Joalheria</option>
+                      <option>Loja de Móveis</option><option>Material de Construção</option><option>Pet Shop</option><option>Floricultura</option>
                     </optgroup>
-                    <optgroup label="🎓 Educação">
-                      <option>Escolas</option><option>Cursos Profissionalizantes</option><option>Autoescolas</option>
+                    <optgroup label="Eventos e turismo">
+                      <option>Buffet</option><option>Fotografia</option><option>Cerimonial</option>
+                      <option>Aluguel para Festas</option><option>Hotel</option><option>Pousada</option><option>Agência de Viagens</option>
+                    </optgroup>
+                    <optgroup label="Franquias">
+                      <option>Franquia</option>
                     </optgroup>
                   </select>
                 </div>
-                <div class="field"><label>📍 Cidade</label><input id="hCidade" value="São Paulo" placeholder="Ex.: Goiânia" /></div>
-                <div class="field"><label>🗺️ Estado</label>
+                <div class="field"><label>Estado</label>
                   <select id="hEstado"><option>SP</option><option>RJ</option><option>MG</option><option>PR</option><option>RS</option><option>SC</option><option>BA</option><option>DF</option><option>GO</option><option>ES</option><option>CE</option><option>PE</option><option>PA</option><option>MT</option><option>MS</option></select>
+                </div>
+                <div class="field"><label>Cidade</label>
+                  <select id="hCidade"></select>
                 </div>
               </div>
             </div>
 
-            <!-- Grupo 2 — Oferta & estratégia -->
+            <!-- Seção 02 — Estratégia (dirigida pelo nicho) -->
             <div class="hunter-group gold">
               <div class="hunter-group-head">
-                <span class="hunter-group-num">2</span>
-                <span class="hunter-group-title">Oferta &amp; estratégia</span>
-                <span class="hunter-group-hint">O que você vende e onde encontrar</span>
+                <span class="hunter-group-num">02</span>
+                <span class="hunter-group-title">Estratégia</span>
+                <span class="hunter-group-hint">A dor do nicho define a oferta certa</span>
               </div>
               <div class="hunter-grid cols-2">
-                <div class="field"><label>💼 Oferta da agência</label>
+                <div class="strategy">
+                  <div class="strategy-cell pain">
+                    <div class="strategy-k">Dor diagnosticada</div>
+                    <div class="strategy-v" id="hStratPain">Selecione um nicho para diagnosticar</div>
+                  </div>
+                  <div class="strategy-cell">
+                    <div class="strategy-k">Oferta recomendada</div>
+                    <div class="strategy-v" id="hStratOffer">—</div>
+                  </div>
+                </div>
+                <div class="field"><label>Oferta a apresentar</label>
                   <select id="hOferta">
-                    <optgroup label="🤖 IA &amp; Automação">
+                    <optgroup label="Recomendada para o nicho">
+                      <option id="hOfertaRec" value="">Selecione um nicho</option>
+                    </optgroup>
+                    <optgroup label="IA e automação">
                       <option>Agente de IA / SDR IA</option>
                       <option>Atendimento 24/7 no WhatsApp</option>
                       <option>Qualificação automática de leads</option>
-                      <option>Chatbot de vendas</option>
                       <option>Automação de agendamento</option>
-                      <option>Automação de WhatsApp</option>
                       <option>Follow-up automático</option>
-                      <option>Sequência automática de mensagens</option>
                     </optgroup>
-                    <optgroup label="📈 Comercial &amp; CRM">
-                      <option>Automação para vender mais</option>
+                    <optgroup label="Comercial e CRM">
                       <option>CRM comercial</option>
                       <option>Gestão de leads</option>
-                      <option>Gestão de relacionamento com leads</option>
                       <option>Recuperação de leads perdidos</option>
-                      <option>Recuperação de vendas</option>
                       <option>Diagnóstico comercial</option>
                     </optgroup>
-                    <optgroup label="🚀 Aquisição &amp; Funil">
+                    <optgroup label="Aquisição e funil">
                       <option>Funil de vendas</option>
                       <option>Tráfego pago</option>
-                      <option>Remarketing</option>
                       <option>Página de captura</option>
-                      <option>Página de vendas</option>
                       <option>Captação de leads no Instagram</option>
-                      <option>Lançamento digital</option>
-                      <option>Automação para eventos</option>
-                      <option>Automação para grupos de WhatsApp</option>
-                      <option>Automação para lançamentos digitais</option>
                     </optgroup>
                   </select>
                 </div>
-                <div class="field"><label>🔎 Tipo de busca</label>
+                <div class="field"><label>Onde procurar</label>
                   <select id="hTipo">
-                    <optgroup label="🌐 Presença digital">
-                      <option>Site oficial</option><option>Página de contato</option>
-                      <option>Página de serviços</option><option>Página institucional</option>
+                    <optgroup label="Presença digital">
+                      <option>Site oficial</option><option>Página de contato</option><option>Página de serviços</option>
                     </optgroup>
-                    <optgroup label="💰 Conversão">
+                    <optgroup label="Conversão">
                       <option>Página de orçamento</option><option>Página de agendamento</option>
-                      <option>Página de vendas</option><option>Página de captura</option>
-                      <option>Página de checkout</option><option>WhatsApp Business</option>
-                      <option>Página de obrigado</option>
+                      <option>WhatsApp Business</option><option>Página de vendas</option>
                     </optgroup>
-                    <optgroup label="🚀 Lançamentos / Eventos">
-                      <option>Página de lançamento digital</option><option>Página de evento online</option>
-                      <option>Página de webinar</option><option>Página de aula gratuita</option>
+                    <optgroup label="Redes e grupos">
+                      <option>Instagram público</option><option>WhatsApp público</option><option>Grupo de WhatsApp</option>
                     </optgroup>
-                    <optgroup label="📱 Redes &amp; Grupos">
-                      <option>Instagram público</option><option>WhatsApp público</option>
-                      <option>Grupo de WhatsApp</option><option>Grupo de Telegram</option><option>Comunidade paga</option>
+                    <optgroup label="Decisores">
+                      <option>Dono da empresa</option><option>Sócio / CEO</option><option>Gestor de marketing</option>
                     </optgroup>
-                    <optgroup label="🎯 Decisores">
-                      <option>Procurar dono da empresa</option><option>Sócio / CEO</option>
-                      <option>Gestor de marketing</option><option>Procurar gestor de tráfego</option>
-                      <option>Procurar agência responsável</option>
-                    </optgroup>
-                    <optgroup label="🧠 Inteligência">
-                      <option>Procurar anúncios ativos</option><option>Avaliações no Google</option>
-                      <option>Reclame Aqui</option><option>Negócio local completo</option>
+                    <optgroup label="Inteligência">
+                      <option>Anúncios ativos</option><option>Avaliações no Google</option><option>Negócio local completo</option>
                     </optgroup>
                   </select>
                 </div>
               </div>
             </div>
 
-            <!-- Grupo 3 — Parâmetros -->
+            <!-- Seção 03 — Parâmetros -->
             <div class="hunter-group">
               <div class="hunter-group-head">
-                <span class="hunter-group-num">3</span>
-                <span class="hunter-group-title">Parâmetros da busca</span>
+                <span class="hunter-group-num">03</span>
+                <span class="hunter-group-title">Parâmetros</span>
                 <span class="hunter-group-hint">Ajuste fino do volume e da qualidade</span>
               </div>
               <div class="hunter-grid cols-3-params">
-                <div class="field"><label>⚡ Profundidade</label>
+                <div class="field"><label>Profundidade</label>
                   <select id="hDepth"><option>Rápida</option><option>Média</option><option>Profunda</option></select>
                 </div>
-                <div class="field"><label>⭐ Score mínimo</label><input id="hScore" type="number" value="60" min="0" max="100" /></div>
-                <div class="field"><label>📊 Máx. leads</label><input id="hMax" type="number" value="8" min="1" max="50" /></div>
+                <div class="field"><label>Score mínimo</label><input id="hScore" type="number" value="60" min="0" max="100" /></div>
+                <div class="field"><label>Máx. de leads</label><input id="hMax" type="number" value="8" min="1" max="50" /></div>
               </div>
             </div>
 
           </div>
 
           <div class="hunter-cta">
-            <button class="btn btn-primary" id="btnGenDorks">⚡ Gerar Dorks</button>
-            <button class="btn btn-success" id="btnSaveAll">＋ Salvar Resultados no CRM</button>
+            <button class="btn btn-primary" id="btnGenDorks">Gerar dorks</button>
+            <button class="btn btn-success" id="btnSaveAll">Salvar no CRM</button>
             <span class="hunter-cta-sep"></span>
             <div class="hunter-cta-group">
-              <button class="btn btn-ghost" id="btnRunBrowser">🌐 Rodar no Navegador</button>
-              <button class="btn btn-ghost" id="btnImportUrls">⤓ Importar URLs</button>
-              <button class="btn btn-outline" id="btnExportDorks">↗ Exportar Dorks</button>
+              <button class="btn btn-ghost" id="btnRunBrowser">Rodar no navegador</button>
+              <button class="btn btn-ghost" id="btnImportUrls">Importar URLs</button>
+              <button class="btn btn-outline" id="btnExportDorks">Exportar dorks</button>
             </div>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="card">
-            <div class="section-head"><h2><span class="dot"></span> Dorks Gerados</h2>
+            <div class="section-head"><h2><span class="dot"></span> Dorks gerados</h2>
               <button class="btn btn-sm btn-ghost" id="btnCopyAll">Copiar todos</button>
             </div>
             <div class="dork-list" id="dorkList">
-              <div class="empty"><div class="em-ico">⌖</div><h3>Sem dorks gerados</h3><p>Configure os parâmetros e clique em Gerar Dorks para começar.</p></div>
+              <div class="empty"><div class="em-ico">—</div><h3>Nenhum dork gerado</h3><p>Defina o alvo e clique em Gerar dorks para montar as consultas.</p></div>
             </div>
           </div>
           <div class="card">
-            <div class="section-head"><h2><span class="dot"></span> Resultados Simulados</h2>
+            <div class="section-head"><h2><span class="dot"></span> Resultados da prospecção</h2>
               <span class="badge badge-mute" id="resultCount">0 leads</span>
             </div>
             <div id="resultsArea">
-              <div class="empty"><div class="em-ico">🎯</div><h3>Aguardando prospecção</h3><p>Gere dorks ou importe URLs para popular esta área.</p></div>
+              <div class="empty"><div class="em-ico">—</div><h3>Aguardando prospecção</h3><p>Gere dorks ou rode a busca para popular esta área.</p></div>
             </div>
           </div>
         </div>
@@ -1562,14 +1581,47 @@ function insightCard(ico,title,text,kind){
 }
 function emptyHtml(msg,ico){ return '<div class="empty"><div class="em-ico">'+(ico||'∅')+'</div><p>'+msg+'</p></div>'; }
 
+// Principais municípios por UF — cidade é escolhida numa lista (não digitada).
+const CITIES_BY_UF = {
+  SP:['São Paulo','Guarulhos','Campinas','São Bernardo do Campo','Santo André','Osasco','Ribeirão Preto','Sorocaba','Santos','São José dos Campos','Bauru','Piracicaba','Jundiaí'],
+  RJ:['Rio de Janeiro','São Gonçalo','Duque de Caxias','Nova Iguaçu','Niterói','Campos dos Goytacazes','Petrópolis','Volta Redonda','Macaé','Cabo Frio'],
+  MG:['Belo Horizonte','Uberlândia','Contagem','Juiz de Fora','Betim','Montes Claros','Uberaba','Governador Valadares','Ipatinga','Divinópolis'],
+  PR:['Curitiba','Londrina','Maringá','Ponta Grossa','Cascavel','São José dos Pinhais','Foz do Iguaçu','Colombo','Guarapuava'],
+  RS:['Porto Alegre','Caxias do Sul','Canoas','Pelotas','Santa Maria','Gravataí','Novo Hamburgo','Passo Fundo','Rio Grande'],
+  SC:['Florianópolis','Joinville','Blumenau','São José','Chapecó','Itajaí','Criciúma','Jaraguá do Sul','Lages','Balneário Camboriú'],
+  BA:['Salvador','Feira de Santana','Vitória da Conquista','Camaçari','Itabuna','Juazeiro','Ilhéus','Lauro de Freitas','Barreiras'],
+  DF:['Brasília','Ceilândia','Taguatinga','Gama','Sobradinho','Planaltina','Águas Claras'],
+  GO:['Goiânia','Aparecida de Goiânia','Anápolis','Rio Verde','Luziânia','Águas Lindas de Goiás','Valparaíso de Goiás','Trindade','Catalão'],
+  ES:['Vitória','Vila Velha','Serra','Cariacica','Cachoeiro de Itapemirim','Linhares','Colatina','Guarapari'],
+  CE:['Fortaleza','Caucaia','Juazeiro do Norte','Maracanaú','Sobral','Crato','Itapipoca'],
+  PE:['Recife','Jaboatão dos Guararapes','Olinda','Caruaru','Petrolina','Paulista','Cabo de Santo Agostinho','Camaragibe'],
+  PA:['Belém','Ananindeua','Santarém','Marabá','Parauapebas','Castanhal','Abaetetuba'],
+  MT:['Cuiabá','Várzea Grande','Rondonópolis','Sinop','Tangará da Serra','Cáceres','Sorriso'],
+  MS:['Campo Grande','Dourados','Três Lagoas','Corumbá','Ponta Porã','Naviraí','Nova Andradina'],
+};
+/** Preenche a lista de cidades conforme o estado selecionado (preserva a escolha se ainda existir). */
+function populateCities(){
+  const uf = document.getElementById('hEstado');
+  const city = document.getElementById('hCidade');
+  if(!uf || !city) return;
+  const list = CITIES_BY_UF[uf.value] || [];
+  const prev = city.value;
+  city.innerHTML = list.map(c=>'<option>'+escapeHtml(c)+'</option>').join('');
+  if(prev && list.includes(prev)) city.value = prev;
+}
+/** Diagnostica a dor do nicho e recomenda a oferta (assinatura da tela). */
+function updateStrategy(){
+  const niche = document.getElementById('hNicho')?.value;
+  const m = resolvePainOffer(niche);
+  const pv = document.getElementById('hStratPain'); if(pv) pv.textContent = m.pain;
+  const ov = document.getElementById('hStratOffer'); if(ov) ov.textContent = m.offer;
+  // A oferta recomendada vira a opção selecionada por padrão (editável).
+  const rec = document.getElementById('hOfertaRec');
+  if(rec){ rec.textContent = m.offer; rec.value = m.offer; document.getElementById('hOferta').value = m.offer; }
+}
 function renderHunter(){
-  const sel = document.getElementById('hNicho');
-  if(sel && sel.options.length<=1){
-    const base = (state.settings.niches||'').split(',').map(x=>x.trim()).filter(Boolean);
-    const extra = ['clínica odontológica','clínica de estética','barbearia','petshop','imobiliária','academia','restaurante delivery','escritório de advocacia'];
-    const all = []; [].concat(base,extra).forEach(n=>{ if(n && !all.includes(n)) all.push(n); });
-    all.forEach(n=>sel.add(new Option(n,n)));
-  }
+  populateCities();
+  updateStrategy();
   // Re-renderiza os dorks gerados (switchView re-monta o DOM da view).
   if(state.currentDorks && state.currentDorks.length) renderDorks();
 }
@@ -1587,8 +1639,8 @@ async function generateDorks(){
 }
 function renderDorks(){
   const el = document.getElementById('dorkList');
-  if(!state.currentDorks.length){ el.innerHTML = '<div class="empty"><div class="em-ico">⌖</div><h3>Sem dorks gerados</h3><p>Configure os parâmetros e clique em Gerar Dorks.</p></div>'; return; }
-  el.innerHTML = state.currentDorks.map((d,i)=>'<div class="dork-item"><div style="flex:1;min-width:0"><code>'+escapeHtml(d.q)+'</code><span class="dork-desc">'+escapeHtml(d.d)+'</span></div><div class="dork-actions"><button class="btn-icon" title="Copiar" onclick="copyText('+i+')">📋</button><button class="btn-icon" title="Abrir no Google" onclick="openGoogle('+i+')">🌐</button></div></div>').join('');
+  if(!state.currentDorks.length){ el.innerHTML = '<div class="empty"><div class="em-ico">—</div><h3>Nenhum dork gerado</h3><p>Defina o alvo e clique em Gerar dorks para montar as consultas.</p></div>'; return; }
+  el.innerHTML = state.currentDorks.map((d,i)=>'<div class="dork-item"><div style="flex:1;min-width:0"><code>'+escapeHtml(d.q)+'</code><span class="dork-desc">'+escapeHtml(d.d)+'</span></div><div class="dork-actions"><button class="btn btn-sm btn-ghost" onclick="copyText('+i+')">Copiar</button><button class="btn btn-sm btn-ghost" onclick="openGoogle('+i+')">Abrir</button></div></div>').join('');
 }
 function copyText(i){ navigator.clipboard.writeText(state.currentDorks[i].q); toast('success','Dork copiado'); }
 function openGoogle(i){ window.open('https://www.google.com/search?q='+encodeURIComponent(state.currentDorks[i].q),'_blank'); }
@@ -1889,18 +1941,60 @@ async function deleteLead(id){
 
 // §3.2 — Mapa fixo dor→oferta por nicho (negócios locais do spec).
 const NICHE_PAIN_OFFER = {
+  // Saúde e bem-estar
+  'Odontologia':{ pain:'Pouca captação digital, agenda com horários ociosos', offer:'Funil de captação + automação de agendamento' },
   'Clínica Odontológica':{ pain:'Pouca captação digital, agenda com horários ociosos', offer:'Funil de captação + automação de agendamento' },
   'Estética':{ pain:'Baixa recompra e ausência de funil de retorno', offer:'Programa de recompra e nutrição via WhatsApp' },
-  'Energia Solar':{ pain:'Leads desqualificados e ciclo de venda longo', offer:'Qualificação por SDR + CRM Gravity' },
-  'Advocacia':{ pain:'Pouca presença digital e site sem conversão', offer:'Site institucional + landing pages especializadas' },
-  'Academia':{ pain:'Alto churn e baixa retenção de alunos', offer:'CRM de retenção e campanhas de winback' },
-  'Barbearia':{ pain:'Agenda manual e baixo ticket médio', offer:'Agenda automatizada + upsell de produtos' },
-  'Escola':{ pain:'Captação sazonal e jornada de matrícula confusa', offer:'Funil de matrícula sazonal multicanal' },
-  'Imobiliária':{ pain:'Lentidão no atendimento e perda de leads quentes', offer:'Speed-to-lead em <5min com automação' },
+  'Dermatologia':{ pain:'Procura sazonal e baixa recompra de procedimentos', offer:'Nutrição e recompra via WhatsApp' },
+  'Fisioterapia':{ pain:'Dependência de indicação e agenda com vagas', offer:'Captação local + lembrete de retorno' },
+  'Nutrição':{ pain:'Baixa retenção de pacientes após a 1ª consulta', offer:'Acompanhamento e recompra automatizados' },
+  'Psicologia':{ pain:'Agenda irregular e alto índice de no-show', offer:'Confirmação e lembrete automático de sessões' },
   'Clínica Médica':{ pain:'Falta de follow-up e agenda fragmentada', offer:'CRM médico + lembretes automáticos' },
-  'Restaurante':{ pain:'Pouco delivery direto e dependência de marketplaces', offer:'Delivery direto e fidelidade via WhatsApp' },
-  'Pet Shop':{ pain:'Baixa recorrência e sem CRM de clientes', offer:'Clube de assinatura e recompra automática' },
+  'Veterinária':{ pain:'Baixa recorrência e sem controle de retorno', offer:'Lembrete de vacina + clube de recompra' },
+  // Fitness
+  'Academia':{ pain:'Alto churn e baixa retenção de alunos', offer:'CRM de retenção e campanhas de winback' },
+  'Pilates':{ pain:'Turmas com vagas e captação irregular', offer:'Captação local + planos recorrentes' },
+  'CrossFit':{ pain:'Churn alto e poucos leads recorrentes', offer:'CRM de retenção + winback de ex-alunos' },
+  'Personal Trainer':{ pain:'Poucos alunos recorrentes e agenda ociosa', offer:'Captação local + planos recorrentes' },
+  // Beleza
+  'Barbearia':{ pain:'Agenda manual e ticket médio baixo', offer:'Agenda automatizada + upsell de produtos' },
+  'Salão de Beleza':{ pain:'Agenda manual e baixa recorrência', offer:'Agenda online + programa de fidelidade' },
+  // Imóveis e construção
+  'Imobiliária':{ pain:'Lentidão no atendimento e perda de leads quentes', offer:'Speed-to-lead em <5min com automação' },
+  'Corretor de Imóveis':{ pain:'Leads frios e resposta lenta', offer:'Speed-to-lead + qualificação por SDR' },
   'Construtora':{ pain:'Funil longo sem nutrição comercial', offer:'Nutrição comercial longa via e-mail + WhatsApp' },
+  'Arquitetura':{ pain:'Ciclo longo e orçamento sem acompanhamento', offer:'Portfólio digital + nutrição comercial' },
+  // Casa e serviços
+  'Energia Solar':{ pain:'Leads desqualificados e ciclo de venda longo', offer:'Qualificação por SDR + CRM Gravity' },
+  'Segurança Eletrônica':{ pain:'Orçamentos parados e follow-up manual', offer:'Qualificação + follow-up automático' },
+  // Serviços profissionais
+  'Advocacia':{ pain:'Pouca presença digital e site sem conversão', offer:'Site institucional + landing pages especializadas' },
+  'Contabilidade':{ pain:'Aquisição por indicação e churn de clientes', offer:'Aquisição digital + onboarding automatizado' },
+  'Consultoria':{ pain:'Autoridade sem geração de demanda previsível', offer:'Funil de autoridade + captação de reuniões' },
+  // Alimentação
+  'Restaurante':{ pain:'Pouco delivery direto e dependência de marketplaces', offer:'Delivery direto e fidelidade via WhatsApp' },
+  'Pizzaria':{ pain:'Dependência de marketplace e margem baixa', offer:'Delivery próprio + recompra no WhatsApp' },
+  'Hamburgueria':{ pain:'Dependência de marketplace e margem baixa', offer:'Delivery próprio + recompra no WhatsApp' },
+  'Cafeteria':{ pain:'Baixa recorrência e sem base de clientes', offer:'Clube de fidelidade + recompra' },
+  'Padaria':{ pain:'Baixa recorrência e sem CRM de clientes', offer:'Clube de fidelidade + encomendas por WhatsApp' },
+  // Automotivo
+  'Oficina Mecânica':{ pain:'Baixa recorrência e sem follow-up de revisão', offer:'Lembrete de revisão + CRM de clientes' },
+  'Estética Automotiva':{ pain:'Agenda ociosa e ticket médio baixo', offer:'Agenda online + upsell de serviços' },
+  'Concessionária':{ pain:'Leads sem qualificação e resposta lenta', offer:'Qualificação por SDR + speed-to-lead' },
+  // Educação
+  'Escola':{ pain:'Captação sazonal e jornada de matrícula confusa', offer:'Funil de matrícula sazonal multicanal' },
+  'Curso Profissionalizante':{ pain:'Matrícula sazonal e alta evasão', offer:'Funil de matrícula + retenção de alunos' },
+  'Escola de Idiomas':{ pain:'Matrícula sazonal e evasão de alunos', offer:'Funil de matrícula + retenção' },
+  'Autoescola':{ pain:'Captação irregular e concorrência por preço', offer:'Captação local + prova social' },
+  // Comércio e varejo
+  'Loja de Roupas':{ pain:'Tráfego só físico e sem recompra', offer:'Vitrine digital + remarketing e recompra' },
+  'Ótica':{ pain:'Baixa recompra e sem base de clientes', offer:'Recompra programada + campanhas locais' },
+  'Pet Shop':{ pain:'Baixa recorrência e sem CRM de clientes', offer:'Clube de assinatura e recompra automática' },
+  // Eventos e turismo
+  'Buffet':{ pain:'Sazonalidade e orçamento demorado', offer:'Captação + orçamento rápido no WhatsApp' },
+  'Fotografia':{ pain:'Demanda sazonal e agenda irregular', offer:'Captação local + follow-up de orçamentos' },
+  'Hotel':{ pain:'Dependência de OTAs e diárias ociosas', offer:'Reserva direta + remarketing' },
+  'Pousada':{ pain:'Dependência de OTAs e baixa ocupação fora de pico', offer:'Reserva direta + campanhas de baixa temporada' },
 };
 const PAIN_OFFER_FALLBACK = { pain:'Operação comercial sem automação', offer:'CRM Gravity + automação comercial' };
 function resolvePainOffer(niche){
@@ -2575,6 +2669,9 @@ function bindEvents(){
   document.getElementById('btnGenDorks')&&document.getElementById('btnGenDorks').addEventListener('click', generateDorks);
   document.getElementById('btnRunBrowser')&&document.getElementById('btnRunBrowser').addEventListener('click', runProspect);
   document.getElementById('btnSaveAll')&&document.getElementById('btnSaveAll').addEventListener('click', runProspect);
+  // Caça: nicho define a estratégia; estado repovoa as cidades.
+  document.getElementById('hNicho')&&document.getElementById('hNicho').addEventListener('change', updateStrategy);
+  document.getElementById('hEstado')&&document.getElementById('hEstado').addEventListener('change', ()=>{ populateCities(); });
   document.getElementById('btnSaveSettings')&&document.getElementById('btnSaveSettings').addEventListener('click', saveSettings);
   document.getElementById('btnCreateTask')&&document.getElementById('btnCreateTask').addEventListener('click', openNewTask);
   // --- Lançamentos ---
