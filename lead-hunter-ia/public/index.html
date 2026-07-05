@@ -506,6 +506,40 @@ table.table tbody tr:last-child td{border-bottom:0}
 .crm-sort{padding:9px 12px;font-size:13px;border-radius:10px;min-width:150px}
 .crm-toolbar .crm-spacer{flex:1}
 
+.crm-focus-strip{
+  display:grid;
+  grid-template-columns:1.25fr repeat(3,minmax(150px,1fr));
+  gap:12px;
+  margin:0 0 16px;
+}
+.crm-focus-card{
+  min-height:92px;
+  padding:14px 15px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  overflow:hidden;
+  position:relative;
+}
+.crm-focus-card::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:3px;
+  background:var(--blue);
+  opacity:.85;
+}
+.crm-focus-card.gold::before{background:var(--gold)}
+.crm-focus-card.warn::before{background:var(--rose)}
+.crm-focus-card.good::before{background:var(--emerald)}
+.crm-focus-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-mute)}
+.crm-focus-value{font-size:22px;font-weight:850;letter-spacing:-.04em;line-height:1.05;margin-top:5px}
+.crm-focus-note{font-size:11.5px;color:var(--text-dim);margin-top:7px;line-height:1.35}
+.crm-focus-card .btn{align-self:flex-start;margin-top:10px}
+
 /* Colunas */
 .kanban-wrap{overflow-x:auto;padding-bottom:8px}
 .kanban{display:flex;gap:12px;min-width:max-content;padding-bottom:8px}
@@ -547,6 +581,12 @@ table.table tbody tr:last-child td{border-bottom:0}
 .kc-score.t-warm .kc-dot{background:#F2C14E}
 .kc-score.t-cold .kc-dot{background:#5B8DEF}
 .kc-sub{font-size:11.5px;color:var(--text-mute);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kc-status{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}
+.kc-pill{font-size:10.5px;font-weight:700;padding:3px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--text-dim)}
+.kc-pill.late{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.32);color:#FDA4AF}
+.kc-pill.open{background:rgba(242,193,78,.12);border-color:rgba(242,193,78,.30);color:#F2C14E}
+.kc-pill.empty{background:rgba(255,255,255,.035);border-style:dashed;color:var(--text-mute)}
+.kc-pill.contact{background:rgba(16,185,129,.10);border-color:rgba(16,185,129,.26);color:#8BE6C4}
 .kc-next{font-size:11.5px;color:var(--text-dim);margin-top:8px;line-height:1.35;
   border-left:2px solid var(--line-2);padding-left:8px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -563,6 +603,7 @@ table.table tbody tr:last-child td{border-bottom:0}
 }
 @media(max-width:640px){
   .crm-toolbar{gap:8px}
+  .crm-focus-strip{grid-template-columns:1fr}
   .crm-search{max-width:none;flex:1 1 100%;order:-1}
   .crm-chips{flex:1 1 auto}
   .crm-chip{flex:1;text-align:center}
@@ -735,22 +776,268 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
 .rcard-info b{color:var(--text)}
 .rcard-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 
+/* Analisador Inteligente de Dor */
+.pain-top{
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);
+  gap:14px;
+  margin-bottom:16px;
+}
+.pain-brief{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:18px;
+  background:linear-gradient(160deg,rgba(46,107,255,.12),rgba(242,193,78,.055) 58%,rgba(255,255,255,.025));
+}
+.pain-brief h2{margin:0;font-size:18px;letter-spacing:-.02em}
+.pain-brief p{margin:6px 0 0;color:var(--text-dim);font-size:12.5px;line-height:1.45;max-width:780px}
+.pain-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.pain-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.pain-stat{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px;
+  min-height:88px;
+}
+.pain-stat span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-mute);font-weight:800}
+.pain-stat strong{display:block;font-size:25px;line-height:1.05;letter-spacing:-.04em;margin-top:8px}
+.pain-stat small{display:block;margin-top:6px;color:var(--text-dim);font-size:11.5px;line-height:1.3}
+.pain-filters{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(130px,1fr));
+  gap:10px;
+  margin-bottom:16px;
+}
+.pain-filters input,.pain-filters select{width:100%;font-size:12.5px;padding:9px 10px}
+.pain-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.pain-card{
+  position:relative;
+  overflow:hidden;
+  min-height:330px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.022));
+}
+.pain-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--text-mute)}
+.pain-card.moderate::before{background:var(--gold)}
+.pain-card.strong::before{background:var(--orange)}
+.pain-card.priority::before{background:var(--rose)}
+.pain-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.pain-company{font-size:14px;font-weight:800;line-height:1.25;letter-spacing:-.01em}
+.pain-meta{margin-top:4px;font-size:11.5px;color:var(--text-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}
+.pain-score{
+  width:58px;height:58px;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--surface-2);border:1px solid var(--line);
+  font-variant-numeric:tabular-nums;flex-shrink:0;
+}
+.pain-score strong{font-size:21px;line-height:1;font-weight:900}
+.pain-score span{font-size:10px;color:var(--text-mute);font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.pain-level{display:inline-flex;align-items:center;align-self:flex-start;gap:6px;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;border:1px solid var(--line);background:var(--surface-2)}
+.pain-level::before{content:"";width:6px;height:6px;border-radius:99px;background:currentColor}
+.pain-level.weak{color:var(--text-mute)}
+.pain-level.moderate{color:#F2C14E;background:rgba(242,193,78,.10);border-color:rgba(242,193,78,.28)}
+.pain-level.strong{color:#FDBA74;background:rgba(240,167,66,.12);border-color:rgba(240,167,66,.30)}
+.pain-level.priority{color:#FDA4AF;background:rgba(244,63,94,.13);border-color:rgba(244,63,94,.34)}
+.pain-main{font-size:13px;font-weight:800;color:var(--text)}
+.pain-tags{display:flex;gap:6px;flex-wrap:wrap;min-height:24px}
+.pain-tag{font-size:10.5px;font-weight:750;color:var(--text-dim);padding:4px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line)}
+.pain-service{font-size:12.5px;color:var(--gold);font-weight:800;line-height:1.35}
+.pain-message{
+  flex:1;
+  font-size:12px;
+  line-height:1.48;
+  color:var(--text-dim);
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  border-radius:10px;
+  padding:10px;
+  max-height:124px;
+  overflow:auto;
+}
+.pain-card-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto}
+.pain-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pain-score-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;padding:7px 0;border-bottom:1px solid var(--line)}
+.pain-score-row:last-child{border-bottom:0}
+.pain-score-bar{height:7px;flex:1;border-radius:999px;background:var(--surface-3);overflow:hidden}
+.pain-score-bar span{display:block;height:100%;border-radius:inherit;background:var(--grad-brand)}
+.pain-list{margin:6px 0 0 16px;padding:0;font-size:12px;line-height:1.65;color:var(--text-dim)}
+
+/* Caca Inteligente Local */
+.local-top{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+  align-items:start;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:linear-gradient(145deg,rgba(16,185,129,.11),rgba(46,107,255,.075) 48%,rgba(242,193,78,.045));
+  margin-bottom:16px;
+}
+.local-top h2{margin:0;font-size:18px;letter-spacing:-.02em}
+.local-top p{margin:6px 0 0;color:var(--text-dim);font-size:12.5px;line-height:1.45;max-width:820px}
+.local-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.local-layout{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:16px;align-items:start}
+.local-panel{
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  padding:16px;
+}
+.local-form{display:grid;gap:11px}
+.local-form .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.local-form input,.local-form select,.local-form textarea{width:100%}
+.local-form textarea{min-height:118px;resize:vertical}
+.local-presets{display:flex;gap:7px;flex-wrap:wrap;margin-top:-2px}
+.local-preset{
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  color:var(--text-dim);
+  border-radius:999px;
+  padding:6px 9px;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.16s background,.16s color,.16s border-color,.16s transform;
+}
+.local-preset:hover{background:var(--surface-3);color:var(--text);border-color:var(--line-2);transform:translateY(-1px)}
+.local-help{
+  font-size:11.5px;
+  color:var(--text-mute);
+  line-height:1.45;
+  padding:9px 10px;
+  border:1px dashed var(--line);
+  border-radius:10px;
+  background:rgba(255,255,255,.025);
+}
+.local-warning{
+  display:none;
+  padding:10px 11px;
+  border-radius:10px;
+  border:1px solid rgba(245,158,11,.28);
+  background:rgba(245,158,11,.09);
+  color:#FCD34D;
+  font-size:11.5px;
+  line-height:1.45;
+}
+.local-warning.show{display:block}
+.local-progress{height:10px;border-radius:999px;overflow:hidden;background:var(--surface-3);border:1px solid var(--line);margin:12px 0}
+.local-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#10B981,#22D3EE,#F2C14E);border-radius:inherit;transition:.25s width}
+.local-log{font-size:11.5px;color:var(--text-dim);line-height:1.5;max-height:122px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:10px}
+.local-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.local-stat{padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.local-stat span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-mute);font-weight:800}
+.local-stat strong{display:block;font-size:22px;line-height:1.1;margin-top:6px}
+.local-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.local-card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-height:310px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.052),rgba(255,255,255,.022));
+  overflow:hidden;
+}
+.local-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--text-mute)}
+.local-card.hot::before{background:var(--rose)}
+.local-card.warm::before{background:var(--gold)}
+.local-card.cold::before{background:var(--blue-2)}
+.local-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.local-company{font-size:14px;font-weight:850;line-height:1.25;letter-spacing:-.01em}
+.local-meta{font-size:11.5px;color:var(--text-mute);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}
+.local-score{width:56px;height:56px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface-2);border:1px solid var(--line);flex-shrink:0}
+.local-score strong{font-size:20px;line-height:1;font-weight:900}
+.local-score span{font-size:10px;color:var(--text-mute);font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.local-contact{display:flex;gap:6px;flex-wrap:wrap}
+.local-pill{font-size:10.5px;font-weight:800;padding:4px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--text-dim)}
+.local-pill.owner{color:#8BE6C4;background:rgba(16,185,129,.11);border-color:rgba(16,185,129,.28)}
+.local-pains{display:flex;gap:6px;flex-wrap:wrap;min-height:24px}
+.local-message{flex:1;min-height:74px;font-size:12px;color:var(--text-dim);line-height:1.5;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px;overflow:auto}
+.local-card-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto}
+@media(max-width:1100px){
+  .local-top,.local-layout{grid-template-columns:1fr}
+  .local-actions{justify-content:flex-start}
+  .local-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:640px){
+  .local-form .row,.local-stats{grid-template-columns:1fr}
+  .local-results{grid-template-columns:1fr}
+}
+@media(max-width:1100px){
+  .pain-top{grid-template-columns:1fr}
+  .pain-actions{justify-content:flex-start}
+  .pain-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pain-filters{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:640px){
+  .pain-stats,.pain-filters,.pain-detail-grid{grid-template-columns:1fr}
+  .pain-grid{grid-template-columns:1fr}
+}
+
 /* Tasks */
-.task-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.task-col h3{margin:0 0 12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
-.task-col .count{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--surface-3);color:var(--text-dim)}
-.task-list{display:flex;flex-direction:column;gap:8px}
-.task{padding:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;transition:.18s all;position:relative;overflow:hidden}
-.task::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--indigo)}
+.task-hero{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  margin-bottom:16px;
+}
+.task-hero h2{margin:0;font-size:16px;font-weight:750;letter-spacing:-.02em}
+.task-hero p{margin:5px 0 0;color:var(--text-dim);font-size:12.5px;line-height:1.45}
+.task-summary{
+  display:grid;
+  grid-template-columns:1.25fr repeat(3,minmax(140px,1fr));
+  gap:12px;
+  margin-bottom:16px;
+}
+.task-summary-card{
+  padding:14px 15px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--surface-2);
+}
+.task-summary-card strong{display:block;font-size:21px;line-height:1.05;letter-spacing:-.04em;margin-top:5px}
+.task-summary-card span{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute);font-weight:700}
+.task-summary-card small{display:block;margin-top:6px;color:var(--text-dim);font-size:11.5px;line-height:1.35}
+.task-board{display:grid;grid-template-columns:repeat(4,minmax(230px,1fr));gap:14px;align-items:start}
+.task-col{padding:14px}
+.task-col h3{margin:0 0 12px;font-size:13px;font-weight:750;display:flex;align-items:center;gap:8px}
+.task-col .count{margin-left:auto;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--surface-3);color:var(--text-dim)}
+.task-list{display:flex;flex-direction:column;gap:9px;min-height:70px}
+.task{
+  padding:12px;
+  background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
+  border:1px solid var(--line);
+  border-radius:12px;
+  transition:.18s background,.18s border-color,.18s transform;
+  position:relative;
+  overflow:hidden;
+}
+.task:hover{transform:translateY(-1px);background:var(--surface-3);border-color:var(--line-2)}
+.task::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue)}
 .task.high::before{background:var(--rose)}
-.task.medium::before{background:var(--amber)}
-.task.low::before{background:var(--cyan)}
-.task.late{border-color:rgba(244,63,94,.35);background:rgba(244,63,94,.06)}
-.task.done{opacity:.55}
+.task.medium::before{background:var(--gold)}
+.task.low::before{background:var(--blue-2)}
+.task.late{border-color:rgba(244,63,94,.35);background:rgba(244,63,94,.07)}
+.task.done{opacity:.58}
 .task.done .task-title{text-decoration:line-through}
-.task-title{font-weight:600;font-size:13px}
-.task-meta{font-size:11px;color:var(--text-mute);margin-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.task-actions{display:flex;gap:4px;margin-top:8px;justify-content:flex-end}
+.task-title{font-weight:700;font-size:13px;line-height:1.35}
+.task-meta{font-size:11.5px;color:var(--text-mute);margin-top:7px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.task-badge{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:10.5px;font-weight:700;color:var(--text-dim)}
+.task-badge.late{background:rgba(244,63,94,.13);border-color:rgba(244,63,94,.32);color:#FDA4AF}
+.task-badge.today{background:rgba(242,193,78,.13);border-color:rgba(242,193,78,.32);color:#F2C14E}
+.task-badge.done{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.28);color:#8BE6C4}
+.task-actions{display:flex;gap:6px;margin-top:10px;justify-content:flex-end;flex-wrap:wrap}
+.task-empty{color:var(--text-mute);font-size:12px;padding:12px;border:1px dashed var(--line);border-radius:10px;text-align:center}
 
 /* Automations */
 .auto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
@@ -772,6 +1059,40 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
 .sdr-step p{margin:0;font-size:11.5px;color:var(--text-mute);line-height:1.45}
 @media(max-width:900px){.sdr-flow{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.sdr-flow{grid-template-columns:1fr}}
+
+/* ============================================================
+   IA COMERCIAL
+   ============================================================ */
+.ai-score{display:inline-flex;align-items:center;gap:8px;padding:5px 11px;border-radius:10px;font-weight:700;border:1px solid transparent;line-height:1;flex-shrink:0}
+.ai-score-n{font-size:15px;font-variant-numeric:tabular-nums}
+.ai-score-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.9}
+.ai-score.ai-hot{background:rgba(244,63,94,.14);color:#FB7185;border-color:rgba(244,63,94,.3)}
+.ai-score.ai-good{background:rgba(16,185,129,.14);color:#34D399;border-color:rgba(16,185,129,.3)}
+.ai-score.ai-mid{background:rgba(242,193,78,.14);color:#F2C14E;border-color:rgba(242,193,78,.3)}
+.ai-score.ai-cold{background:rgba(91,141,239,.14);color:#9DBBFF;border-color:rgba(91,141,239,.3)}
+.ai-summary{background:linear-gradient(160deg,rgba(46,107,255,.10),rgba(242,193,78,.05));border:1px solid rgba(46,107,255,.28);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
+.ai-summary-k{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-mute);margin-bottom:6px}
+.ai-summary p{margin:0;font-size:13.5px;line-height:1.55;color:var(--text)}
+.ai-note{margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);font-size:12.5px;color:var(--text-dim)}
+.ai-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px}
+.ai-list li{font-size:12.5px;color:var(--text-dim);line-height:1.5}
+.ai-bars{display:flex;flex-direction:column;gap:12px}
+.ai-bar-top{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;margin-bottom:5px}
+.ai-bar-top span{color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ai-bar-top b{color:var(--text);font-variant-numeric:tabular-nums}
+.ai-bar-track{height:8px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.ai-bar-fill{height:100%;border-radius:6px;background:var(--grad-brand)}
+.ai-disabled{display:flex;gap:14px;align-items:flex-start}
+.ai-disabled-ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;background:rgba(46,107,255,.12);border:1px solid rgba(46,107,255,.24);color:#8FB2FF}
+.ai-disabled code{background:var(--surface-3);padding:1px 6px;border-radius:6px;font-size:11.5px}
+.ia-form-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+/* Bloco de IA no modal do lead */
+.ai-lead-box{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
+.ai-lead-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.ai-lead-head h4{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mute)}
+.ai-lead-grid{display:grid;grid-template-columns:1fr;gap:8px;font-size:12.5px}
+.ai-lead-grid b{color:var(--text)}
+.ai-lead-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 
 /* Settings */
 .settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
@@ -814,6 +1135,7 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
   .stats{grid-template-columns:repeat(2,1fr)}
   .grid-2{grid-template-columns:1fr}
   .grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}
+  .crm-focus-strip,.task-summary{grid-template-columns:repeat(2,1fr)}
   .hunter-form{grid-template-columns:repeat(2,1fr)}
   .task-board{grid-template-columns:repeat(2,1fr)}
   .lead-grid{grid-template-columns:1fr}
@@ -827,6 +1149,8 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
   .content{padding:16px 16px 100px}
   .stats{grid-template-columns:repeat(2,1fr)}
   .grid-3,.grid-4{grid-template-columns:1fr}
+  .crm-focus-strip,.task-summary{grid-template-columns:1fr}
+  .task-hero{align-items:flex-start;flex-direction:column}
   .hunter-form{grid-template-columns:1fr}
   .task-board{grid-template-columns:1fr}
   .field-row{grid-template-columns:1fr}
@@ -861,8 +1185,11 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
     <nav class="nav" id="mainNav">
       <div class="nav-item active" data-view="dashboard"><span class="nav-ico">◉</span> Dashboard</div>
       <div class="nav-item" data-view="hunter"><span class="nav-ico">⌖</span> Lead Hunter IA <span class="nav-badge">AI</span></div>
+      <div class="nav-item" data-view="localhunt"><span class="nav-ico">◎</span> Caça Local <span class="nav-badge">NOVO</span></div>
+      <div class="nav-item" data-view="ia"><span class="nav-ico"></span> IA Comercial <span class="nav-badge">AI</span></div>
       <div class="nav-item" data-view="sdr"><span class="nav-ico">🤖</span> SDR IA</div>
       <div class="nav-item" data-view="crm"><span class="nav-ico">⎘</span> CRM Funil</div>
+      <div class="nav-item" data-view="pain"><span class="nav-ico">◇</span> Analisador de Dor</div>
       <div class="nav-item" data-view="leads"><span class="nav-ico">☰</span> Leads</div>
       <div class="nav-item" data-view="launches"><span class="nav-ico">🚀</span> Lançamentos</div>
       <div class="nav-item" data-view="tasks"><span class="nav-ico">✓</span> Tarefas</div>
@@ -1124,7 +1451,99 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
         </div>
       </section>
 
+      <!-- =============== CACA INTELIGENTE LOCAL =============== -->
+      <section class="section" id="view-localhunt">
+        <div class="local-top">
+          <div>
+            <h2>Caça Inteligente Local</h2>
+            <p>Analise sites públicos em lote, encontre contatos comerciais, extraia responsável público quando existir e salve oportunidades quentes direto no CRM.</p>
+          </div>
+          <div class="local-actions">
+            <button class="btn btn-primary" id="lhStart">Iniciar caça</button>
+            <button class="btn btn-ghost" id="lhStop">Parar</button>
+            <button class="btn btn-success" id="lhSave">Salvar no CRM</button>
+            <button class="btn btn-outline" id="lhExport">Exportar CSV</button>
+          </div>
+        </div>
+
+        <div class="local-layout">
+          <div class="local-panel">
+            <div class="section-head"><h2><span class="dot"></span> Alvo e intensidade</h2></div>
+            <div class="local-form">
+              <div class="field"><label>Nicho</label><input id="lhNiche" placeholder="Ex.: Odontologia" value="Odontologia" /></div>
+              <div class="field"><label>Preset de praça</label>
+                <select id="lhPreset">
+                  <option value="">Selecionar cidade rapidamente</option>
+                  <optgroup label="GO"><option value="Goiânia|GO">Goiânia / GO</option><option value="Aparecida de Goiânia|GO">Aparecida de Goiânia / GO</option><option value="Anápolis|GO">Anápolis / GO</option></optgroup>
+                  <optgroup label="SP"><option value="São Paulo|SP">São Paulo / SP</option><option value="Ribeirão Preto|SP">Ribeirão Preto / SP</option><option value="Campinas|SP">Campinas / SP</option><option value="Santos|SP">Santos / SP</option></optgroup>
+                  <optgroup label="RJ"><option value="Rio de Janeiro|RJ">Rio de Janeiro / RJ</option><option value="Niterói|RJ">Niterói / RJ</option><option value="Petrópolis|RJ">Petrópolis / RJ</option></optgroup>
+                  <optgroup label="MG"><option value="Belo Horizonte|MG">Belo Horizonte / MG</option><option value="Uberlândia|MG">Uberlândia / MG</option><option value="Juiz de Fora|MG">Juiz de Fora / MG</option></optgroup>
+                  <optgroup label="Sul"><option value="Curitiba|PR">Curitiba / PR</option><option value="Florianópolis|SC">Florianópolis / SC</option><option value="Porto Alegre|RS">Porto Alegre / RS</option></optgroup>
+                  <optgroup label="Nordeste"><option value="Salvador|BA">Salvador / BA</option><option value="Recife|PE">Recife / PE</option><option value="Fortaleza|CE">Fortaleza / CE</option></optgroup>
+                </select>
+              </div>
+              <div class="local-presets" aria-label="Presets rápidos">
+                <button class="local-preset" data-city="Goiânia" data-region="GO">Goiânia</button>
+                <button class="local-preset" data-city="Ribeirão Preto" data-region="SP">Ribeirão Preto</button>
+                <button class="local-preset" data-city="São Paulo" data-region="SP">São Paulo</button>
+                <button class="local-preset" data-city="Belo Horizonte" data-region="MG">Belo Horizonte</button>
+                <button class="local-preset" data-city="Curitiba" data-region="PR">Curitiba</button>
+              </div>
+              <div class="local-form row">
+                <div class="field"><label>Cidade</label><input id="lhCity" placeholder="Ex.: Goiânia" /></div>
+                <div class="field"><label>UF</label><input id="lhRegion" placeholder="GO" maxlength="2" /></div>
+              </div>
+              <div class="field"><label>Palavra-chave opcional</label><input id="lhKeyword" placeholder="Ex.: implante, orçamento, estética" /></div>
+              <div class="local-form row">
+                <div class="field"><label>Modo</label>
+                  <select id="lhMode">
+                    <option value="advanced">Avançado</option>
+                    <option value="fast">Rápido agressivo</option>
+                    <option value="calm">Calmo</option>
+                  </select>
+                </div>
+                <div class="field"><label>Foco</label>
+                  <select id="lhFocus">
+                    <option value="contacts">Contato e WhatsApp</option>
+                    <option value="owners">Dono, sócio ou diretor</option>
+                    <option value="conversion">Conversão e orçamento</option>
+                    <option value="ads">Anúncios e landing pages</option>
+                  </select>
+                </div>
+              </div>
+              <div class="local-form row">
+                <div class="field"><label>Máx. sites</label><input id="lhMaxUrls" type="number" min="1" max="80" value="24" /></div>
+                <div class="field"><label>Score mínimo no card</label><input id="lhMinScore" type="number" min="0" max="100" value="45" /></div>
+              </div>
+              <div class="local-help">Dica: use “Dono, sócio ou diretor” quando quiser tentar achar decisores publicados em páginas como Sobre, Equipe e Contato.</div>
+              <div class="field"><label>URLs manuais</label><textarea id="lhUrls" placeholder="Cole sites, um por linha. Se ficar vazio, o sistema busca sites públicos automaticamente."></textarea></div>
+              <div class="local-warning" id="lhWarning">Modo rápido aumenta volume, reduz espera e consulta mais páginas internas públicas. Pode gerar bloqueio temporário em alguns sites.</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="local-stats" id="lhStats"></div>
+            <div class="local-panel" style="margin-bottom:14px">
+              <div class="section-head"><h2><span class="dot"></span> Execução ao vivo</h2><span class="badge badge-mute" id="lhStatus">Parado</span></div>
+              <div class="local-progress"><span id="lhProgress"></span></div>
+              <div class="local-log" id="lhLog">Aguardando início da caça local.</div>
+            </div>
+            <div class="local-results" id="lhResults"></div>
+          </div>
+        </div>
+      </section>
+
       <!-- =============== CRM =============== -->
+      <!-- =============== IA COMERCIAL =============== -->
+      <section class="section" id="view-ia">
+        <div class="lq-tabs" id="iaTabs" role="tablist">
+          <button class="lq-tab active" data-iatab="dashboard">Dashboard IA</button>
+          <button class="lq-tab" data-iatab="report">Relatório Noturno</button>
+          <button class="lq-tab" data-iatab="hunter">Caçador IA</button>
+        </div>
+        <div id="iaPanel"></div>
+      </section>
+
       <section class="section" id="view-crm">
         <div class="crm-toolbar">
           <div class="crm-search"><input id="crmSearch" placeholder="Buscar por empresa, nicho ou cidade" autocomplete="off" /></div>
@@ -1143,9 +1562,97 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
           </select>
           <button class="btn btn-primary btn-sm" id="crmNewLead">Novo lead</button>
         </div>
+        <div class="crm-focus-strip" aria-label="Resumo do CRM">
+          <div class="crm-focus-card gold">
+            <div>
+              <div class="crm-focus-label">Pipeline aberto</div>
+              <div class="crm-focus-value" id="crmMetricPipeline">R$ 0</div>
+              <div class="crm-focus-note">Valor estimado nas oportunidades visiveis.</div>
+            </div>
+          </div>
+          <div class="crm-focus-card warn">
+            <div>
+              <div class="crm-focus-label">Sem follow-up</div>
+              <div class="crm-focus-value" id="crmMetricNoTask">0</div>
+              <div class="crm-focus-note">Leads abertos sem proxima tarefa.</div>
+            </div>
+          </div>
+          <div class="crm-focus-card good">
+            <div>
+              <div class="crm-focus-label">Para hoje</div>
+              <div class="crm-focus-value" id="crmMetricToday">0</div>
+              <div class="crm-focus-note">Follow-ups que pedem acao agora.</div>
+            </div>
+          </div>
+          <div class="crm-focus-card">
+            <div>
+              <div class="crm-focus-label">Operacao</div>
+              <div class="crm-focus-value" id="crmMetricOpenTasks">0</div>
+              <div class="crm-focus-note">Tarefas abertas no funil.</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="switchView('tasks')">Ver tarefas</button>
+          </div>
+        </div>
         <div class="kanban-wrap">
           <div class="kanban" id="kanban"></div>
         </div>
+      </section>
+
+      <!-- =============== ANALISADOR INTELIGENTE DE DOR =============== -->
+      <section class="section" id="view-pain">
+        <div class="pain-top">
+          <div class="pain-brief">
+            <h2>Analisador Inteligente de Dor</h2>
+            <p>Diagnóstico comercial automático para priorizar leads, entender gargalos prováveis e usar uma abordagem consultiva baseada em evidências.</p>
+          </div>
+          <div class="pain-actions">
+            <button class="btn btn-ghost" id="painExportCsv">Exportar CSV</button>
+            <button class="btn btn-primary" id="painRefresh">Atualizar análise</button>
+          </div>
+        </div>
+
+        <div class="pain-stats" id="painStats"></div>
+
+        <div class="pain-filters" id="painFilters">
+          <input id="painSearch" placeholder="Buscar empresa, nicho ou cidade" autocomplete="off" />
+          <input id="painMin" type="number" min="0" max="100" placeholder="Score mínimo" />
+          <input id="painMax" type="number" min="0" max="100" placeholder="Score máximo" />
+          <select id="painLevelFilter">
+            <option value="">Todos os níveis</option>
+            <option>Dor fraca</option>
+            <option>Dor moderada</option>
+            <option>Dor forte</option>
+            <option>Prioridade máxima</option>
+          </select>
+          <select id="painTypeFilter">
+            <option value="">Todas as dores</option>
+            <option>Dor de conversão</option>
+            <option>Dor de posicionamento</option>
+            <option>Tráfego desperdiçado</option>
+            <option>Dor de atendimento</option>
+            <option>Dor de confiança</option>
+          </select>
+          <select id="painMainFilter">
+            <option value="">Dor principal</option>
+            <option>Dor de conversão</option>
+            <option>Dor de posicionamento</option>
+            <option>Tráfego desperdiçado</option>
+            <option>Dor de atendimento</option>
+            <option>Dor de confiança</option>
+            <option>Informação insuficiente</option>
+          </select>
+          <select id="painCityFilter"><option value="">Todas as cidades</option></select>
+          <select id="painNicheFilter"><option value="">Todos os nichos</option></select>
+          <select id="painSourceFilter"><option value="">Todas as fontes</option></select>
+          <select id="painHasSite"><option value="">Possui site?</option><option value="yes">Sim</option><option value="no">Não</option></select>
+          <select id="painHasInstagram"><option value="">Possui Instagram?</option><option value="yes">Sim</option><option value="no">Não</option></select>
+          <select id="painHasWhatsapp"><option value="">WhatsApp visível?</option><option value="yes">Sim</option><option value="no">Não</option></select>
+          <select id="painAdsFilter"><option value="">Parece anunciar?</option><option value="yes">Sim</option><option value="no">Não/sem evidência</option></select>
+          <select id="painLandingFilter"><option value="">Landing page?</option><option value="yes">Sim</option><option value="no">Não/sem evidência</option></select>
+          <select id="painProofFilter"><option value="">Prova social?</option><option value="yes">Sim</option><option value="no">Não/sem evidência</option></select>
+        </div>
+
+        <div class="pain-grid" id="painGrid"></div>
       </section>
 
       <!-- =============== LEADS =============== -->
@@ -1278,22 +1785,42 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
 
       <!-- =============== TASKS =============== -->
       <section class="section" id="view-tasks">
-        <div class="card" style="margin-bottom:18px">
-          <div class="section-head"><h2><span class="dot"></span> Criar Nova Tarefa</h2></div>
-          <div class="hunter-form">
-            <div class="field"><label>Título</label><input id="tTitle" placeholder="Ex: Ligar para follow-up" /></div>
-            <div class="field"><label>Lead vinculado</label><select id="tLead"></select></div>
-            <div class="field"><label>Vencimento</label><input id="tDue" type="date" /></div>
-            <div class="field"><label>Prioridade</label><select id="tPri"><option>Alta</option><option selected>Média</option><option>Baixa</option></select></div>
+        <div class="card task-hero">
+          <div>
+            <h2>Central de follow-up</h2>
+            <p>Priorize o que vence hoje, limpe atrasos e mantenha cada lead com uma proxima acao clara.</p>
           </div>
-          <div style="margin-top:12px"><button class="btn btn-primary" id="btnCreateTask">＋ Criar tarefa</button></div>
+          <button class="btn btn-primary" id="btnCreateTask">Nova tarefa</button>
+        </div>
+
+        <div class="task-summary" aria-label="Resumo das tarefas">
+          <div class="task-summary-card">
+            <span>Proximo foco</span>
+            <strong id="taskMetricFocus">-</strong>
+            <small id="taskMetricFocusMeta">Nenhum follow-up pendente.</small>
+          </div>
+          <div class="task-summary-card">
+            <span>Atrasadas</span>
+            <strong id="taskMetricLate">0</strong>
+            <small>Resolva primeiro para recuperar ritmo.</small>
+          </div>
+          <div class="task-summary-card">
+            <span>Abertas</span>
+            <strong id="taskMetricOpen">0</strong>
+            <small>Tarefas em andamento no CRM.</small>
+          </div>
+          <div class="task-summary-card">
+            <span>Concluidas</span>
+            <strong id="taskMetricDone">0</strong>
+            <small>Historico de follow-ups finalizados.</small>
+          </div>
         </div>
 
         <div class="task-board">
-          <div class="card task-col"><h3>📌 Hoje <span class="count" id="cToday">0</span></h3><div class="task-list" id="tToday"></div></div>
-          <div class="card task-col"><h3>⚠ Atrasadas <span class="count" id="cLate">0</span></h3><div class="task-list" id="tLate"></div></div>
-          <div class="card task-col"><h3>📅 Próximas <span class="count" id="cNext">0</span></h3><div class="task-list" id="tNext"></div></div>
-          <div class="card task-col"><h3>✓ Concluídas <span class="count" id="cDone">0</span></h3><div class="task-list" id="tDone"></div></div>
+          <div class="card task-col"><h3>Hoje <span class="count" id="cToday">0</span></h3><div class="task-list" id="tToday"></div></div>
+          <div class="card task-col"><h3>Atrasadas <span class="count" id="cLate">0</span></h3><div class="task-list" id="tLate"></div></div>
+          <div class="card task-col"><h3>Proximas <span class="count" id="cNext">0</span></h3><div class="task-list" id="tNext"></div></div>
+          <div class="card task-col"><h3>Concluidas <span class="count" id="cDone">0</span></h3><div class="task-list" id="tDone"></div></div>
         </div>
       </section>
 
@@ -1351,8 +1878,10 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
 <div class="mobile-tabs" id="mobileTabs">
   <div class="nav-item active" data-view="dashboard"><span class="nav-ico">◉</span>Home</div>
   <div class="nav-item" data-view="hunter"><span class="nav-ico">⌖</span>Hunter</div>
+  <div class="nav-item" data-view="localhunt"><span class="nav-ico">◎</span>Local</div>
   <div class="nav-item" data-view="sdr"><span class="nav-ico">🤖</span>SDR</div>
   <div class="nav-item" data-view="crm"><span class="nav-ico">⎘</span>CRM</div>
+  <div class="nav-item" data-view="pain"><span class="nav-ico">◇</span>Dor</div>
   <div class="nav-item" data-view="leads"><span class="nav-ico">☰</span>Leads</div>
   <div class="nav-item" data-view="launches"><span class="nav-ico">🚀</span>Lanç.</div>
   <div class="nav-item" data-view="tasks"><span class="nav-ico">✓</span>Tarefas</div>
@@ -1388,8 +1917,12 @@ let state = {
   leads: [], tasks: [], launches: [],
   settings: { agencyName:'Gravity', message:'', niches:'', theme:'dark' },
   currentDorks: [], currentResults: [], currentLeadId: null, currentLaunchId: null,
+  localHunt: { results: [], running:false, es:null, logs:[], jobId:null, progress:0, saved:0 },
   provider: 'multi', activeView: 'dashboard', lqTab: 'table',
   crm: { q:'', temp:'', sort:'score' },
+  pain: { q:'', min:'', max:'', level:'', type:'', main:'', city:'', niche:'', source:'', site:'', instagram:'', whatsapp:'', ads:'', landing:'', proof:'' },
+  aiCommercial: false, aiModel: null,
+  ia: { tab:'dashboard' },
 };
 
 function uid(){ return 'r'+Math.random().toString(36).slice(2,9) }
@@ -1410,21 +1943,27 @@ async function api(path, method='GET', body){
 function mapLead(b){
   const score = b.finalScore != null ? b.finalScore : (b.score||0);
   const temp = b.temperature || (score>=70?'Quente':score>=40?'Morno':'Frio');
+  const pd = b.painDiagnostic || null;
   return {
     id: b.id, name: b.companyName||'', niche: b.niche||'', city: b.city||'', uf: b.region||'',
     phone: b.phone||'', whatsapp: String(b.whatsapp||'').replace(/\D/g,''),
     instagram: b.instagram||'', site: b.site||'', email: b.email||'',
+    publicContactName: b.publicContactName||'', publicContactRole: b.publicContactRole||'',
     stage: b.stage||'Novo', value: Number(b.dealValue)||Math.round(1200+score*40),
     note: b.evidence||'', lastContact: b.lastContactAt||null, nextAction: b.nextAction||'',
     history: (b.notes||[]).map(n=>({ at:n.date, text:(n.author?'['+n.author+'] ':'')+n.text })),
     hasWhatsapp: !!b.whatsapp, hasSite: !!b.site, hasInsta: !!b.instagram,
     score, temp,
     reasons: (b.scoreEvidences||[]).map(e=>e.signal+' ('+(e.points>=0?'+':'')+e.points+')').slice(0,6),
-    pain: (b.websiteDiagnostic && b.websiteDiagnostic.summary) || '',
-    offer: b.commercialHook || (b.outreachMessage ? b.outreachMessage.slice(0,140)+'…' : ''),
+    pain: (pd && pd.main_pain) || (b.websiteDiagnostic && b.websiteDiagnostic.summary) || '',
+    offer: (pd && pd.recommended_service) || b.commercialHook || (b.outreachMessage ? b.outreachMessage.slice(0,140)+'…' : ''),
     priorityKey: b.commercialPriority||'',
-    outreachMessage: b.outreachMessage||'',
+    outreachMessage: (pd && pd.prospecting_message) || b.outreachMessage||'',
     dataConfidence: b.dataConfidence,
+    sourceProvider: b.sourceProvider || '',
+    sourceUrl: b.sourceUrl || '',
+    painDiagnostic: pd,
+    painSignals: b.painSignals||[],
     research: b.researchReport||null,
     researchedAt: b.researchedAt||null,
     sdrStatus: b.sdrStatus||null,
@@ -1459,7 +1998,7 @@ function activeProvidersLabel(){
   const list = (state.activeProviders||[]).map(function(p){ return PROVIDER_LABELS[p]||p; });
   return list.length ? list.join(' + ') : 'Nenhum robô configurado';
 }
-async function loadConfig(){ try{ const c=await api('/api/config'); state.provider=c.provider; state.ai=!!c.ai; state.activeProviders=c.activeProviders||[]; }catch{} }
+async function loadConfig(){ try{ const c=await api('/api/config'); state.provider=c.provider; state.ai=!!c.ai; state.activeProviders=c.activeProviders||[]; state.aiCommercial=!!c.aiCommercial; state.aiModel=c.aiModel||null; }catch{} }
 async function loadSettings(){ try{ const r=await api('/api/settings'); state.settings={...state.settings,...r.settings}; }catch{} }
 async function loadLeads(){ try{ const r=await api('/api/leads'); state.leads=(r.leads||[]).map(mapLead); }catch(e){ toast('error','Erro ao carregar leads',e.message); } }
 async function loadTasks(){ try{ const r=await api('/api/tasks'); const idx=new Map(state.leads.map(l=>[l.id,l])); state.tasks=(r.tasks||[]).map(t=>mapTask(t,idx)); }catch{ state.tasks=[]; } }
@@ -1475,6 +2014,8 @@ async function refreshAll(){
   invalidateStatsCache();
   if(state.activeView==='dashboard') renderDashboard();
   if(state.activeView==='crm') renderKanban();
+  if(state.activeView==='pain') renderPainAnalyzer();
+  if(state.activeView==='localhunt') renderLocalHunt();
   if(state.activeView==='leads'){ loadLeadsPage(); }
   if(state.activeView==='tasks') renderTasks();
   if(state.activeView==='automations') renderAutomations();
@@ -1484,8 +2025,11 @@ async function refreshAll(){
 const titles = {
   dashboard:['Dashboard','Visão executiva da sua operação comercial'],
   hunter:['Lead Hunter IA','Gere dorks reais e ative os robôs de busca'],
+  ia:['IA Comercial','O cérebro comercial: análise, priorização e rascunhos de abordagem'],
+  localhunt:['Caça Inteligente Local','Scraping público com scoring, dono público e salvamento no CRM'],
   sdr:['SDR IA','Pesquisa, cadência e qualificação automática de leads'],
   crm:['CRM Funil','Arraste os cards entre etapas — tudo salva no banco'],
+  pain:['Analisador de Dor','Priorize gargalos comerciais prováveis com diagnóstico salvo no lead'],
   leads:['Leads','Sua base completa, filtrável e auditável'],
   launches:['Lançamentos','Encontre, organize e acompanhe lançamentos digitais'],
   tasks:['Tarefas','Follow-ups e ações em aberto'],
@@ -1500,7 +2044,10 @@ function switchView(view){
   document.getElementById('pageSub').textContent = titles[view][1];
   if(view==='dashboard') renderDashboard();
   if(view==='hunter') renderHunter();
+  if(view==='ia') renderIaComercial();
+  if(view==='localhunt') renderLocalHunt();
   if(view==='crm') renderKanban();
+  if(view==='pain') renderPainAnalyzer();
   if(view==='leads'){
     // Hidratação: prioriza o hash da URL; senão, restaura perPage preferido.
     if(!applyLeadsHash()){
@@ -1754,6 +2301,224 @@ function runProspect(){
   es.addEventListener('error', ev=>{ let m='Não foi possível concluir a busca'; try{m=JSON.parse(ev.data).message||m}catch{} es.close(); toast('error','Falha na prospecção', m); el.innerHTML = '<div class="empty state-error"><div class="em-ico">!</div><h3>Falha na prospecção</h3><p>'+escapeHtml(m)+'</p></div>'; });
 }
 
+/* ============================================================
+   IA COMERCIAL — frontend (consome só endpoints internos /api/ai/*)
+   ============================================================ */
+function aiScoreMeta(score){
+  const s = Number(score)||0;
+  if(s>=85) return { cls:'ai-hot',  label:'quente' };
+  if(s>=70) return { cls:'ai-good', label:'bom' };
+  if(s>=40) return { cls:'ai-mid',  label:'médio' };
+  return { cls:'ai-cold', label:'frio' };
+}
+function aiScoreBadge(score){
+  const m = aiScoreMeta(score);
+  return '<span class="ai-score '+m.cls+'"><span class="ai-score-n">'+(Number(score)||0)+'</span><span class="ai-score-l">'+m.label+'</span></span>';
+}
+function aiSpinner(msg){ return '<div class="empty state-loading"><div class="em-ico"><div class="spinner"></div></div><p>'+escapeHtml(msg||'A IA está pensando…')+'</p></div>'; }
+function aiDisabledCard(extra){
+  return '<div class="card"><div class="ai-disabled"><div class="ai-disabled-ico">'+svgIco('bot',22)+'</div>'+
+    '<div><h3 style="margin:0 0 4px;font-size:14px">IA Comercial desativada</h3>'+
+    '<p style="margin:0;font-size:12.5px;color:var(--text-dim);line-height:1.5">Configure <code>OPENAI_API_KEY</code> no <code>.env</code> do backend para habilitar. '+(extra||'')+'</p></div></div></div>';
+}
+
+const IA_TABS = { dashboard:renderIaDashboard, report:renderIaReport, hunter:renderIaHunter };
+let _iaTabsWired = false;
+function renderIaComercial(){
+  if(!_iaTabsWired){
+    document.querySelectorAll('#iaTabs .lq-tab').forEach(function(b){
+      b.addEventListener('click', function(){ iaSwitchTab(b.dataset.iatab); });
+    });
+    _iaTabsWired = true;
+  }
+  iaSwitchTab(state.ia.tab || 'dashboard');
+}
+function iaSwitchTab(tab){
+  state.ia.tab = tab;
+  document.querySelectorAll('#iaTabs .lq-tab').forEach(function(b){ b.classList.toggle('active', b.dataset.iatab===tab); });
+  (IA_TABS[tab] || renderIaDashboard)();
+}
+
+/* ---- Aba: Dashboard IA ---- */
+async function renderIaDashboard(){
+  const el = document.getElementById('iaPanel');
+  el.innerHTML = aiSpinner('Calculando o dashboard e pedindo a leitura da IA…');
+  let d;
+  try{ d = await api('/api/ai/generate-dashboard','POST',{ date_range:'all' }); }
+  catch(e){ el.innerHTML = '<div class="empty state-error"><div class="em-ico">!</div><h3>Falha ao gerar o dashboard</h3><p>'+escapeHtml(e.message)+'</p></div>'; return; }
+  const kpi = [
+    ['Total de leads', d.total_leads||0, 'users', ''],
+    ['Leads quentes', d.hot_leads||0, 'flame', 'rose'],
+    ['Média de score', (d.average_score||0), 'gauge', 'cool'],
+    ['Modelo', state.aiCommercial ? (state.aiModel||'ativo') : 'desativado', 'bot', 'warm'],
+  ];
+  const top = (d.top_10_leads_today||[]);
+  const summary = d.executive_summary
+    ? '<div class="ai-summary"><div class="ai-summary-k">Resumo executivo</div><p>'+escapeHtml(d.executive_summary)+'</p></div>'
+    : (state.aiCommercial
+        ? '<div class="ai-note">A IA não retornou resumo (verifique billing da OpenAI). As estatísticas abaixo vêm direto do banco.</div>'
+        : '<div class="ai-note">IA desativada: as estatísticas abaixo vêm do banco. Configure OPENAI_API_KEY para o resumo executivo e recomendações.</div>');
+  const recs = (d.daily_recommendations||[]);
+  el.innerHTML =
+    '<div class="stats" style="grid-template-columns:repeat(4,minmax(0,1fr))">'+
+      kpi.map(function(k){ return '<div class="card stat '+k[3]+'"><div class="stat-label">'+k[0]+'</div><div class="stat-value" style="font-size:'+(k[0]==='Modelo'?'16px':'28px')+'">'+escapeHtml(String(k[1]))+'</div><div class="stat-ico">'+svgIco(k[2])+'</div></div>'; }).join('')+
+    '</div>'+
+    summary+
+    (recs.length ? '<div class="card" style="margin-top:16px"><div class="section-head"><h2><span class="dot"></span> Recomendações para hoje</h2></div><ul class="ai-list">'+recs.map(function(r){return '<li>'+escapeHtml(r)+'</li>';}).join('')+'</ul></div>' : '')+
+    '<div class="grid-2" style="margin-top:16px">'+
+      '<div class="card"><div class="section-head"><h2><span class="dot"></span> Top 10 para abordar hoje</h2></div>'+
+        (top.length ? '<div class="op-list">'+top.map(function(l){ return '<div class="op-item" onclick="openLeadModal('+l.id+')"><div class="op-info"><div class="op-name">'+escapeHtml(l.company_name||'')+'</div><div class="op-meta">'+escapeHtml(l.niche||'—')+' · '+escapeHtml(l.city||'')+(l.uf?'/'+escapeHtml(l.uf):'')+'</div></div>'+aiScoreBadge(l.score)+'</div>'; }).join('')+'</div>' : emptyHtml('Sem leads no período'))+
+      '</div>'+
+      '<div class="card"><div class="section-head"><h2><span class="dot"></span> Ofertas mais recomendadas</h2></div>'+
+        ((d.most_recommended_offers||[]).length ? '<div class="ai-bars">'+d.most_recommended_offers.map(function(o){ return iaBar(o.offer, o.count, d.most_recommended_offers[0].count); }).join('')+'</div>' : emptyHtml('Nenhuma análise de IA ainda'))+
+      '</div>'+
+    '</div>'+
+    '<div class="grid-2" style="margin-top:16px">'+
+      '<div class="card"><div class="section-head"><h2><span class="dot"></span> Distribuição por nicho</h2></div>'+iaDist(d.leads_by_niche)+'</div>'+
+      '<div class="card"><div class="section-head"><h2><span class="dot"></span> Distribuição por cidade</h2></div>'+iaDist(d.leads_by_city)+'</div>'+
+    '</div>';
+}
+function iaBar(label, count, max){
+  const pct = Math.round((count/Math.max(1,max))*100);
+  return '<div class="ai-bar"><div class="ai-bar-top"><span>'+escapeHtml(label||'—')+'</span><b>'+count+'</b></div><div class="ai-bar-track"><div class="ai-bar-fill" style="width:'+pct+'%"></div></div></div>';
+}
+function iaDist(arr){
+  arr = arr||[];
+  if(!arr.length) return emptyHtml('Sem dados');
+  const max = arr[0].count;
+  return '<div class="ai-bars">'+arr.map(function(x){ return iaBar(x.name, x.count, max); }).join('')+'</div>';
+}
+
+/* ---- Aba: Relatório Noturno ---- */
+function renderIaReport(){
+  const el = document.getElementById('iaPanel');
+  const today = new Date().toISOString().slice(0,10);
+  el.innerHTML =
+    '<div class="card"><div class="section-head"><h2><span class="dot"></span> Relatório da prospecção</h2></div>'+
+      '<div class="ia-form-row"><div class="field" style="margin:0"><label>Data</label><input type="date" id="iaReportDate" value="'+today+'"></div>'+
+      '<button class="btn btn-primary" onclick="iaLoadReport(false)">Ver / gerar relatório</button>'+
+      '<button class="btn btn-ghost" onclick="iaLoadReport(true)">Regerar (força)</button></div>'+
+    '</div>'+
+    '<div id="iaReportOut" style="margin-top:16px"><div class="empty"><div class="em-ico">—</div><h3>Nenhum relatório carregado</h3><p>Escolha a data e clique em "Ver / gerar relatório".</p></div></div>';
+}
+async function iaLoadReport(force){
+  const out = document.getElementById('iaReportOut');
+  const date = document.getElementById('iaReportDate').value || new Date().toISOString().slice(0,10);
+  if(force && !confirm('Regerar o relatório desta data? Isso faz uma nova chamada de IA.')) return;
+  out.innerHTML = aiSpinner('Montando o relatório do dia…');
+  let r;
+  try{ r = await api('/api/ai/daily-report','POST',{ date, force:!!force }); }
+  catch(e){ out.innerHTML = '<div class="empty state-error"><div class="em-ico">!</div><h3>Falha ao gerar</h3><p>'+escapeHtml(e.message)+'</p></div>'; return; }
+  if(r.enabled===false){ out.innerHTML = aiDisabledCard('Mesmo assim, encontramos <b>'+(r.total_found||0)+'</b> lead(s) nesta data.'); return; }
+  const top = r.top_10_leads||[];
+  const block = function(title, arr){ arr=arr||[]; return arr.length ? '<div class="card" style="margin-top:14px"><div class="section-head"><h2><span class="dot"></span> '+title+'</h2></div><ul class="ai-list">'+arr.map(function(x){return '<li>'+escapeHtml(x)+'</li>';}).join('')+'</ul></div>' : ''; };
+  out.innerHTML =
+    '<div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">'+
+      '<div class="card stat"><div class="stat-label">Data</div><div class="stat-value" style="font-size:18px">'+escapeHtml(r.report_date||date)+'</div><div class="stat-ico">'+svgIco('calendar')+'</div></div>'+
+      '<div class="card stat cool"><div class="stat-label">Leads encontrados</div><div class="stat-value">'+(r.total_found||0)+'</div><div class="stat-ico">'+svgIco('users')+'</div></div>'+
+      '<div class="card stat warm"><div class="stat-label">Origem</div><div class="stat-value" style="font-size:16px">'+(r.cached?'salvo':'gerado agora')+'</div><div class="stat-ico">'+svgIco('bolt')+'</div></div>'+
+    '</div>'+
+    (r.executive_summary ? '<div class="ai-summary" style="margin-top:14px"><div class="ai-summary-k">Resumo executivo</div><p>'+escapeHtml(r.executive_summary)+'</p></div>' : '')+
+    '<div class="grid-2" style="margin-top:14px">'+
+      '<div class="card"><div class="section-head"><h2><span class="dot"></span> Top 10 leads</h2></div>'+
+        (top.length ? '<div class="op-list">'+top.map(function(l){ return '<div class="op-item" onclick="openLeadModal('+l.id+')"><div class="op-info"><div class="op-name">'+escapeHtml(l.company_name||'')+'</div><div class="op-meta">'+escapeHtml(l.niche||'—')+' · '+escapeHtml(l.city||'')+'</div></div>'+aiScoreBadge(l.score)+'</div>'; }).join('')+'</div>' : emptyHtml('Nenhum lead nesta data'))+
+      '</div>'+
+      '<div>'+block('Melhores nichos', r.best_niches)+block('Principais dores', r.main_pain_points)+'</div>'+
+    '</div>'+
+    block('Oportunidades comerciais', r.commercial_opportunities)+
+    block('Próximos passos recomendados', r.recommended_next_steps);
+}
+
+/* ---- Aba: Caçador IA ---- */
+function renderIaHunter(){
+  const el = document.getElementById('iaPanel');
+  el.innerHTML =
+    '<div class="card"><div class="section-head"><h2><span class="dot"></span> Caçador IA — buscas públicas</h2></div>'+
+      '<p style="font-size:12.5px;color:var(--text-dim);margin:-6px 0 14px;line-height:1.5">Gera consultas públicas (Google dorks) para encontrar empresas com possível necessidade de marketing. São apenas buscas públicas — o sistema não faz spam nem coleta indevida.</p>'+
+      '<div class="hunter-grid">'+
+        '<div class="field"><label>Nicho</label><input id="iaqNiche" placeholder="Ex.: clínica de estética"></div>'+
+        '<div class="field"><label>Cidade</label><input id="iaqCity" placeholder="Ex.: Goiânia"></div>'+
+        '<div class="field"><label>Tipo de cliente (opcional)</label><input id="iaqType" placeholder="Ex.: negócio local"></div>'+
+      '</div>'+
+      '<div class="hunter-cta"><button class="btn btn-primary" onclick="iaGenerateQueries()">Gerar buscas inteligentes</button>'+
+      '<button class="btn btn-ghost" id="iaqCopyAll" onclick="iaCopyAllQueries()" style="display:none">Copiar todas</button></div>'+
+    '</div>'+
+    '<div id="iaqOut" style="margin-top:16px"></div>';
+}
+async function iaGenerateQueries(){
+  const niche = (document.getElementById('iaqNiche').value||'').trim();
+  const city = (document.getElementById('iaqCity').value||'').trim();
+  const clientType = (document.getElementById('iaqType').value||'').trim();
+  if(!niche && !city){ toast('warn','Faltam dados','Informe ao menos nicho ou cidade.'); return; }
+  const out = document.getElementById('iaqOut');
+  out.innerHTML = aiSpinner('Gerando buscas públicas…');
+  let r;
+  try{ r = await api('/api/ai/generate-search-queries','POST',{ niche, city, client_type:clientType }); }
+  catch(e){ out.innerHTML = '<div class="empty state-error"><div class="em-ico">!</div><h3>Falha</h3><p>'+escapeHtml(e.message)+'</p></div>'; return; }
+  if(r.enabled===false){ out.innerHTML = aiDisabledCard(''); return; }
+  if(!r.ok || !(r.queries||[]).length){ out.innerHTML = '<div class="empty state-error"><div class="em-ico">!</div><h3>Sem resultados</h3><p>'+escapeHtml(r.error||'A IA não retornou buscas. Tente novamente.')+'</p></div>'; return; }
+  state.ia.queries = r.queries;
+  document.getElementById('iaqCopyAll').style.display='';
+  out.innerHTML = '<div class="card"><div class="section-head"><h2><span class="dot"></span> '+r.queries.length+' buscas geradas</h2></div><div class="dork-list" style="max-height:none">'+
+    r.queries.map(function(q,i){ return '<div class="dork-item"><code style="flex:1;min-width:0">'+escapeHtml(q)+'</code><div class="dork-actions"><button class="btn btn-sm btn-ghost" onclick="iaCopyQuery('+i+')">Copiar</button><button class="btn btn-sm btn-ghost" onclick="window.open(\'https://www.google.com/search?q=\'+encodeURIComponent(state.ia.queries['+i+']),\'_blank\')">Abrir</button></div></div>'; }).join('')+
+    '</div></div>';
+}
+function iaCopyQuery(i){ navigator.clipboard.writeText(state.ia.queries[i]); toast('success','Busca copiada'); }
+function iaCopyAllQueries(){ navigator.clipboard.writeText((state.ia.queries||[]).join('\n')); toast('success','Todas as buscas copiadas'); }
+
+/* ---- Análise por lead (usada no modal do lead) ---- */
+async function aiAnalyzeLead(id, force){
+  if(!state.aiCommercial){ toast('warn','IA desativada','Configure OPENAI_API_KEY no backend.'); return; }
+  toast('info','Analisando com IA…','O cérebro comercial está avaliando o lead.');
+  try{
+    const r = await api('/api/ai/analyze-lead','POST',{ lead_id:id, force:!!force });
+    if(r.enabled===false){ toast('warn','IA desativada', r.error); return; }
+    if(!r.ok){ toast('error','Falha na análise', r.error||'Tente novamente.'); return; }
+    state.aiAnalysis = state.aiAnalysis || {};
+    state.aiAnalysis[id] = r;
+    toast('success', r.cached?'Análise (cache)':'Análise concluída', 'Score '+r.score+' · '+(r.priority||''));
+    if(state.currentLeadId===id) openLeadModal(id);
+  }catch(e){ toast('error','Erro', e.message); }
+}
+async function aiGenMessage(id, channel){
+  if(!state.aiCommercial){ toast('warn','IA desativada','Configure OPENAI_API_KEY no backend.'); return; }
+  toast('info','Gerando rascunho…', channel==='email'?'E-mail para aprovação humana':'WhatsApp para aprovação humana');
+  try{
+    const r = await api('/api/ai/generate-message','POST',{ lead_id:id, channel });
+    if(r.enabled===false){ toast('warn','IA desativada', r.error); return; }
+    if(!r.ok){ toast('error','Falha', r.error||'Tente novamente.'); return; }
+    const body = (channel==='email' && r.subject ? 'Assunto: '+r.subject+'\n\n' : '')+r.message;
+    openModal({ title: channel==='email'?'Rascunho de e-mail':'Rascunho de WhatsApp', sub:'Requer aprovação humana antes de enviar',
+      body:'<div class="field"><label>Rascunho (revise antes de enviar)</label><textarea id="aiMsgOut" rows="8">'+escapeHtml(body)+'</textarea></div><div style="font-size:11px;color:var(--text-mute)">A IA gera apenas rascunhos. Nenhum envio é feito automaticamente.</div>',
+      footer:'<button class="btn btn-ghost" onclick="closeModal()">Fechar</button><button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById(\'aiMsgOut\').value);toast(\'success\',\'Copiado\')">Copiar</button>' });
+  }catch(e){ toast('error','Erro', e.message); }
+}
+
+/** Bloco de IA Comercial dentro do modal do lead. */
+function aiLeadPanelHtml(l){
+  const a = (state.aiAnalysis||{})[l.id];
+  const disabled = !state.aiCommercial;
+  const head = '<div class="ai-lead-head"><h4>IA Comercial</h4>'+(a?aiScoreBadge(a.score):'')+'</div>';
+  let bodyHtml;
+  if(a){
+    bodyHtml = '<div class="ai-lead-grid">'+
+      '<div><b>Prioridade:</b> '+escapeHtml(a.priority||'—')+(a.cached?' <span style="color:var(--text-mute)">(cache)</span>':'')+'</div>'+
+      (a.pain_point?'<div><b>Dor principal:</b> '+escapeHtml(a.pain_point)+'</div>':'')+
+      (a.recommended_offer?'<div><b>Oferta recomendada:</b> '+escapeHtml(a.recommended_offer)+'</div>':'')+
+      (a.next_step?'<div><b>Próximo passo:</b> '+escapeHtml(a.next_step)+'</div>':'')+
+      (a.score_reason?'<div style="color:var(--text-dim)"><b style="color:var(--text)">Motivo do score:</b> '+escapeHtml(a.score_reason)+'</div>':'')+
+    '</div>';
+  } else {
+    bodyHtml = '<div style="font-size:12px;color:var(--text-mute)">'+(disabled?'IA desativada. Configure OPENAI_API_KEY no backend para analisar este lead.':'Nenhuma análise ainda. Clique em "Analisar com IA".')+'</div>';
+  }
+  const btns = '<div class="ai-lead-actions">'+
+    '<button class="btn btn-sm btn-primary" '+(disabled?'disabled':'')+' onclick="aiAnalyzeLead('+l.id+','+(a?'true':'false')+')">'+(a?'Reanalisar':'Analisar com IA')+'</button>'+
+    '<button class="btn btn-sm btn-ghost" '+(disabled?'disabled':'')+' onclick="aiGenMessage('+l.id+',\'whatsapp\')">Gerar WhatsApp</button>'+
+    '<button class="btn btn-sm btn-ghost" '+(disabled?'disabled':'')+' onclick="aiGenMessage('+l.id+',\'email\')">Gerar e-mail</button>'+
+  '</div>';
+  return '<div class="ai-lead-box">'+head+bodyHtml+btns+'</div>';
+}
+
 /** Predicado de filtro do quadro (busca livre + temperatura). */
 function crmMatch(l){
   if(state.crm.temp && l.temp !== state.crm.temp) return false;
@@ -1769,9 +2534,55 @@ function crmSorter(){
   if(s==='recent')return (a,b)=>(b.id||0)-(a.id||0);
   return (a,b)=>(b.score||0)-(a.score||0);
 }
+function setText(id, value){
+  const el = document.getElementById(id);
+  if(el) el.textContent = value;
+}
+function isoToday(){ return new Date().toISOString().slice(0,10); }
+function leadOpenTasks(leadId){
+  return state.tasks.filter(t=>t.leadId===leadId && !t.done);
+}
+function leadLateTasks(leadId, today){
+  return leadOpenTasks(leadId).filter(t=>t.due && t.due.slice(0,10)<today);
+}
+function dueLabel(t, today){
+  if(t.done) return 'Concluida';
+  if(!t.due) return 'Sem data';
+  const d = t.due.slice(0,10);
+  if(d<today) return 'Atrasada';
+  if(d===today) return 'Hoje';
+  return new Date(d+'T00:00:00').toLocaleDateString('pt-BR');
+}
+function priorityClass(priority){
+  const p = String(priority||'Media').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  if(p==='alta') return 'high';
+  if(p==='baixa') return 'low';
+  return 'medium';
+}
+function taskSort(a,b){
+  const rank = { Alta:0, 'Média':1, Media:1, Baixa:2 };
+  const da = a.due || '9999-12-31';
+  const db = b.due || '9999-12-31';
+  return da.localeCompare(db) || ((rank[a.priority] ?? 1) - (rank[b.priority] ?? 1));
+}
+function updateCrmFocus(){
+  const today = isoToday();
+  const visible = state.leads.filter(crmMatch);
+  const openTasks = state.tasks.filter(t=>!t.done);
+  const todayTasks = openTasks.filter(t=>t.due && t.due.slice(0,10)===today);
+  const noTask = visible.filter(l=>!leadOpenTasks(l.id).length && l.stage!=='Cliente' && l.stage!=='Perdido');
+  const pipeline = visible
+    .filter(l=>l.stage!=='Cliente' && l.stage!=='Perdido')
+    .reduce((sum,l)=>sum+(Number(l.value)||0),0);
+  setText('crmMetricPipeline', brl(pipeline));
+  setText('crmMetricNoTask', String(noTask.length));
+  setText('crmMetricToday', String(todayTasks.length));
+  setText('crmMetricOpenTasks', String(openTasks.length));
+}
 function renderKanban(){
   const k = document.getElementById('kanban');
   const sorter = crmSorter();
+  updateCrmFocus();
   k.innerHTML = STAGES.map(s=>{
     const ls = state.leads.filter(l=>l.stage===s && crmMatch(l)).sort(sorter);
     const tot = ls.reduce((sum,l)=>sum+(l.value||0),0);
@@ -1793,6 +2604,15 @@ function renderKanban(){
 }
 function kanbanCard(l){
   const t = l.temp==='Quente'?'t-hot':l.temp==='Morno'?'t-warm':'t-cold';
+  const today = isoToday();
+  const openTasks = leadOpenTasks(l.id);
+  const lateTasks = leadLateTasks(l.id, today);
+  const lastContact = l.lastContact ? new Date(l.lastContact).toLocaleDateString('pt-BR') : 'sem contato';
+  const taskPill = lateTasks.length
+    ? '<span class="kc-pill late">'+lateTasks.length+' atrasada'+(lateTasks.length>1?'s':'')+'</span>'
+    : openTasks.length
+      ? '<span class="kc-pill open">'+openTasks.length+' tarefa'+(openTasks.length>1?'s':'')+'</span>'
+      : '<span class="kc-pill empty">sem follow-up</span>';
   const next = l.nextAction ? '<div class="kc-next">'+escapeHtml(l.nextAction)+'</div>' : '';
   const wa = l.whatsapp
     ? '<a class="kc-wa" onclick="event.stopPropagation()" target="_blank" rel="noopener" href="https://wa.me/'+escapeHtml(l.whatsapp)+'?text='+encodeURIComponent(l.outreachMessage||'')+'">WhatsApp</a>'
@@ -1804,6 +2624,10 @@ function kanbanCard(l){
         '<span class="kc-score '+t+'"><span class="kc-dot"></span>'+(l.score||0)+'</span>'+
       '</div>'+
       '<div class="kc-sub">'+escapeHtml(l.niche)+' · '+escapeHtml(l.city)+'/'+escapeHtml(l.uf)+'</div>'+
+      '<div class="kc-status">'+
+        taskPill+
+        '<span class="kc-pill contact">'+escapeHtml(lastContact)+'</span>'+
+      '</div>'+
       next+
       '<div class="kc-foot">'+
         '<span class="kc-value"><span class="cur">R$</span>'+(Number(l.value)||0).toLocaleString('pt-BR')+'</span>'+
@@ -2034,6 +2858,487 @@ function onSearchInput(){
   _searchDebounce = setTimeout(resetLeadsPage, 250);
 }
 function stageBadge(s){ return '<span class="badge badge-stage"><span class="dot"></span>'+escapeHtml(s)+'</span>'; }
+
+/* ============================================================
+   ANALISADOR INTELIGENTE DE DOR
+   ============================================================ */
+const PAIN_KEYS = ['conversion','positioning','wasted_traffic','attendance','trust'];
+const PAIN_LABELS = {
+  conversion:'Dor de conversão',
+  positioning:'Dor de posicionamento',
+  wasted_traffic:'Tráfego desperdiçado',
+  attendance:'Dor de atendimento',
+  trust:'Dor de confiança',
+};
+function plainText(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+function painDiag(l){
+  return l.painDiagnostic || {
+    pain_score:0,
+    pain_level:'Dor fraca',
+    main_pain:'Informação insuficiente',
+    category_scores:{ conversion:0, positioning:0, wasted_traffic:0, attendance:0, trust:0 },
+    detected_pains:[],
+    evidences:['Informações insuficientes para diagnosticar dores comerciais com segurança.'],
+    probable_consequences:[],
+    gravity_opportunity:'Validar manualmente a presença digital antes da abordagem.',
+    recommended_service:'Diagnóstico comercial',
+    recommended_services:['Diagnóstico comercial'],
+    prospecting_message:l.outreachMessage || buildWhatsappMsg(l),
+    next_steps:['Revisar site do lead','Verificar Instagram manualmente','Validar dados antes de abordar'],
+    analyzed_at:'',
+    updated_at:'',
+  };
+}
+function painLevelClass(level){
+  const p = plainText(level);
+  if(p.includes('prioridade')) return 'priority';
+  if(p.includes('forte')) return 'strong';
+  if(p.includes('moderada')) return 'moderate';
+  return 'weak';
+}
+function painEvidence(l){ return plainText((painDiag(l).evidences||[]).join(' | ')); }
+function painSignal(l, key){
+  const ev = painEvidence(l);
+  if(key==='site') return l.hasSite ? true : false;
+  if(key==='instagram') return l.hasInsta ? true : false;
+  if(key==='whatsapp') return l.hasWhatsapp ? true : false;
+  if(key==='ads') return ev.includes('parece anunciar') ? true : undefined;
+  if(key==='landing'){
+    if(ev.includes('nao possui landing page') || ev.includes('não possui landing page')) return false;
+    if(ev.includes('landing page')) return true;
+    return undefined;
+  }
+  if(key==='proof'){
+    if(ev.includes('nao possui prova social') || ev.includes('não possui prova social') || ev.includes('nao apresenta depoimentos') || ev.includes('não apresenta depoimentos')) return false;
+    if(ev.includes('prova social') || ev.includes('depoimento') || ev.includes('case')) return true;
+    return undefined;
+  }
+  return undefined;
+}
+function fillPainSelect(id, values, label){
+  const el = document.getElementById(id); if(!el) return;
+  const keep = el.value;
+  el.innerHTML = '<option value="">'+label+'</option>'+values.map(v=>'<option '+(v===keep?'selected':'')+'>'+escapeHtml(v)+'</option>').join('');
+}
+function populatePainFilters(){
+  const uniq = (getter)=>Array.from(new Set(state.leads.map(getter).filter(Boolean))).sort((a,b)=>String(a).localeCompare(String(b)));
+  fillPainSelect('painCityFilter', uniq(l=>l.city), 'Todas as cidades');
+  fillPainSelect('painNicheFilter', uniq(l=>l.niche), 'Todos os nichos');
+  fillPainSelect('painSourceFilter', uniq(l=>l.sourceProvider || l.sourceUrl), 'Todas as fontes');
+}
+function collectPainFilters(){
+  const get = id => document.getElementById(id)?.value || '';
+  state.pain = {
+    q:get('painSearch').trim(),
+    min:get('painMin'),
+    max:get('painMax'),
+    level:get('painLevelFilter'),
+    type:get('painTypeFilter'),
+    main:get('painMainFilter'),
+    city:get('painCityFilter'),
+    niche:get('painNicheFilter'),
+    source:get('painSourceFilter'),
+    site:get('painHasSite'),
+    instagram:get('painHasInstagram'),
+    whatsapp:get('painHasWhatsapp'),
+    ads:get('painAdsFilter'),
+    landing:get('painLandingFilter'),
+    proof:get('painProofFilter'),
+  };
+  return state.pain;
+}
+function passTri(value, wanted){
+  if(!wanted) return true;
+  if(wanted==='yes') return value === true;
+  return value !== true;
+}
+function filteredPainLeads(){
+  const f = collectPainFilters();
+  return state.leads.filter(l=>{
+    const d = painDiag(l);
+    const hay = plainText([l.name,l.niche,l.city,l.uf,l.site,l.instagram,l.whatsapp,d.main_pain,(d.detected_pains||[]).join(' ')].join(' '));
+    const score = Number(d.pain_score)||0;
+    if(f.q && !hay.includes(plainText(f.q))) return false;
+    if(f.min !== '' && score < Number(f.min)) return false;
+    if(f.max !== '' && score > Number(f.max)) return false;
+    if(f.level && d.pain_level !== f.level) return false;
+    if(f.type && !(d.detected_pains||[]).includes(f.type)) return false;
+    if(f.main && d.main_pain !== f.main) return false;
+    if(f.city && l.city !== f.city) return false;
+    if(f.niche && l.niche !== f.niche) return false;
+    if(f.source && (l.sourceProvider || l.sourceUrl) !== f.source) return false;
+    if(!passTri(painSignal(l,'site'), f.site)) return false;
+    if(!passTri(painSignal(l,'instagram'), f.instagram)) return false;
+    if(!passTri(painSignal(l,'whatsapp'), f.whatsapp)) return false;
+    if(!passTri(painSignal(l,'ads'), f.ads)) return false;
+    if(!passTri(painSignal(l,'landing'), f.landing)) return false;
+    if(!passTri(painSignal(l,'proof'), f.proof)) return false;
+    return true;
+  }).sort((a,b)=>(Number(painDiag(b).pain_score)||0)-(Number(painDiag(a).pain_score)||0));
+}
+function renderPainStats(rows){
+  const total = rows.length;
+  const max = rows.filter(l=>painDiag(l).pain_level==='Prioridade máxima').length;
+  const strong = rows.filter(l=>painDiag(l).pain_level==='Dor forte').length;
+  const avg = total ? Math.round(rows.reduce((s,l)=>s+(Number(painDiag(l).pain_score)||0),0)/total) : 0;
+  const top = rows[0] ? painDiag(rows[0]).main_pain : '-';
+  document.getElementById('painStats').innerHTML = [
+    '<div class="pain-stat"><span>Leads analisados</span><strong>'+total+'</strong><small>Dentro dos filtros atuais.</small></div>',
+    '<div class="pain-stat"><span>Prioridade máxima</span><strong>'+max+'</strong><small>Score entre 76 e 100.</small></div>',
+    '<div class="pain-stat"><span>Dor forte</span><strong>'+strong+'</strong><small>Score entre 51 e 75.</small></div>',
+    '<div class="pain-stat"><span>Média de dor</span><strong>'+avg+'</strong><small>Principal agora: '+escapeHtml(top)+'</small></div>',
+  ].join('');
+}
+function renderPainAnalyzer(){
+  populatePainFilters();
+  const rows = filteredPainLeads();
+  renderPainStats(rows);
+  const grid = document.getElementById('painGrid');
+  if(!grid) return;
+  grid.innerHTML = rows.length
+    ? rows.map(painCard).join('')
+    : '<div class="empty"><div class="em-ico">—</div><h3>Nenhum diagnóstico encontrado</h3><p>Ajuste os filtros ou adicione leads com site, Instagram, WhatsApp ou observações comerciais.</p></div>';
+}
+function painCard(l){
+  const d = painDiag(l);
+  const cls = painLevelClass(d.pain_level);
+  const tags = (d.detected_pains||[]).slice(0,4).map(x=>'<span class="pain-tag">'+escapeHtml(x)+'</span>').join('') || '<span class="pain-tag">Informação insuficiente</span>';
+  const msg = d.prospecting_message || l.outreachMessage || '';
+  return '<article class="pain-card '+cls+'">'+
+    '<div class="pain-card-head"><div><div class="pain-company">'+escapeHtml(l.name||'Lead sem nome')+'</div><div class="pain-meta">'+escapeHtml(l.niche||'Sem nicho')+' · '+escapeHtml(l.city||'Sem cidade')+'</div></div><div class="pain-score"><strong>'+Number(d.pain_score||0)+'</strong><span>Dor</span></div></div>'+
+    '<span class="pain-level '+cls+'">'+escapeHtml(d.pain_level||'Dor fraca')+'</span>'+
+    '<div class="pain-main">'+escapeHtml(d.main_pain||'Informação insuficiente')+'</div>'+
+    '<div class="pain-tags">'+tags+'</div>'+
+    '<div class="pain-service">'+escapeHtml(d.recommended_service||'Diagnóstico comercial')+'</div>'+
+    '<div class="pain-message">'+escapeHtml(msg)+'</div>'+
+    '<div class="pain-card-actions">'+
+      '<button class="btn btn-sm btn-ghost" onclick="copyPainMessage('+l.id+')">Copiar mensagem</button>'+
+      '<button class="btn btn-sm btn-outline" onclick="openPainDetails('+l.id+')">Ver detalhes</button>'+
+      '<button class="btn btn-sm btn-outline" onclick="exportPainCsv('+l.id+')">CSV</button>'+
+    '</div>'+
+  '</article>';
+}
+function painPanelHtml(l){
+  const d = painDiag(l);
+  const cls = painLevelClass(d.pain_level);
+  return '<div class="lead-section" style="margin-top:14px"><h4>Analisador de dor</h4>'+
+    '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">'+
+      '<div class="pain-score"><strong>'+Number(d.pain_score||0)+'</strong><span>Dor</span></div>'+
+      '<div style="flex:1;min-width:160px"><span class="pain-level '+cls+'">'+escapeHtml(d.pain_level||'Dor fraca')+'</span><div style="font-size:12.5px;font-weight:800;margin-top:8px">'+escapeHtml(d.main_pain||'Informação insuficiente')+'</div><div style="font-size:11.5px;color:var(--text-dim);margin-top:4px">'+escapeHtml(d.recommended_service||'Diagnóstico comercial')+'</div></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn btn-sm btn-ghost" onclick="copyPainMessage('+l.id+')">Copiar mensagem</button><button class="btn btn-sm btn-outline" onclick="reanalyzePain('+l.id+')">Reanalisar lead</button></div>'+
+  '</div>';
+}
+function scoreBarsHtml(d){
+  const scores = d.category_scores || {};
+  return PAIN_KEYS.map(k=>{
+    const v = Number(scores[k]||0);
+    return '<div class="pain-score-row"><span style="width:136px">'+escapeHtml(PAIN_LABELS[k])+'</span><div class="pain-score-bar"><span style="width:'+(v*5)+'%"></span></div><b>'+v+'/20</b></div>';
+  }).join('');
+}
+function listHtml(items){
+  return '<ul class="pain-list">'+(items&&items.length?items:['Informação insuficiente.']).map(x=>'<li>'+escapeHtml(x)+'</li>').join('')+'</ul>';
+}
+function openPainDetails(id){
+  const l = state.leads.find(x=>x.id===id); if(!l) return;
+  const d = painDiag(l);
+  const msg = d.prospecting_message || l.outreachMessage || '';
+  openModal({
+    title:'Diagnóstico de dor',
+    sub:(l.name||'Lead')+' · '+(d.main_pain||'Informação insuficiente'),
+    body:'<div class="pain-detail-grid">'+
+      '<div class="lead-section"><h4>Score por categoria</h4>'+scoreBarsHtml(d)+'</div>'+
+      '<div class="lead-section"><h4>Resumo comercial</h4><div style="font-size:12.5px;line-height:1.6"><b>Nível:</b> '+escapeHtml(d.pain_level||'')+'</div><div style="font-size:12.5px;line-height:1.6"><b>Principal dor:</b> '+escapeHtml(d.main_pain||'')+'</div><div style="font-size:12.5px;line-height:1.6"><b>Serviço:</b> '+escapeHtml(d.recommended_service||'')+'</div><div style="font-size:11.5px;color:var(--text-mute);margin-top:8px">Atualizado em '+(d.updated_at?new Date(d.updated_at).toLocaleString('pt-BR'):'—')+'</div></div>'+
+      '<div class="lead-section"><h4>Evidências usadas</h4>'+listHtml(d.evidences)+'</div>'+
+      '<div class="lead-section"><h4>Consequências prováveis</h4>'+listHtml(d.probable_consequences)+'</div>'+
+      '<div class="lead-section"><h4>Oportunidade Gravity</h4><div style="font-size:12.5px;line-height:1.6;color:var(--text-dim)">'+escapeHtml(d.gravity_opportunity||'')+'</div></div>'+
+      '<div class="lead-section"><h4>Próximos passos</h4>'+listHtml(d.next_steps)+'</div>'+
+    '</div><div class="lead-section" style="margin-top:12px"><h4>Mensagem personalizada</h4><textarea id="painMsgModal" rows="6">'+escapeHtml(msg)+'</textarea></div>',
+    footer:'<button class="btn btn-ghost" onclick="closeModal()">Fechar</button><button class="btn btn-outline" onclick="reanalyzePain('+l.id+')">Reanalisar lead</button><button class="btn btn-primary" onclick="copyPainModalMsg()">Copiar mensagem</button>'
+  });
+}
+function copyPainModalMsg(){ const t=document.getElementById('painMsgModal')?.value||''; navigator.clipboard?.writeText(t); toast('success','Mensagem copiada'); }
+function copyPainMessage(id){
+  const l = state.leads.find(x=>x.id===id); if(!l) return;
+  const msg = painDiag(l).prospecting_message || l.outreachMessage || '';
+  navigator.clipboard?.writeText(msg);
+  toast('success','Mensagem copiada', l.name);
+}
+async function reanalyzePain(id){
+  try{
+    const r = await api('/api/leads/'+id+'/pain/reanalyze','POST');
+    if(r.lead){
+      const mapped = mapLead(r.lead);
+      const i = state.leads.findIndex(x=>x.id===id);
+      if(i>=0) state.leads[i]=mapped;
+    }
+    toast('success','Diagnóstico atualizado');
+    if(state.activeView==='pain') renderPainAnalyzer();
+    if(state.currentLeadId===id) openPainDetails(id);
+  }catch(e){ toast('error','Erro ao reanalisar', e.message); }
+}
+function csvEscape(v){ return '"'+String(v==null?'':Array.isArray(v)?v.join(' | '):v).replace(/"/g,'""')+'"'; }
+function painCsvRow(l){
+  const d = painDiag(l);
+  return [l.name,l.niche,l.city,l.site,l.instagram,l.whatsapp,l.sourceProvider||l.sourceUrl,d.pain_score,d.pain_level,d.main_pain,d.detected_pains,d.recommended_service,d.gravity_opportunity,d.prospecting_message,d.next_steps,d.analyzed_at].map(csvEscape).join(';');
+}
+function exportPainCsv(id){
+  if(id==null){ location.href='/api/pain/export.csv'; return; }
+  const l = state.leads.find(x=>x.id===id); if(!l) return;
+  const head = ['nome da empresa','nicho','cidade','site','Instagram','WhatsApp','fonte','score geral','nível da dor','principal dor','dores detectadas','serviço recomendado','oportunidade comercial','mensagem personalizada','próximos passos sugeridos','data da análise'].map(csvEscape).join(';');
+  const blob = new Blob(['\uFEFF'+head+'\n'+painCsvRow(l)],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='diagnostico-'+(l.name||'lead').replace(/[^\w-]+/g,'-').toLowerCase()+'.csv'; a.click();
+  toast('success','CSV gerado', l.name);
+}
+
+/* ============================================================
+   CACA INTELIGENTE LOCAL
+   ============================================================ */
+function localTempClass(t){ return t==='Quente'?'hot':t==='Morno'?'warm':'cold'; }
+function localPainTypes(l){ return (l.painSignals||[]).map(p=>p.type); }
+function localMainPain(l){
+  const signals = l.painSignals||[];
+  return (signals.find(p=>p.severity==='high') || signals[0] || {}).type || 'Validação manual';
+}
+function localService(l){
+  const pain = localMainPain(l).toLowerCase();
+  if(pain.includes('whatsapp') || pain.includes('cta')) return 'WhatsApp + CTA de conversão';
+  if(pain.includes('formul')) return 'Formulário + qualificação';
+  if(pain.includes('prova')) return 'Prova social e autoridade';
+  if(pain.includes('instagram')) return 'Link de bio e jornada social';
+  return 'Diagnóstico comercial';
+}
+function localMessage(l){
+  const intro = l.publicContactName && l.publicContactRole
+    ? 'Olá, '+l.publicContactName+', tudo bem? Vi você como '+l.publicContactRole+' da '+l.companyName+'.'
+    : 'Olá, '+l.companyName+', tudo bem?';
+  const pain = localMainPain(l);
+  if(/whatsapp|cta/i.test(pain)) return intro+' Analisando a presença digital de vocês, notei sinais de que o caminho para contato pode ficar mais claro. A Gravity ajuda a transformar visitas em conversas comerciais com CTA, WhatsApp e qualificação simples. Posso te mostrar rapidamente onde estão essas oportunidades?';
+  if(/formul/i.test(pain)) return intro+' Vi presença digital, mas senti falta de um caminho estruturado para capturar interessados. A Gravity pode ajudar com uma estrutura simples de formulário, qualificação e follow-up. Posso te mostrar alguns pontos de melhoria?';
+  if(/prova social/i.test(pain)) return intro+' Vi presença digital, mas senti falta de elementos mais fortes de confiança, como depoimentos, cases ou evidências de resultado. A Gravity pode ajudar a organizar melhor essa autoridade digital. Posso te mostrar algumas oportunidades?';
+  return intro+' Notei alguns pontos públicos que podem estar dificultando a conversão de visitantes em contatos comerciais, principalmente em relação a '+pain+'. A Gravity pode ajudar a corrigir esse gargalo com uma estrutura comercial mais clara. Posso te mostrar rapidamente?';
+}
+function localLeadKey(l){ return (l.site || l.sourceUrl || l.companyName || '').toLowerCase(); }
+function localStatsHtml(){
+  const R = state.localHunt.results;
+  const hot = R.filter(l=>l.temperature==='Quente').length;
+  const owners = R.filter(l=>l.publicContactName).length;
+  const avg = R.length ? Math.round(R.reduce((s,l)=>s+(Number(l.score)||0),0)/R.length) : 0;
+  return [
+    '<div class="local-stat"><span>Encontrados</span><strong>'+R.length+'</strong></div>',
+    '<div class="local-stat"><span>Quentes</span><strong>'+hot+'</strong></div>',
+    '<div class="local-stat"><span>Com dono público</span><strong>'+owners+'</strong></div>',
+    '<div class="local-stat"><span>Score médio</span><strong>'+avg+'</strong></div>',
+  ].join('');
+}
+function appendLocalLog(message){
+  const stamp = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  state.localHunt.logs.unshift(stamp+' · '+message);
+  state.localHunt.logs = state.localHunt.logs.slice(0,40);
+  const el = document.getElementById('lhLog');
+  if(el) el.innerHTML = state.localHunt.logs.map(escapeHtml).join('<br>');
+}
+function collectLocalHuntInput(){
+  const get = id => document.getElementById(id)?.value || '';
+  return {
+    niche:get('lhNiche').trim(),
+    city:get('lhCity').trim(),
+    region:get('lhRegion').trim().toUpperCase(),
+    keyword:get('lhKeyword').trim(),
+    mode:get('lhMode') || 'advanced',
+    focus:get('lhFocus') || 'contacts',
+    minScore:Number(get('lhMinScore') || 0),
+    maxUrls:get('lhMaxUrls') || '20',
+    urls:get('lhUrls').trim(),
+  };
+}
+function setLocalPreset(city, region){
+  const c = document.getElementById('lhCity');
+  const r = document.getElementById('lhRegion');
+  if(c) c.value = city || '';
+  if(r) r.value = region || '';
+  renderLocalHunt();
+}
+function hydrateLocalDefaults(){
+  const niche = document.getElementById('lhNiche');
+  const city = document.getElementById('lhCity');
+  const region = document.getElementById('lhRegion');
+  if(niche && !niche.value && document.getElementById('hNicho')) niche.value = document.getElementById('hNicho').value || '';
+  if(city && !city.value && document.getElementById('hCidade')) city.value = document.getElementById('hCidade').value || '';
+  if(region && !region.value && document.getElementById('hEstado')) region.value = document.getElementById('hEstado').value || '';
+}
+function renderLocalHunt(){
+  hydrateLocalDefaults();
+  const mode = document.getElementById('lhMode')?.value || 'advanced';
+  const warning = document.getElementById('lhWarning');
+  if(warning) warning.classList.toggle('show', mode==='fast');
+  const status = document.getElementById('lhStatus');
+  if(status) status.textContent = state.localHunt.running ? 'Rodando' : (state.localHunt.results.length ? 'Concluído' : 'Parado');
+  const prog = document.getElementById('lhProgress');
+  if(prog) prog.style.width = Math.max(0, Math.min(100, state.localHunt.progress||0))+'%';
+  const stats = document.getElementById('lhStats');
+  if(stats) stats.innerHTML = localStatsHtml();
+  const log = document.getElementById('lhLog');
+  if(log && !state.localHunt.logs.length) log.textContent = 'Aguardando início da caça local.';
+  const grid = document.getElementById('lhResults');
+  if(!grid) return;
+  grid.innerHTML = state.localHunt.results.length
+    ? state.localHunt.results.map(localCard).join('')
+    : '<div class="empty"><div class="em-ico">—</div><h3>Nenhum lead local ainda</h3><p>Informe um alvo ou cole URLs públicas e inicie a caça.</p></div>';
+}
+function localCard(l, i){
+  const contacts = [
+    l.whatsapp?'<span class="local-pill">WhatsApp</span>':'',
+    l.email?'<span class="local-pill">E-mail</span>':'',
+    l.instagram?'<span class="local-pill">Instagram</span>':'',
+    l.publicContactName?'<span class="local-pill owner">'+escapeHtml(l.publicContactName)+' · '+escapeHtml(l.publicContactRole||'responsável')+'</span>':'',
+  ].filter(Boolean).join('');
+  const pains = localPainTypes(l).slice(0,4).map(p=>'<span class="pain-tag">'+escapeHtml(p)+'</span>').join('') || '<span class="pain-tag">Validação manual</span>';
+  return '<article class="local-card '+localTempClass(l.temperature)+'">'+
+    '<div class="local-head"><div><div class="local-company">'+escapeHtml(l.companyName||'Lead sem nome')+'</div><div class="local-meta">'+escapeHtml(l.niche||'Sem nicho')+' · '+escapeHtml(l.city||'Sem cidade')+'</div></div><div class="local-score"><strong>'+Number(l.score||0)+'</strong><span>Score</span></div></div>'+
+    '<div>'+tempBadge(l.temperature==='Fraco'?'Frio':l.temperature)+' <span class="pain-level '+(l.temperature==='Quente'?'priority':l.temperature==='Morno'?'moderate':'weak')+'">'+escapeHtml(localMainPain(l))+'</span></div>'+
+    '<div class="local-contact">'+(contacts || '<span class="local-pill">Contato a validar</span>')+'</div>'+
+    '<div class="local-pains">'+pains+'</div>'+
+    '<div class="pain-service">'+escapeHtml(localService(l))+'</div>'+
+    '<div class="local-message">'+escapeHtml(localMessage(l))+'</div>'+
+    '<div class="local-card-actions">'+
+      '<button class="btn btn-sm btn-ghost" onclick="copyLocalMessage('+i+')">Copiar mensagem</button>'+
+      '<button class="btn btn-sm btn-outline" onclick="openLocalDetails('+i+')">Ver detalhes</button>'+
+      (l.site?'<a class="btn btn-sm btn-outline" target="_blank" href="'+escapeHtml(l.site)+'">Abrir site</a>':'')+
+    '</div>'+
+  '</article>';
+}
+function startLocalHunt(){
+  if(state.localHunt.running) return;
+  const data = collectLocalHuntInput();
+  if(!data.urls && (!data.niche || !data.city)){
+    toast('warn','Informe o alvo', 'Use nicho + cidade ou cole URLs manuais.');
+    return;
+  }
+  if(state.localHunt.es) state.localHunt.es.close();
+  state.localHunt = { results: [], running:true, es:null, logs:[], jobId:null, progress:0, saved:0 };
+  appendLocalLog('Caça local iniciada em modo '+data.mode);
+  renderLocalHunt();
+  const qs = new URLSearchParams(data);
+  qs.delete('minScore');
+  const es = new EventSource('/api/local-hunt/stream?'+qs.toString());
+  state.localHunt.es = es;
+  es.addEventListener('status', e=>{
+    const payload = JSON.parse(e.data||'{}');
+    state.localHunt.progress = payload.progress || state.localHunt.progress || 0;
+    if(payload.data?.jobId) state.localHunt.jobId = payload.data.jobId;
+    appendLocalLog(payload.message || 'Status atualizado');
+    renderLocalHunt();
+  });
+  es.addEventListener('lead', e=>{
+    const payload = JSON.parse(e.data||'{}');
+    const lead = payload.data;
+    if(lead){
+      const minScore = Number(document.getElementById('lhMinScore')?.value || 0);
+      const key = localLeadKey(lead);
+      if(Number(lead.score||0) >= minScore && !state.localHunt.results.some(x=>localLeadKey(x)===key)) state.localHunt.results.push(lead);
+      if(Number(lead.score||0) < minScore) appendLocalLog('Filtrado por score mínimo: '+(lead.companyName || 'sem nome')+' ('+(lead.score||0)+')');
+      state.localHunt.results.sort((a,b)=>(Number(b.score)||0)-(Number(a.score)||0));
+    }
+    if(payload.jobId) state.localHunt.jobId = payload.jobId;
+    state.localHunt.progress = payload.progress || state.localHunt.progress;
+    appendLocalLog('Lead encontrado: '+(lead?.companyName || payload.message || 'sem nome'));
+    renderLocalHunt();
+  });
+  es.addEventListener('hunt-error', e=>{
+    let payload = {};
+    try{ payload = JSON.parse(e.data||'{}'); }catch{}
+    if(payload.jobId) state.localHunt.jobId = payload.jobId;
+    appendLocalLog(payload.message || 'Falha em uma URL');
+    renderLocalHunt();
+  });
+  es.addEventListener('hunt-warning', e=>{
+    let payload = {};
+    try{ payload = JSON.parse(e.data||'{}'); }catch{}
+    if(payload.jobId) state.localHunt.jobId = payload.jobId;
+    appendLocalLog('Aviso de provedor: '+(payload.message || 'falha recuperável'));
+    renderLocalHunt();
+  });
+  es.addEventListener('done', e=>{
+    const payload = JSON.parse(e.data||'{}');
+    if(payload.jobId) state.localHunt.jobId = payload.jobId;
+    if(payload.data?.jobId) state.localHunt.jobId = payload.data.jobId;
+    state.localHunt.progress = 100;
+    state.localHunt.running = false;
+    es.close();
+    appendLocalLog(payload.message || 'Caça local concluída');
+    renderLocalHunt();
+    toast('success','Caça concluída', state.localHunt.results.length+' lead(s) encontrados');
+  });
+  es.onerror = function(){
+    if(!state.localHunt.running) return;
+    state.localHunt.running = false;
+    es.close();
+    appendLocalLog('Conexão encerrada ou bloqueada pelo navegador.');
+    renderLocalHunt();
+  };
+}
+function stopLocalHunt(){
+  if(state.localHunt.es) state.localHunt.es.close();
+  state.localHunt.running = false;
+  appendLocalLog('Caça local interrompida pelo usuário');
+  renderLocalHunt();
+}
+async function saveLocalHuntLeads(){
+  if(!state.localHunt.results.length){ toast('warn','Nada para salvar'); return; }
+  const meta = collectLocalHuntInput();
+  try{
+    const r = await api('/api/local-hunt/save','POST',{
+      leads: state.localHunt.results,
+      city: meta.city,
+      region: meta.region,
+      niche: meta.niche,
+      keyword: meta.keyword,
+      jobId: state.localHunt.jobId,
+    });
+    state.localHunt.saved += r.saved || 0;
+    toast('success','Leads enviados ao CRM', (r.saved||0)+' novo(s), '+((r.received||0)-(r.saved||0))+' duplicado(s) ou já existentes');
+    await refreshAll();
+    renderLocalHunt();
+  }catch(e){ toast('error','Erro ao salvar', e.message); }
+}
+function copyLocalMessage(i){
+  const l = state.localHunt.results[i]; if(!l) return;
+  navigator.clipboard?.writeText(localMessage(l));
+  toast('success','Mensagem copiada', l.companyName);
+}
+function localList(items){ return '<ul class="pain-list">'+(items&&items.length?items:['Informação insuficiente.']).map(x=>'<li>'+escapeHtml(x)+'</li>').join('')+'</ul>'; }
+function openLocalDetails(i){
+  const l = state.localHunt.results[i]; if(!l) return;
+  const contacts = [
+    l.whatsapp?'WhatsApp: '+l.whatsapp:'',
+    l.phone?'Telefone: '+l.phone:'',
+    l.email?'E-mail: '+l.email:'',
+    l.instagram?'Instagram: '+l.instagram:'',
+    l.publicContactName?'Responsável público: '+l.publicContactName+' ('+(l.publicContactRole||'cargo público')+')':'',
+  ].filter(Boolean);
+  openModal({
+    title:l.companyName || 'Lead local',
+    sub:(l.niche||'')+' · '+(l.city||'')+'/'+(l.region||''),
+    body:'<div class="pain-detail-grid">'+
+      '<div class="lead-section"><h4>Contato e origem</h4>'+localList(contacts)+'<div style="font-size:11.5px;color:var(--text-mute);margin-top:8px">'+escapeHtml(l.sourceUrl||l.site||'')+'</div></div>'+
+      '<div class="lead-section"><h4>Diagnóstico local</h4><div style="font-size:12.5px;line-height:1.7"><b>Score:</b> '+Number(l.score||0)+'</div><div style="font-size:12.5px;line-height:1.7"><b>Temperatura:</b> '+escapeHtml(l.temperature||'Fraco')+'</div><div style="font-size:12.5px;line-height:1.7"><b>Principal sinal:</b> '+escapeHtml(localMainPain(l))+'</div><div style="font-size:12.5px;line-height:1.7"><b>Serviço:</b> '+escapeHtml(localService(l))+'</div></div>'+
+      '<div class="lead-section"><h4>Sinais de dor</h4>'+localList((l.painSignals||[]).map(p=>p.type+': '+p.evidence))+'</div>'+
+      '<div class="lead-section"><h4>Próximos passos</h4>'+localList(['Validar o site manualmente','Checar se o responsável público ainda atua na empresa','Enviar mensagem consultiva','Criar follow-up no CRM','Oferecer diagnóstico comercial gratuito'])+'</div>'+
+    '</div><div class="lead-section" style="margin-top:12px"><h4>Mensagem personalizada</h4><textarea id="localMsgModal" rows="6">'+escapeHtml(localMessage(l))+'</textarea></div>',
+    footer:'<button class="btn btn-ghost" onclick="closeModal()">Fechar</button><button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById(\'localMsgModal\').value);toast(\'success\',\'Mensagem copiada\')">Copiar mensagem</button>'
+  });
+}
+function exportLocalHuntCsv(){
+  if(!state.localHunt.results.length){ location.href='/api/local-hunt/export.csv'; return; }
+  const cols = ['nome da empresa','nicho','cidade','uf','site','instagram','whatsapp','email','responsavel publico','cargo publico','score','temperatura','sinais de dor','servico recomendado','mensagem','fonte'];
+  const body = state.localHunt.results.map(l=>[
+    l.companyName,l.niche,l.city,l.region,l.site,l.instagram,l.whatsapp,l.email,l.publicContactName,l.publicContactRole,l.score,l.temperature,localPainTypes(l),localService(l),localMessage(l),l.sourceUrl,
+  ].map(csvEscape).join(';')).join('\n');
+  const blob = new Blob(['\uFEFF'+cols.map(csvEscape).join(';')+'\n'+body],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='caca-inteligente-local.csv'; a.click();
+  toast('success','CSV exportado');
+}
 
 async function deleteLead(id){
   if(!confirm('Excluir este lead? Esta ação NÃO pode ser desfeita.')) return;
@@ -2305,7 +3610,7 @@ async function openLeadModal(id){
   openModal({
     title: l.name,
     sub: l.niche+' • '+l.city+'/'+l.uf+' • Etapa: '+l.stage,
-    body: '<div class="lead-grid"><div><div class="lead-section"><h4>Informações</h4><div class="field-row"><div class="field"><label>Telefone</label><input id="leTel" value="'+escapeHtml(l.phone)+'"/></div><div class="field"><label>WhatsApp</label><input id="leWa" value="'+escapeHtml(l.whatsapp)+'"/></div></div><div class="field-row"><div class="field"><label>Instagram</label><input id="leIg" value="'+escapeHtml(l.instagram)+'"/></div><div class="field"><label>Email</label><input id="leMail" value="'+escapeHtml(l.email)+'"/></div></div><div class="field"><label>Site</label><input id="leSite" value="'+escapeHtml(l.site)+'"/></div><div class="field-row"><div class="field"><label>Valor estimado (R$)</label><input id="leVal" type="number" value="'+l.value+'"/></div><div class="field"><label>Próxima ação</label><input id="leNext" value="'+escapeHtml(l.nextAction)+'"/></div></div><div class="field"><label>Observações</label><textarea id="leNote" rows="3">'+escapeHtml(l.note)+'</textarea></div><div class="field"><label>Etapa</label><select id="leStage">'+STAGES.map(s=>'<option '+(s===l.stage?'selected':'')+'>'+s+'</option>').join('')+'</select></div></div><div class="lead-section" style="margin-top:14px"><h4>Mensagem pronta WhatsApp</h4><textarea id="leMsg" rows="8">'+escapeHtml(baseMsg)+'</textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn btn-sm btn-ghost" onclick="copyMsg()">📋 Copiar</button><button class="btn btn-sm btn-success" onclick="openWa('+l.id+')">💬 WhatsApp</button><button class="btn btn-sm btn-warm" onclick="markLastContact('+l.id+')">⏱ Marcar contato</button><button class="btn btn-sm btn-outline" onclick="quickTaskForLead('+l.id+')">＋ Tarefa</button></div></div></div><div><div class="lead-section" style="display:flex;gap:14px;align-items:center"><div class="lead-score-circle" style="--p:'+l.score+'"><span>'+l.score+'</span></div><div style="flex:1"><div style="font-weight:700;margin-bottom:4px">'+tempBadge(l.temp)+'</div><div style="font-size:11px;color:var(--text-mute);line-height:1.5">'+(l.reasons||[]).slice(0,4).map(escapeHtml).join(' • ')+'</div><div style="font-size:13px;font-weight:800;color:#FCD34D;margin-top:8px">'+brl(l.value)+'</div></div></div><div class="lead-section" style="margin-top:14px"><h4>Inteligência comercial</h4><div style="font-size:12px;line-height:1.6"><b>Dor digital:</b> '+escapeHtml(ci.pain)+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Oferta sugerida:</b> '+escapeHtml(ci.offer)+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Último contato:</b> '+(l.lastContact?new Date(l.lastContact).toLocaleDateString('pt-BR'):'—')+'</div>'+(l.priorityKey?'<div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Prioridade:</b> '+escapeHtml(PRIO_LBL[l.priorityKey]||l.priorityKey)+'</div>':'')+'</div>'+researchPanelHtml(l)+ssPanel+'<div class="lead-section" style="margin-top:14px"><h4>Histórico de interações</h4><div class="history">'+(l.history && l.history.length ? l.history.map(h=>'<div class="history-item"><time>'+new Date(h.at).toLocaleString('pt-BR')+'</time>'+escapeHtml(h.text)+'</div>').join('') : '<div style="color:var(--text-mute);font-size:12px">Sem interações registradas</div>')+'</div></div><div class="lead-section" style="margin-top:14px"><h4>Tarefas vinculadas</h4><div id="leadTasks">'+renderLeadTasks(l.id)+'</div></div></div></div>',
+    body: '<div class="lead-grid"><div><div class="lead-section"><h4>Informações</h4><div class="field-row"><div class="field"><label>Telefone</label><input id="leTel" value="'+escapeHtml(l.phone)+'"/></div><div class="field"><label>WhatsApp</label><input id="leWa" value="'+escapeHtml(l.whatsapp)+'"/></div></div><div class="field-row"><div class="field"><label>Instagram</label><input id="leIg" value="'+escapeHtml(l.instagram)+'"/></div><div class="field"><label>Email</label><input id="leMail" value="'+escapeHtml(l.email)+'"/></div></div><div class="field"><label>Site</label><input id="leSite" value="'+escapeHtml(l.site)+'"/></div><div class="field-row"><div class="field"><label>Valor estimado (R$)</label><input id="leVal" type="number" value="'+l.value+'"/></div><div class="field"><label>Próxima ação</label><input id="leNext" value="'+escapeHtml(l.nextAction)+'"/></div></div><div class="field"><label>Observações</label><textarea id="leNote" rows="3">'+escapeHtml(l.note)+'</textarea></div><div class="field"><label>Etapa</label><select id="leStage">'+STAGES.map(s=>'<option '+(s===l.stage?'selected':'')+'>'+s+'</option>').join('')+'</select></div></div><div class="lead-section" style="margin-top:14px"><h4>Mensagem pronta WhatsApp</h4><textarea id="leMsg" rows="8">'+escapeHtml(baseMsg)+'</textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn btn-sm btn-ghost" onclick="copyMsg()">📋 Copiar</button><button class="btn btn-sm btn-success" onclick="openWa('+l.id+')">💬 WhatsApp</button><button class="btn btn-sm btn-warm" onclick="markLastContact('+l.id+')">⏱ Marcar contato</button><button class="btn btn-sm btn-outline" onclick="quickTaskForLead('+l.id+')">＋ Tarefa</button></div></div></div><div><div class="lead-section" style="display:flex;gap:14px;align-items:center"><div class="lead-score-circle" style="--p:'+l.score+'"><span>'+l.score+'</span></div><div style="flex:1"><div style="font-weight:700;margin-bottom:4px">'+tempBadge(l.temp)+'</div><div style="font-size:11px;color:var(--text-mute);line-height:1.5">'+(l.reasons||[]).slice(0,4).map(escapeHtml).join(' • ')+'</div><div style="font-size:13px;font-weight:800;color:#FCD34D;margin-top:8px">'+brl(l.value)+'</div></div></div><div class="lead-section" style="margin-top:14px"><h4>Inteligência comercial</h4><div style="font-size:12px;line-height:1.6"><b>Dor digital:</b> '+escapeHtml(ci.pain)+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Oferta sugerida:</b> '+escapeHtml(ci.offer)+'</div><div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Último contato:</b> '+(l.lastContact?new Date(l.lastContact).toLocaleDateString('pt-BR'):'—')+'</div>'+(l.priorityKey?'<div style="font-size:12px;line-height:1.6;margin-top:6px"><b>Prioridade:</b> '+escapeHtml(PRIO_LBL[l.priorityKey]||l.priorityKey)+'</div>':'')+'</div>'+painPanelHtml(l)+aiLeadPanelHtml(l)+researchPanelHtml(l)+ssPanel+'<div class="lead-section" style="margin-top:14px"><h4>Histórico de interações</h4><div class="history">'+(l.history && l.history.length ? l.history.map(h=>'<div class="history-item"><time>'+new Date(h.at).toLocaleString('pt-BR')+'</time>'+escapeHtml(h.text)+'</div>').join('') : '<div style="color:var(--text-mute);font-size:12px">Sem interações registradas</div>')+'</div></div><div class="lead-section" style="margin-top:14px"><h4>Tarefas vinculadas</h4><div id="leadTasks">'+renderLeadTasks(l.id)+'</div></div></div></div>',
     footer: '<button class="btn btn-ghost" onclick="closeModal()">Fechar</button><button class="btn btn-danger" onclick="deleteLead('+l.id+')">🗑 Excluir</button><button class="btn btn-primary" onclick="saveLeadChanges('+l.id+')">💾 Salvar</button>'
   });
 }
@@ -2349,23 +3654,47 @@ async function createQuickTask(id){
 }
 
 function renderTasks(){
-  const today = new Date().toISOString().slice(0,10);
-  const tToday = state.tasks.filter(t=>!t.done && t.due && t.due.slice(0,10)===today);
-  const tLate = state.tasks.filter(t=>!t.done && t.due && t.due.slice(0,10)<today);
-  const tNext = state.tasks.filter(t=>!t.done && t.due && t.due.slice(0,10)>today);
-  const tDone = state.tasks.filter(t=>t.done);
+  const today = isoToday();
+  const tToday = state.tasks.filter(t=>!t.done && t.due && t.due.slice(0,10)===today).sort(taskSort);
+  const tLate = state.tasks.filter(t=>!t.done && t.due && t.due.slice(0,10)<today).sort(taskSort);
+  const tNext = state.tasks.filter(t=>!t.done && (!t.due || t.due.slice(0,10)>today)).sort(taskSort);
+  const tDone = state.tasks.filter(t=>t.done).sort(taskSort);
+  const open = tToday.length + tLate.length + tNext.length;
+  const focus = tLate[0] || tToday[0] || tNext[0];
   document.getElementById('cToday').textContent = tToday.length;
   document.getElementById('cLate').textContent = tLate.length;
   document.getElementById('cNext').textContent = tNext.length;
   document.getElementById('cDone').textContent = tDone.length;
-  document.getElementById('tToday').innerHTML = tToday.map(taskCard).join('') || '<div style="color:var(--text-mute);font-size:12px;padding:8px">vazio</div>';
-  document.getElementById('tLate').innerHTML = tLate.map(taskCard).join('') || '<div style="color:var(--text-mute);font-size:12px;padding:8px">vazio</div>';
-  document.getElementById('tNext').innerHTML = tNext.map(taskCard).join('') || '<div style="color:var(--text-mute);font-size:12px;padding:8px">vazio</div>';
-  document.getElementById('tDone').innerHTML = tDone.map(taskCard).join('') || '<div style="color:var(--text-mute);font-size:12px;padding:8px">vazio</div>';
+  setText('taskMetricLate', String(tLate.length));
+  setText('taskMetricOpen', String(open));
+  setText('taskMetricDone', String(tDone.length));
+  setText('taskMetricFocus', focus ? (focus.company || 'Lead sem nome') : '-');
+  setText('taskMetricFocusMeta', focus ? (focus.title || 'Follow-up pendente') : 'Nenhum follow-up pendente.');
+  document.getElementById('tToday').innerHTML = tToday.map(taskCard).join('') || '<div class="task-empty">Nada para hoje</div>';
+  document.getElementById('tLate').innerHTML = tLate.map(taskCard).join('') || '<div class="task-empty">Sem atrasos</div>';
+  document.getElementById('tNext').innerHTML = tNext.map(taskCard).join('') || '<div class="task-empty">Sem proximas tarefas</div>';
+  document.getElementById('tDone').innerHTML = tDone.map(taskCard).join('') || '<div class="task-empty">Nada concluido ainda</div>';
 }
 function taskCard(t){
-  const pCol = t.priority==='Alta'?'#F87171':t.priority==='Baixa'?'#67E8F9':'#FCD34D';
-  return '<div class="task '+(t.done?'done':'')+'"><div class="task-title">'+escapeHtml(t.title)+'</div><div class="task-meta">'+escapeHtml(t.company||'')+' • '+(t.due?new Date(t.due).toLocaleDateString('pt-BR'):'—')+' • <span style="color:'+pCol+'">'+escapeHtml(t.priority)+'</span></div><div style="display:flex;gap:6px;margin-top:8px">'+(!t.done?'<button class="btn btn-sm btn-success" onclick="completeTask('+t.id+')">✓ Concluir</button>':'<button class="btn btn-sm btn-ghost" onclick="completeTask('+t.id+')">↺ Reabrir</button>')+'<button class="btn btn-sm btn-ghost" onclick="openLeadModal('+t.leadId+')">Ver lead</button><button class="btn btn-sm btn-danger" onclick="deleteTask('+t.id+')">🗑</button></div></div>';
+  const today = isoToday();
+  const pClass = priorityClass(t.priority);
+  const late = !t.done && t.due && t.due.slice(0,10)<today;
+  const due = dueLabel(t, today);
+  const dueClass = t.done ? 'done' : late ? 'late' : (t.due && t.due.slice(0,10)===today ? 'today' : '');
+  const leadAction = t.leadId ? '<button class="btn btn-sm btn-ghost" onclick="openLeadModal('+t.leadId+')">Ver lead</button>' : '';
+  return '<div class="task '+pClass+' '+(late?'late ':'')+(t.done?'done':'')+'">'+
+    '<div class="task-title">'+escapeHtml(t.title)+'</div>'+
+    '<div class="task-meta">'+
+      '<span>'+escapeHtml(t.company||'Sem lead vinculado')+'</span>'+
+      '<span class="task-badge '+dueClass+'">'+escapeHtml(due)+'</span>'+
+      '<span class="task-badge">'+escapeHtml(t.priority||'Media')+'</span>'+
+    '</div>'+
+    '<div class="task-actions">'+
+      (!t.done?'<button class="btn btn-sm btn-success" onclick="completeTask('+t.id+')">Concluir</button>':'<button class="btn btn-sm btn-ghost" onclick="completeTask('+t.id+')">Reabrir</button>')+
+      leadAction+
+      '<button class="btn btn-sm btn-danger" onclick="deleteTask('+t.id+')">Excluir</button>'+
+    '</div>'+
+  '</div>';
 }
 async function completeTask(id){
   const t = state.tasks.find(x=>x.id===id); if(!t) return;
@@ -2767,13 +4096,16 @@ function applyTheme(){ if(state.settings.theme==='light') document.body.classLis
 const NAV_SVG = {
   dashboard:'<rect x="3" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6"/>',
   hunter:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/><path d="M12 1.6v3M12 19.4v3M1.6 12h3M19.4 12h3"/>',
+  localhunt:'<path d="M4 7.5h16"/><path d="M6.5 4.5h11"/><rect x="4" y="10" width="16" height="9.5" rx="2"/><path d="M8 14h4M8 17h8"/><path d="M17.5 3.5v4"/>',
   sdr:'<path d="M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H9.5L5.5 19v-3.5H5A1.5 1.5 0 0 1 3.5 14V6A1.5 1.5 0 0 1 5 4.5z"/><path d="M9 10h.01M12 10h.01M15 10h.01"/>',
   crm:'<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5" height="11" rx="1.5"/><rect x="16" y="4" width="5" height="14" rx="1.5"/>',
+  pain:'<path d="M12 2.8 20.5 8v8L12 21.2 3.5 16V8z"/><path d="M12 7v5.2"/><path d="M12 16.2h.01"/>',
   leads:'<circle cx="4" cy="6" r="1.4"/><circle cx="4" cy="12" r="1.4"/><circle cx="4" cy="18" r="1.4"/><path d="M8.5 6H21M8.5 12H21M8.5 18H21"/>',
   launches:'<path d="M21.5 2.5 11 13"/><path d="M21.5 2.5 14.7 21.5l-3.7-8.5-8.5-3.7z"/>',
   tasks:'<circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.2l2.6 2.6 5-5.4"/>',
   automations:'<path d="M13 2.5 4.5 13.5H11l-1 8 8.5-11.5H12z"/>',
   settings:'<circle cx="12" cy="12" r="3.4"/><path d="M12 2.2v3M12 18.8v3M21.8 12h-3M5.2 12h-3M18.93 5.07l-2.12 2.12M7.19 16.81l-2.12 2.12M18.93 18.93l-2.12-2.12M7.19 7.19 5.07 5.07"/>',
+  ia:'<path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5 10.1 10.9 5.5 9l4.6-1.4z"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>',
 };
 function paintNavIcons(){
   document.querySelectorAll('.nav-item[data-view] .nav-ico').forEach(ico=>{
@@ -2789,6 +4121,19 @@ function bindEvents(){
   document.getElementById('btnGenDorks')&&document.getElementById('btnGenDorks').addEventListener('click', generateDorks);
   document.getElementById('btnRunBrowser')&&document.getElementById('btnRunBrowser').addEventListener('click', runProspect);
   document.getElementById('btnSaveAll')&&document.getElementById('btnSaveAll').addEventListener('click', runProspect);
+  document.getElementById('lhStart')&&document.getElementById('lhStart').addEventListener('click', startLocalHunt);
+  document.getElementById('lhStop')&&document.getElementById('lhStop').addEventListener('click', stopLocalHunt);
+  document.getElementById('lhSave')&&document.getElementById('lhSave').addEventListener('click', saveLocalHuntLeads);
+  document.getElementById('lhExport')&&document.getElementById('lhExport').addEventListener('click', exportLocalHuntCsv);
+  document.getElementById('lhMode')&&document.getElementById('lhMode').addEventListener('change', renderLocalHunt);
+  document.getElementById('lhPreset')&&document.getElementById('lhPreset').addEventListener('change', e=>{
+    const [city, region] = String(e.target.value||'').split('|');
+    if(city && region) setLocalPreset(city, region);
+  });
+  document.querySelectorAll('.local-preset').forEach(btn=>btn.addEventListener('click', e=>{
+    e.preventDefault();
+    setLocalPreset(btn.dataset.city||'', btn.dataset.region||'');
+  }));
   // Caça: nicho define a estratégia; estado repovoa as cidades.
   document.getElementById('hNicho')&&document.getElementById('hNicho').addEventListener('change', updateStrategy);
   document.getElementById('hEstado')&&document.getElementById('hEstado').addEventListener('change', ()=>{ populateCities(); });
@@ -2800,6 +4145,18 @@ function bindEvents(){
     document.querySelectorAll('#crmTempChips .crm-chip').forEach(c=>c.classList.remove('active'));
     chip.classList.add('active'); state.crm.temp = chip.dataset.temp||''; renderKanban();
   }));
+  document.getElementById('painExportCsv')&&document.getElementById('painExportCsv').addEventListener('click', ()=>exportPainCsv());
+  document.getElementById('painRefresh')&&document.getElementById('painRefresh').addEventListener('click', async ()=>{
+    await refreshAll();
+    renderPainAnalyzer();
+    toast('success','Análises atualizadas');
+  });
+  ['painSearch','painMin','painMax'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('input', renderPainAnalyzer);
+  });
+  ['painLevelFilter','painTypeFilter','painMainFilter','painCityFilter','painNicheFilter','painSourceFilter','painHasSite','painHasInstagram','painHasWhatsapp','painAdsFilter','painLandingFilter','painProofFilter'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('change', renderPainAnalyzer);
+  });
   document.getElementById('btnSaveSettings')&&document.getElementById('btnSaveSettings').addEventListener('click', saveSettings);
   document.getElementById('btnCreateTask')&&document.getElementById('btnCreateTask').addEventListener('click', openNewTask);
   // --- Lançamentos ---
@@ -2877,7 +4234,7 @@ async function initApp(){
     fetch('/api/leads').then(r=>r.json()),
     fetch('/api/tasks').then(r=>r.json()),
   ]);
-  if(cR.status==='fulfilled'){ state.provider = cR.value.provider; state.ai = !!cR.value.ai; state.activeProviders = cR.value.activeProviders||[]; }
+  if(cR.status==='fulfilled'){ state.provider = cR.value.provider; state.ai = !!cR.value.ai; state.activeProviders = cR.value.activeProviders||[]; state.aiCommercial = !!cR.value.aiCommercial; state.aiModel = cR.value.aiModel||null; }
   if(sR.status==='fulfilled') state.settings = {...state.settings, ...sR.value.settings};
   if(lR.status==='fulfilled') state.leads = (lR.value.leads||[]).map(mapLead);
   const idx = new Map(state.leads.map(l=>[l.id,l]));
