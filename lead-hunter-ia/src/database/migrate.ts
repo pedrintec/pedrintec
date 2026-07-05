@@ -31,6 +31,8 @@ const statements = [
     instagram TEXT,
     linkedin TEXT,
     address TEXT,
+    public_contact_name TEXT,
+    public_contact_role TEXT,
     source_url TEXT,
     evidence TEXT,
     opportunities TEXT,
@@ -64,6 +66,18 @@ const statements = [
     status TEXT DEFAULT 'pending',
     total_found INTEGER DEFAULT 0, total_saved INTEGER DEFAULT 0,
     total_duplicates INTEGER DEFAULT 0, total_errors INTEGER DEFAULT 0,
+    started_at TEXT, finished_at TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE TABLE IF NOT EXISTS scraping_jobs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mode TEXT NOT NULL,
+    niche TEXT, city TEXT, region TEXT, keyword TEXT,
+    status TEXT DEFAULT 'pending',
+    total_urls INTEGER DEFAULT 0,
+    analyzed_urls INTEGER DEFAULT 0,
+    saved_leads INTEGER DEFAULT 0,
+    failed_urls INTEGER DEFAULT 0,
     started_at TEXT, finished_at TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   )`,
@@ -120,6 +134,57 @@ const statements = [
     value TEXT,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   )`,
+  // --- IA Comercial (OpenAI): análises, relatórios diários e logs de chamada ---
+  `CREATE TABLE IF NOT EXISTS lead_ai_analysis (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lead_id INTEGER REFERENCES leads(id),
+    score INTEGER,
+    priority TEXT,
+    pain_point TEXT,
+    detected_signals TEXT,
+    recommended_offer TEXT,
+    whatsapp_message TEXT,
+    email_message TEXT,
+    next_step TEXT,
+    score_reason TEXT,
+    raw_response TEXT,
+    model TEXT,
+    input_hash TEXT,
+    status TEXT DEFAULT 'success',
+    error_message TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE TABLE IF NOT EXISTS ai_daily_reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    report_date TEXT NOT NULL,
+    total_found INTEGER DEFAULT 0,
+    best_niches TEXT,
+    top_leads TEXT,
+    main_pain_points TEXT,
+    commercial_opportunities TEXT,
+    recommended_next_steps TEXT,
+    executive_summary TEXT,
+    raw_response TEXT,
+    model TEXT,
+    status TEXT DEFAULT 'success',
+    error_message TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE TABLE IF NOT EXISTS ai_call_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    endpoint TEXT,
+    operation TEXT,
+    lead_id INTEGER,
+    model TEXT,
+    status TEXT,
+    request_payload TEXT,
+    response_payload TEXT,
+    error_message TEXT,
+    duration_ms INTEGER,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
   // Índices úteis para dedup e consultas.
   `CREATE INDEX IF NOT EXISTS idx_leads_domain ON leads(domain)`,
   `CREATE INDEX IF NOT EXISTS idx_leads_phone ON leads(phone)`,
@@ -132,6 +197,8 @@ const statements = [
 // Colunas adicionadas à tabela `leads` após a criação inicial.
 // SQLite não tem "ADD COLUMN IF NOT EXISTS"; checamos via PRAGMA.
 const leadColumnsToAdd: Array<{ name: string; ddl: string }> = [
+  { name: "public_contact_name", ddl: "public_contact_name TEXT" },
+  { name: "public_contact_role", ddl: "public_contact_role TEXT" },
   { name: "normalized_company_name", ddl: "normalized_company_name TEXT" },
   { name: "root_domain", ddl: "root_domain TEXT" },
   { name: "country", ddl: "country TEXT" },
@@ -155,6 +222,8 @@ const leadColumnsToAdd: Array<{ name: string; ddl: string }> = [
   { name: "commercial_hook", ddl: "commercial_hook TEXT" },
   { name: "outreach_message", ddl: "outreach_message TEXT" },
   { name: "roi_estimate", ddl: "roi_estimate TEXT" },
+  { name: "pain_diagnostic", ddl: "pain_diagnostic TEXT" },
+  { name: "pain_signals", ddl: "pain_signals TEXT" },
   { name: "first_seen_at", ddl: "first_seen_at TEXT" },
   { name: "last_seen_at", ddl: "last_seen_at TEXT" },
   { name: "last_checked_at", ddl: "last_checked_at TEXT" },
@@ -169,6 +238,8 @@ const leadColumnsToAdd: Array<{ name: string; ddl: string }> = [
   { name: "researched_at", ddl: "researched_at TEXT" },
   { name: "sdr_status", ddl: "sdr_status TEXT" },
   { name: "sdr_started_at", ddl: "sdr_started_at TEXT" },
+  // --- IA Comercial: timestamp de atualização do lead ---
+  { name: "updated_at", ddl: "updated_at TEXT" },
 ];
 
 // Coluna adicionada à tabela `lead_tasks` (idempotente).
@@ -201,6 +272,11 @@ function migrate() {
     addMissingTaskColumns();
     sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_leads_priority ON leads(commercial_priority)`);
     sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(commercial_status)`);
+    // Índices da IA Comercial (busca da última análise por lead/hash; relatório por data).
+    sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_ai_analysis_lead ON lead_ai_analysis(lead_id)`);
+    sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_ai_analysis_hash ON lead_ai_analysis(input_hash)`);
+    sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_ai_daily_report_date ON ai_daily_reports(report_date)`);
+    sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_ai_call_logs_lead ON ai_call_logs(lead_id)`);
   });
   tx();
   logger.success("✅ Migração concluída. Tabelas prontas.");

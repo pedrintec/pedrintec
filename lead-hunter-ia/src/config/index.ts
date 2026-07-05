@@ -64,6 +64,14 @@ const envSchema = z.object({
   // --- IA (opcional): Pesquisador e SDR usam a API do Claude se houver chave ---
   ANTHROPIC_API_KEY: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
   ANTHROPIC_MODEL: z.string().default("claude-sonnet-5"),
+
+  // --- IA Comercial (opcional): camada OpenAI. Sem a chave, os recursos de IA
+  //     ficam desativados com fallback amigável; o resto do sistema segue normal. ---
+  OPENAI_API_KEY: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
+  OPENAI_MODEL: z.string().default("gpt-4o-mini"),
+  // Timeout por chamada à OpenAI (ms) e teto de leads por lote.
+  OPENAI_TIMEOUT_MS: intFromEnv(45000),
+  AI_BATCH_MAX: intFromEnv(10),
 });
 
 const parsed = envSchema.safeParse(process.env);
