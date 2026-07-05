@@ -753,15 +753,25 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
 .task-actions{display:flex;gap:4px;margin-top:8px;justify-content:flex-end}
 
 /* Automations */
-.auto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-.acard{padding:18px;display:flex;flex-direction:column;gap:12px}
-.acard-ico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:var(--grad-brand);color:#fff;box-shadow:0 12px 28px rgba(99,102,241,.30)}
-.acard-ico.warm{background:var(--grad-warm)}
-.acard-ico.success{background:var(--grad-success)}
-.acard-ico.cool{background:var(--grad-cool)}
-.acard h4{margin:0;font-size:14px;font-weight:700}
-.acard p{margin:0;font-size:12px;color:var(--text-dim);line-height:1.5;flex:1}
-.acard-foot{display:flex;justify-content:space-between;align-items:center}
+.auto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.auto-card{display:flex;flex-direction:column;gap:10px;padding:18px}
+.auto-ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;
+  background:rgba(46,107,255,.12);border:1px solid rgba(46,107,255,.24);color:#8FB2FF}
+.auto-card h3{margin:0;font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.auto-card p{margin:0;font-size:12.5px;color:var(--text-dim);line-height:1.5;flex:1}
+.auto-card .auto-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+
+/* SDR — trilha do processo (fortalece a leitura do pipeline) */
+.sdr-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+.sdr-step{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.sdr-step::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue)}
+.sdr-step.gold::before{background:var(--gold)}
+.sdr-step-n{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;font-weight:700;color:var(--blue-2);letter-spacing:.06em}
+.sdr-step.gold .sdr-step-n{color:var(--gold)}
+.sdr-step h4{margin:6px 0 4px;font-size:13px;font-weight:700;color:var(--text)}
+.sdr-step p{margin:0;font-size:11.5px;color:var(--text-mute);line-height:1.45}
+@media(max-width:900px){.sdr-flow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.sdr-flow{grid-template-columns:1fr}}
 
 /* Settings */
 .settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
@@ -1150,11 +1160,11 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
         </div>
 
         <div class="toolbar">
-          <input class="grow" id="fSearch" placeholder="🔍 Buscar por nome, nicho, cidade, site ou telefone…" />
+          <div class="crm-search grow"><input id="fSearch" placeholder="Buscar por nome, nicho, cidade, site ou telefone" autocomplete="off" /></div>
           <select id="fNicho"><option value="">Todos os nichos</option></select>
-          <select id="fCidade"><option value="">Todas cidades</option></select>
-          <select id="fTemp"><option value="">Todas temperaturas</option><option>Quente</option><option>Morno</option><option>Frio</option></select>
-          <select id="fStage"><option value="">Todas etapas</option><option>Novo</option><option>Qualificado</option><option>Em contato</option><option>Reunião</option><option>Proposta</option><option>Cliente</option><option>Perdido</option></select>
+          <select id="fCidade"><option value="">Todas as cidades</option></select>
+          <select id="fTemp"><option value="">Todas as temperaturas</option><option>Quente</option><option>Morno</option><option>Frio</option></select>
+          <select id="fStage"><option value="">Todas as etapas</option><option>Novo</option><option>Qualificado</option><option>Em contato</option><option>Reunião</option><option>Proposta</option><option>Cliente</option><option>Perdido</option></select>
           <select id="fSort">
             <option value="created" selected>Mais recentes</option>
             <option value="score">Maior score</option>
@@ -1176,7 +1186,7 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
             </tr></thead>
             <tbody id="leadsBody"></tbody>
           </table>
-          <div id="leadsEmpty" style="display:none"><div class="empty"><div class="em-ico">📭</div><h3>Nenhum lead encontrado</h3><p>Ajuste os filtros ou adicione novos leads ao sistema.</p></div></div>
+          <div id="leadsEmpty" style="display:none"><div class="empty"><div class="em-ico">—</div><h3>Nenhum lead encontrado</h3><p>Ajuste os filtros ou adicione novos leads ao sistema.</p></div></div>
         </div>
 
         <!-- Rodapé de paginação -->
@@ -1246,19 +1256,22 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
       <!-- =============== SDR IA =============== -->
       <section class="section" id="view-sdr">
         <div class="stats" id="sdrStats" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+
+        <div class="sdr-flow" id="sdrFlow"></div>
+
         <div class="card" style="margin-top:18px">
-          <div class="section-head"><h2><span class="dot"></span> Leads em cadência SDR</h2>
+          <div class="section-head"><h2><span class="dot"></span> Leads em cadência</h2>
             <span class="badge badge-success" id="sdrAiBadge" style="display:none"><span class="dot"></span> IA ativa (Claude)</span>
           </div>
           <div class="table-wrap" style="border:none;background:transparent">
             <table class="table">
               <thead><tr>
-                <th>Empresa</th><th>Nicho</th><th>Etapa</th><th>Status SDR</th>
+                <th>Empresa</th><th>Nicho</th><th>Etapa</th><th>Status</th>
                 <th>Próxima ação</th><th style="text-align:right">Ações</th>
               </tr></thead>
               <tbody id="sdrBody"></tbody>
             </table>
-            <div id="sdrEmpty" style="display:none"><div class="empty"><div class="em-ico">🤖</div><h3>Nenhuma cadência ativa</h3><p>Abra um lead e clique em "Iniciar SDR" — o Pesquisador gera o dossiê e a cadência D0/D+2/D+5 é criada sozinha.</p></div></div>
+            <div id="sdrEmpty" style="display:none"><div class="empty"><div class="em-ico">—</div><h3>Nenhuma cadência ativa</h3><p>Abra um lead e clique em "Iniciar SDR": o Pesquisador gera o dossiê e a cadência D0 / D+2 / D+5 é criada automaticamente.</p></div></div>
           </div>
         </div>
       </section>
@@ -1537,20 +1550,39 @@ function getStats(){
   return _statsCache;
 }
 
+// Ícones de UI (linha, sem emoji) reutilizados em KPIs, insights e afins.
+const UI_SVG = {
+  users:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5c0-3 2.6-5 5.5-5s5.5 2 5.5 5"/><path d="M16 5.2a3.2 3.2 0 0 1 0 6"/><path d="M17.5 14.6c2.2.5 3.9 2.3 3.9 4.9"/>',
+  flame:'<path d="M12 3s5 4.2 5 9a5 5 0 0 1-10 0c0-2 1-3.4 2-4.5.3 1.6 1.2 2.3 2 2.5-.8-2.4.3-5.4 1-7z"/>',
+  funnel:'<path d="M3 5h18l-7 8v6l-4-2v-4z"/>',
+  percent:'<path d="M5 19 19 5"/><circle cx="7.5" cy="7.5" r="2.2"/><circle cx="16.5" cy="16.5" r="2.2"/>',
+  calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>',
+  chat:'<path d="M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H9l-4 3.5V16H4a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 4 5.5z"/>',
+  star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/>',
+  bot:'<rect x="4.5" y="7.5" width="15" height="11" rx="2.5"/><path d="M12 7.5V4.2M9 12h.01M15 12h.01M9.5 15.5h5M2.8 11.5v3M21.2 11.5v3"/>',
+  bulb:'<path d="M9.2 17.5h5.6M10.2 20.5h3.6"/><path d="M8 12.5a5 5 0 1 1 8 0c-.8 1-1.5 1.7-1.7 3H9.7c-.2-1.3-.9-2-1.7-3z"/>',
+  bolt:'<path d="M13 2.5 4.5 13.5H11l-1 8 8.5-11.5H12z"/>',
+  target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/>',
+  check:'<circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.2l2.6 2.6 5-5.4"/>',
+  refresh:'<path d="M20 11a8 8 0 0 0-14-4.5L3.5 9M3.5 4v5h5"/><path d="M4 13a8 8 0 0 0 14 4.5L20.5 15M20.5 20v-5h-5"/>',
+  bell:'<path d="M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z"/><path d="M10 19a2 2 0 0 0 4 0"/>',
+  gauge:'<path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18l4-5"/>',
+};
+function svgIco(name,size){ const s=size||18; return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(UI_SVG[name]||'')+'</svg>'; }
 function renderDashboard(){
   const s = getStats();
   const L = state.leads;
 
   // --- KPIs (8 cards premium) ---
   const kpis = [
-    ['Total de leads', s.total,             '👥', ''],
-    ['Quentes',        s.hot,               '🔥', 'rose'],
-    ['Pipeline',       brl(s.pipeline),     '💰', 'warm'],
-    ['Conversão',      s.conv+'%',          '📈', 'success'],
-    ['Tarefas hoje',   s.tasksToday,        '📅', 'cool'],
-    ['Com WhatsApp',   s.wa,                '💬', 'success'],
-    ['Clientes',       s.clients,           '⭐', 'warm'],
-    ['Robôs ativos',   state.provider==='multi'?((state.activeProviders||[]).length||1):1, '🤖', 'cool'],
+    ['Total de leads', s.total,             svgIco('users'),  ''],
+    ['Quentes',        s.hot,               svgIco('flame'),  'rose'],
+    ['Pipeline',       brl(s.pipeline),     svgIco('funnel'), 'warm'],
+    ['Conversão',      s.conv+'%',          svgIco('percent'),'success'],
+    ['Tarefas hoje',   s.tasksToday,        svgIco('calendar'),'cool'],
+    ['Com WhatsApp',   s.wa,                svgIco('chat'),   'success'],
+    ['Clientes',       s.clients,           svgIco('star'),   'warm'],
+    ['Robôs ativos',   state.provider==='multi'?((state.activeProviders||[]).length||1):1, svgIco('bot'), 'cool'],
   ];
   document.getElementById('dashStats').innerHTML =
     kpis.map(([label,value,ico,kind])=>
@@ -1592,9 +1624,9 @@ function renderDashboard(){
   const next = top.find(l=>l.priorityKey==='atacar_hoje' && !s.leadsWithOpenTask.has(l.id)) || top[0];
   document.getElementById('nextBestAction').innerHTML = next
     ? '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px"><div class="op-avatar" style="width:46px;height:46px;font-size:15px">'+escapeHtml(initials(next.name))+'</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px">'+escapeHtml(next.name)+'</div><div style="font-size:12px;color:var(--text-dim);margin-top:2px">'+escapeHtml(next.niche)+' · score '+next.score+' · '+brl(next.value)+'</div></div></div>'+
-      '<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)">💡 <b>Sugestão:</b> '+(next.priorityKey==='atacar_hoje'?'Lead prioritário sem tarefa em aberto. Hora de abordar.':'Lead com maior score da base — abra um diagnóstico hoje.')+'</div>'+
+      '<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)"><b style="color:var(--text)">Sugestão:</b> '+(next.priorityKey==='atacar_hoje'?'Lead prioritário sem tarefa em aberto. Hora de abordar.':'Lead com maior score da base — abra um diagnóstico hoje.')+'</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="openLeadModal('+next.id+')">Abrir lead</button>'+
-      (next.whatsapp?'<a class="btn btn-sm btn-success" target="_blank" href="https://wa.me/'+next.whatsapp+'?text='+encodeURIComponent(next.outreachMessage||'')+'">💬 WhatsApp</a>':'')+
+      (next.whatsapp?'<a class="btn btn-sm btn-success" target="_blank" href="https://wa.me/'+next.whatsapp+'?text='+encodeURIComponent(next.outreachMessage||'')+'">WhatsApp</a>':'')+
       '<button class="btn btn-sm btn-ghost" onclick="quickTaskForLead('+next.id+')">＋ Tarefa</button></div>'
     : emptyHtml('Cadastre o primeiro lead');
 
@@ -1609,9 +1641,9 @@ function renderDashboard(){
 
   // --- Insights ---
   document.getElementById('insightsBlock').innerHTML = [
-    insightCard('💡','Nicho dominante', s.topNiche ? s.topNiche[0]+' · '+s.topNiche[1]+' leads' : 'Sem dados ainda', 'cool'),
-    insightCard('⚡','Atacar hoje', s.attack+' leads em prioridade máxima', 'warm'),
-    insightCard('🤖','Modo busca', state.provider==='multi' ? ('Multi-robô: '+activeProvidersLabel()) : state.provider, 'success'),
+    insightCard(svgIco('bulb'),'Nicho dominante', s.topNiche ? s.topNiche[0]+' · '+s.topNiche[1]+' leads' : 'Sem dados ainda', 'cool'),
+    insightCard(svgIco('bolt'),'Atacar hoje', s.attack+' leads em prioridade máxima', 'warm'),
+    insightCard(svgIco('bot'),'Modo busca', state.provider==='multi' ? ('Multi-robô: '+activeProvidersLabel()) : state.provider, 'success'),
   ].join('');
 }
 /** Card de KPI (usado pelas páginas Lançamentos e afins). */
@@ -1624,8 +1656,8 @@ function stat(label, value, ico, delta, deltaTxt, kind){
   '</div>';
 }
 function insightCard(ico,title,text,kind){
-  const bg = kind==='warm'?'rgba(245,158,11,.14)':kind==='success'?'rgba(16,185,129,.14)':'rgba(99,102,241,.14)';
-  const color = kind==='warm'?'#FCD34D':kind==='success'?'#6EE7B7':'#A5B4FC';
+  const bg = kind==='warm'?'rgba(242,193,78,.14)':kind==='success'?'rgba(16,185,129,.14)':'rgba(46,107,255,.14)';
+  const color = kind==='warm'?'#F2C14E':kind==='success'?'#6EE7B7':'#8FB2FF';
   return '<div class="card insight-card">'+
     '<div class="insight-ico" style="background:'+bg+';color:'+color+'">'+ico+'</div>'+
     '<div><h4 style="color:'+color+'">'+title+'</h4><p>'+escapeHtml(text)+'</p></div>'+
@@ -1960,15 +1992,20 @@ function renderLeadsTable(rows){
   document.getElementById('leadsEmpty').style.display = rows.length ? 'none' : 'block';
   tbody.innerHTML = rows.map(b=>{
     const l = mapLead(b);
+    const contatos = [
+      l.whatsapp?'<a target="_blank" onclick="event.stopPropagation()" href="https://wa.me/'+escapeHtml(l.whatsapp)+'">'+escapeHtml(l.whatsapp)+'</a>':'',
+      l.email?'<div>'+escapeHtml(l.email)+'</div>':'',
+      l.site?'<a target="_blank" onclick="event.stopPropagation()" href="'+escapeHtml(l.site)+'">Site</a>':'',
+    ].filter(Boolean).join('') || '<span style="color:var(--text-mute)">—</span>';
     return '<tr onclick="openLeadModal('+l.id+')">'+
-      '<td><div style="font-weight:700">'+escapeHtml(l.name)+'</div><div style="font-size:11px;color:var(--text-mute)">'+escapeHtml(l.niche)+' • '+escapeHtml(l.city)+'/'+escapeHtml(l.uf)+'</div></td>'+
-      '<td><div class="cell-contacts">'+(l.whatsapp?'<a target="_blank" onclick="event.stopPropagation()" href="https://wa.me/'+escapeHtml(l.whatsapp)+'">💬 '+escapeHtml(l.whatsapp)+'</a>':'')+(l.email?'<div>✉ '+escapeHtml(l.email)+'</div>':'')+(l.site?'<a target="_blank" onclick="event.stopPropagation()" href="'+escapeHtml(l.site)+'">🌐 site</a>':'')+'</div></td>'+
+      '<td><div style="font-weight:600">'+escapeHtml(l.name)+'</div><div style="font-size:11px;color:var(--text-mute);margin-top:2px">'+escapeHtml(l.niche)+' · '+escapeHtml(l.city)+'/'+escapeHtml(l.uf)+'</div></td>'+
+      '<td><div class="cell-contacts">'+contatos+'</div></td>'+
       '<td>'+stageBadge(l.stage)+'</td>'+
-      '<td><div style="font-weight:700">'+l.score+'</div><div style="margin-top:3px">'+tempBadge(l.temp)+'</div></td>'+
-      '<td style="color:#FCD34D;font-weight:700">'+brl(l.value)+'</td>'+
+      '<td><div style="font-weight:700;font-variant-numeric:tabular-nums">'+l.score+'</div><div style="margin-top:4px">'+tempBadge(l.temp)+'</div></td>'+
+      '<td style="color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums">'+brl(l.value)+'</td>'+
       '<td>'+(l.lastContact ? new Date(l.lastContact).toLocaleDateString('pt-BR') : '<span style="color:var(--text-mute)">—</span>')+'</td>'+
-      '<td onclick="event.stopPropagation()"><button class="btn btn-sm btn-primary" onclick="openLeadModal('+l.id+')">Abrir</button>'+
-        (l.whatsapp?' <a class="btn btn-sm btn-success" target="_blank" href="https://wa.me/'+escapeHtml(l.whatsapp)+'?text='+encodeURIComponent(l.outreachMessage||'')+'">💬</a>':'')+
+      '<td onclick="event.stopPropagation()"><button class="btn btn-sm btn-ghost" onclick="openLeadModal('+l.id+')">Abrir</button>'+
+        (l.whatsapp?' <a class="btn btn-sm btn-success" target="_blank" href="https://wa.me/'+escapeHtml(l.whatsapp)+'?text='+encodeURIComponent(l.outreachMessage||'')+'">WhatsApp</a>':'')+
       '</td></tr>';
   }).join('');
 }
@@ -2093,16 +2130,31 @@ function simpleScore(l){
 }
 
 // =============== PIPELINE PESQUISADOR / SDR IA ===============
-const SDR_LABEL = { ativo:'🟢 Em cadência', aguardando_resposta:'🟡 Aguardando resposta', qualificado:'🔥 Qualificado', encerrado:'⚫ Encerrado' };
+const SDR_META = {
+  ativo:               { label:'Em cadência',         cls:'badge-stage' },
+  aguardando_resposta: { label:'Aguardando resposta', cls:'badge-warm' },
+  qualificado:         { label:'Qualificado',         cls:'badge-hot' },
+  encerrado:           { label:'Encerrado',           cls:'badge-mute' },
+};
+function sdrStatusPill(s){ const m=SDR_META[s]||{label:s,cls:'badge-mute'}; return '<span class="badge '+m.cls+'"><span class="dot"></span>'+escapeHtml(m.label)+'</span>'; }
+const SDR_STEPS = [
+  ['01','Pesquisa','O Pesquisador monta o dossiê comercial do lead: dor, oferta e gancho.',''],
+  ['02','Cadência D0 · D+2 · D+5','Três toques automáticos com mensagens personalizadas.',''],
+  ['03','Qualificação','Quando o lead responde, a IA classifica interesse e temperatura.','gold'],
+  ['04','Agendamento','Leads qualificados avançam para reunião com o time comercial.','gold'],
+];
 
 function renderSdr(){
   const L = state.leads.filter(function(l){ return l.sdrStatus; });
   const count = function(s){ return L.filter(function(l){ return l.sdrStatus===s; }).length; };
   document.getElementById('sdrStats').innerHTML =
-    stat('Em cadência', count('ativo'), '🤖') +
-    stat('Aguardando resposta', count('aguardando_resposta'), '🟡') +
-    stat('Qualificados', count('qualificado'), '🔥', null, null, 'gold') +
-    stat('Encerrados', count('encerrado'), '⚫');
+    stat('Em cadência', count('ativo'), svgIco('refresh')) +
+    stat('Aguardando resposta', count('aguardando_resposta'), svgIco('chat'), null, null, 'cool') +
+    stat('Qualificados', count('qualificado'), svgIco('flame'), null, null, 'gold') +
+    stat('Encerrados', count('encerrado'), svgIco('check'));
+  document.getElementById('sdrFlow').innerHTML = SDR_STEPS.map(function(s){
+    return '<div class="sdr-step '+s[3]+'"><div class="sdr-step-n">'+s[0]+'</div><h4>'+s[1]+'</h4><p>'+escapeHtml(s[2])+'</p></div>';
+  }).join('');
   const badge = document.getElementById('sdrAiBadge');
   if(badge) badge.style.display = state.ai ? '' : 'none';
   const body = document.getElementById('sdrBody');
@@ -2110,15 +2162,15 @@ function renderSdr(){
   if(!L.length){ body.innerHTML=''; empty.style.display=''; return; }
   empty.style.display='none';
   body.innerHTML = L.map(function(l){
-    return '<tr>'+
-      '<td><b>'+escapeHtml(l.name)+'</b><div style="font-size:11px;color:var(--text-mute)">'+escapeHtml(l.city||'')+(l.uf?'/'+escapeHtml(l.uf):'')+'</div></td>'+
+    return '<tr onclick="openLeadModal('+l.id+')">'+
+      '<td><b>'+escapeHtml(l.name)+'</b><div style="font-size:11px;color:var(--text-mute);margin-top:2px">'+escapeHtml(l.city||'')+(l.uf?'/'+escapeHtml(l.uf):'')+'</div></td>'+
       '<td>'+escapeHtml(l.niche||'—')+'</td>'+
-      '<td>'+escapeHtml(l.stage)+'</td>'+
-      '<td style="white-space:nowrap">'+(SDR_LABEL[l.sdrStatus]||escapeHtml(l.sdrStatus))+'</td>'+
-      '<td style="font-size:12px">'+escapeHtml(l.nextAction||'—')+'</td>'+
-      '<td style="text-align:right;white-space:nowrap">'+
+      '<td>'+stageBadge(l.stage)+'</td>'+
+      '<td style="white-space:nowrap">'+sdrStatusPill(l.sdrStatus)+'</td>'+
+      '<td style="font-size:12px;color:var(--text-dim)">'+escapeHtml(l.nextAction||'—')+'</td>'+
+      '<td onclick="event.stopPropagation()" style="text-align:right;white-space:nowrap">'+
         '<button class="btn btn-sm btn-ghost" onclick="openLeadModal('+l.id+')">Abrir</button> '+
-        '<button class="btn btn-sm btn-outline" onclick="openReplyModal('+l.id+')">📩 Resposta</button>'+
+        '<button class="btn btn-sm btn-outline" onclick="openReplyModal('+l.id+')">Registrar resposta</button>'+
       '</td></tr>';
   }).join('');
 }
@@ -2213,9 +2265,9 @@ function researchPanelHtml(l){
       '<div style="font-size:12px;color:var(--text-mute)">Nenhum dossiê ainda. Rode o Pesquisador para analisar site, redes e sinais públicos desta empresa.</div>'+btns+'</div>';
   }
   const m = r.nivel_maturidade_digital || { score:0, label:'Baixa', sinais:[] };
-  return '<div class="lead-section" style="margin-top:14px"><h4>Pesquisador IA '+
-      (r.gerado_por==='ia' ? '<span style="font-size:10px;color:var(--cyan)">🧠 gerado com IA</span>' : '<span style="font-size:10px;color:var(--text-mute)">⚙ heurístico</span>')+
-      (l.sdrStatus ? ' <span style="font-size:10px">'+(SDR_LABEL[l.sdrStatus]||'')+'</span>' : '')+'</h4>'+
+  return '<div class="lead-section" style="margin-top:14px"><h4 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Pesquisador IA '+
+      (r.gerado_por==='ia' ? '<span class="badge badge-stage">gerado com IA</span>' : '<span class="badge badge-mute">heurístico</span>')+
+      (l.sdrStatus ? sdrStatusPill(l.sdrStatus) : '')+'</h4>'+
     '<div style="font-size:12px;line-height:1.6">'+escapeHtml(r.resumo_da_empresa||'')+'</div>'+
     '<div style="font-size:12px;margin-top:8px"><b>Público-alvo:</b> '+escapeHtml(r.publico_alvo||'')+'</div>'+
     '<div style="font-size:12px;margin-top:8px"><b>Dores prováveis:</b>'+rpList(r.possiveis_dores)+'</div>'+
@@ -2634,45 +2686,27 @@ function setLaunchTab(tab){
    AUTOMAÇÕES (gerais + específicas de lançamentos)
    ============================================================ */
 const AUTOMATIONS = [
-  { ico:'⚡', titulo:'Speed-to-Lead', desc:'Mensagem automática enviada em até 5 minutos após captura.', on:true, msg:'Olá! Recebemos seu contato e em instantes um especialista vai falar com você.' },
-  { ico:'🔁', titulo:'Follow-up Inteligente', desc:'Sequência de 3 toques em 7 dias para leads sem resposta.', on:true, msg:'Passando para retomar nosso contato — posso te ajudar com os próximos passos?' },
-  { ico:'⭐', titulo:'Nurturing Mensal', desc:'Conteúdo educativo programado para leads "Nutrir".', on:false, msg:'Separei um material que pode te ajudar a vender mais. Quer dar uma olhada?' },
-  { ico:'🎯', titulo:'Qualificação SDR', desc:'Roteiro automático para qualificar interessados.', on:false, msg:'Para eu te ajudar melhor: qual seu principal objetivo comercial hoje?' },
-  { ico:'📊', titulo:'Score Dinâmico', desc:'Recalcula o score a cada interação do lead.', on:true, msg:'' },
-  { ico:'🔔', titulo:'Alerta Quente', desc:'Notifica quando um lead vira "Quente".', on:true, msg:'' },
-];
-const LAUNCH_AUTOMATIONS = [
-  { ico:'🚀', titulo:'Follow-up para dono do lançamento', desc:'Sequência de contato com o expert/produtor do lançamento.', on:true, msg:'Olá {expert}, sobre o {lancamento} — conseguimos organizar seus leads e follow-up no período de carrinho. Bora conversar?' },
-  { ico:'💬', titulo:'Sequência de WhatsApp para leads do lançamento', desc:'Mensagens automáticas para a base de interessados.', on:true, msg:'Oi! O carrinho do {lancamento} está chegando. Quer garantir sua vaga com condição especial?' },
-  { ico:'♻️', titulo:'Recuperação de interessados', desc:'Reativa quem demonstrou interesse e não comprou.', on:true, msg:'Vi que você se interessou pelo {lancamento}. Ficou alguma dúvida que eu possa resolver?' },
-  { ico:'🛒', titulo:'Automação de abertura de carrinho', desc:'Dispara avisos no momento da abertura.', on:false, msg:'🚀 Abriu! O carrinho do {lancamento} está liberado por tempo limitado.' },
-  { ico:'⏳', titulo:'Automação de fechamento de carrinho', desc:'Senso de urgência nas últimas horas.', on:false, msg:'⏳ Últimas horas! O carrinho do {lancamento} fecha hoje. Garanta sua vaga.' },
-  { ico:'📅', titulo:'Lembrete para reunião comercial', desc:'Confirma e lembra reuniões agendadas.', on:false, msg:'Passando para confirmar nossa reunião sobre o {lancamento}. Combinado?' },
-  { ico:'📢', titulo:'Mensagem para grupo de WhatsApp', desc:'Comunicação em massa para o grupo do lançamento.', on:false, msg:'Pessoal! Novidade sobre o {lancamento} — fiquem ligados.' },
-  { ico:'🧊', titulo:'Mensagem para leads frios', desc:'Reaquece a base fria com nova abordagem.', on:false, msg:'Faz um tempo que não conversamos. Tenho uma novidade que pode te interessar.' },
-  { ico:'⚙️', titulo:'Oferta de automação para vender mais', desc:'Apresenta a solução de automação ao dono.', on:true, msg:'Tenho uma automação que organiza os leads do {lancamento} e aumenta a conversão no carrinho. Te mostro?' },
-  { ico:'🗂️', titulo:'Oferta de CRM para organizar os leads', desc:'Apresenta o CRM comercial ao produtor.', on:true, msg:'Posso organizar todos os leads do {lancamento} num CRM com follow-up automático. Faz sentido?' },
+  { icon:'bolt',    titulo:'Speed-to-lead',        desc:'Primeira resposta automática em até 5 minutos após a captura do lead.', on:true,  msg:'Olá! Recebemos seu contato e em instantes um especialista falará com você.' },
+  { icon:'refresh', titulo:'Follow-up inteligente', desc:'Sequência de 3 toques em 7 dias para leads que não responderam.',        on:true,  msg:'Passando para retomar nosso contato — posso ajudar com os próximos passos?' },
+  { icon:'bulb',    titulo:'Nutrição de leads',     desc:'Conteúdo educativo programado para leads na etapa de nutrição.',         on:false, msg:'Separei um material que pode ajudar a vender mais. Quer dar uma olhada?' },
+  { icon:'target',  titulo:'Qualificação por SDR',  desc:'Roteiro automático para qualificar os interessados antes da reunião.',    on:false, msg:'Para eu te ajudar melhor: qual seu principal objetivo comercial hoje?' },
+  { icon:'gauge',   titulo:'Score dinâmico',        desc:'Recalcula o score do lead a cada nova interação registrada.',            on:true,  msg:'' },
+  { icon:'bell',    titulo:'Alerta de lead quente', desc:'Notifica a equipe assim que um lead passa para a temperatura Quente.',    on:true,  msg:'' },
 ];
 function autoCard(a, group, i){
   return '<div class="card auto-card">'+
-    '<div class="auto-ico">'+a.ico+'</div>'+
-    '<h3>'+escapeHtml(a.titulo)+' <span class="badge '+(a.on?'badge-success':'badge-mute')+'" style="float:right">'+(a.on?'Ativo':'Inativo')+'</span></h3>'+
+    '<div class="auto-ico">'+svgIco(a.icon)+'</div>'+
+    '<h3>'+escapeHtml(a.titulo)+'<span class="badge '+(a.on?'badge-success':'badge-mute')+'">'+(a.on?'Ativa':'Inativa')+'</span></h3>'+
     '<p>'+escapeHtml(a.desc)+'</p>'+
-    '<div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap">'+
+    '<div class="auto-actions">'+
       '<button class="btn btn-sm '+(a.on?'btn-ghost':'btn-primary')+'" onclick="toggleAuto(\''+group+'\','+i+')">'+(a.on?'Desativar':'Ativar')+'</button>'+
-      '<button class="btn btn-sm btn-success" onclick="useAuto(\''+group+'\','+i+')">Usar automação</button>'+
-      (a.msg!==undefined?'<button class="btn btn-sm btn-ghost" onclick="editAuto(\''+group+'\','+i+')">Editar mensagem</button>':'')+
+      (a.msg!==undefined&&a.msg!==''?'<button class="btn btn-sm btn-ghost" onclick="editAuto(\''+group+'\','+i+')">Editar mensagem</button>':'')+
     '</div></div>';
 }
 function renderAutomations(){
-  const grid=document.getElementById('autoGrid');
-  grid.innerHTML =
-    '<div style="grid-column:1/-1"><h3 style="font-size:14px;font-weight:700;margin:0 0 4px">⚙️ Gerais</h3></div>'+
-    AUTOMATIONS.map((a,i)=>autoCard(a,'gen',i)).join('')+
-    '<div style="grid-column:1/-1;margin-top:8px"><h3 style="font-size:14px;font-weight:700;margin:0 0 4px">🚀 Lançamentos digitais</h3></div>'+
-    LAUNCH_AUTOMATIONS.map((a,i)=>autoCard(a,'lnc',i)).join('');
+  document.getElementById('autoGrid').innerHTML = AUTOMATIONS.map((a,i)=>autoCard(a,'gen',i)).join('');
 }
-function autoArr(g){ return g==='lnc'?LAUNCH_AUTOMATIONS:AUTOMATIONS; }
+function autoArr(g){ return AUTOMATIONS; }
 function toggleAuto(g,i){ const a=autoArr(g)[i]; a.on=!a.on; renderAutomations(); toast(a.on?'success':'info', a.titulo, a.on?'Ativada':'Desativada'); }
 function useAuto(g,i){ const a=autoArr(g)[i]; if(a.msg){ navigator.clipboard?.writeText(a.msg); toast('success','Mensagem copiada', a.titulo); } else { toast('info','Automação acionada', a.titulo); } }
 function editAuto(g,i){ const a=autoArr(g)[i];
@@ -2729,7 +2763,26 @@ function toggleTheme(){
 }
 function applyTheme(){ if(state.settings.theme==='light') document.body.classList.add('light'); }
 
+// Ícones de navegação — set de linha consistente (sem emoji). Uma fonte só p/ sidebar e mobile-tabs.
+const NAV_SVG = {
+  dashboard:'<rect x="3" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6"/>',
+  hunter:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/><path d="M12 1.6v3M12 19.4v3M1.6 12h3M19.4 12h3"/>',
+  sdr:'<path d="M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H9.5L5.5 19v-3.5H5A1.5 1.5 0 0 1 3.5 14V6A1.5 1.5 0 0 1 5 4.5z"/><path d="M9 10h.01M12 10h.01M15 10h.01"/>',
+  crm:'<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5" height="11" rx="1.5"/><rect x="16" y="4" width="5" height="14" rx="1.5"/>',
+  leads:'<circle cx="4" cy="6" r="1.4"/><circle cx="4" cy="12" r="1.4"/><circle cx="4" cy="18" r="1.4"/><path d="M8.5 6H21M8.5 12H21M8.5 18H21"/>',
+  launches:'<path d="M21.5 2.5 11 13"/><path d="M21.5 2.5 14.7 21.5l-3.7-8.5-8.5-3.7z"/>',
+  tasks:'<circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.2l2.6 2.6 5-5.4"/>',
+  automations:'<path d="M13 2.5 4.5 13.5H11l-1 8 8.5-11.5H12z"/>',
+  settings:'<circle cx="12" cy="12" r="3.4"/><path d="M12 2.2v3M12 18.8v3M21.8 12h-3M5.2 12h-3M18.93 5.07l-2.12 2.12M7.19 16.81l-2.12 2.12M18.93 18.93l-2.12-2.12M7.19 7.19 5.07 5.07"/>',
+};
+function paintNavIcons(){
+  document.querySelectorAll('.nav-item[data-view] .nav-ico').forEach(ico=>{
+    const v = ico.closest('.nav-item').dataset.view;
+    if(NAV_SVG[v]) ico.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+NAV_SVG[v]+'</svg>';
+  });
+}
 function bindEvents(){
+  paintNavIcons();
   document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click', ()=>switchView(n.dataset.view)));
   document.getElementById('themeToggle')&&document.getElementById('themeToggle').addEventListener('click', toggleTheme);
   document.getElementById('quickAddLead')&&document.getElementById('quickAddLead').addEventListener('click', openQuickAdd);
