@@ -134,7 +134,7 @@ const statements = [
     value TEXT,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   )`,
-  // --- IA Comercial (OpenAI): análises, relatórios diários e logs de chamada ---
+  // --- IA Comercial (Gemini): analises, relatorios diarios e logs de chamada ---
   `CREATE TABLE IF NOT EXISTS lead_ai_analysis (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     lead_id INTEGER REFERENCES leads(id),

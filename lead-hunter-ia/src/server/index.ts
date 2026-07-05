@@ -46,7 +46,8 @@ import {
   generateMessage,
   generateSearchQueries,
   summarizeDay,
-  openaiEnabled,
+  pingAi,
+  geminiEnabled,
   type AnalyzeLeadInput,
 } from "../ai/commercialAi.js";
 import {
@@ -54,6 +55,7 @@ import {
   getDailyReport,
   saveDailyReport,
   topRecommendedOffers,
+  analyzedLeadIdSet,
 } from "../database/aiRepository.js";
 import { priorityFromScore } from "../ai/schemas.js";
 import { exportCsv, exportJson, exportXlsx } from "../exporters/index.js";
@@ -229,8 +231,9 @@ app.get("/api/config", (_req, res) => {
     activeProviders,
     defaultCountry: config.DEFAULT_COUNTRY,
     ai: aiEnabled(),
-    aiCommercial: openaiEnabled(),
-    aiModel: openaiEnabled() ? config.OPENAI_MODEL : null,
+    aiCommercial: geminiEnabled(),
+    aiProvider: "Gemini",
+    aiModel: geminiEnabled() ? config.GEMINI_MODEL : null,
   });
 });
 
@@ -842,8 +845,8 @@ app.put("/api/settings", (req, res) => {
 });
 
 // ====================================================================
-// IA COMERCIAL — o "cérebro comercial" (OpenAI, server-side apenas).
-// Toda IA passa pelo backend. Sem OPENAI_API_KEY → fallback amigável.
+// IA COMERCIAL - o "cerebro comercial" (Gemini, server-side apenas).
+// Toda IA passa pelo backend. Sem GEMINI_API_KEY -> fallback amigavel.
 // Nunca há envio automático: mensagens são rascunhos p/ aprovação humana.
 // ====================================================================
 
@@ -964,13 +967,27 @@ app.post("/api/ai/analyze-lead", async (req, res) => {
   });
 });
 
+const MSG_TONES = ["consultivo", "direto", "amigavel", "premium"] as const;
+type MsgTone = (typeof MSG_TONES)[number];
 const genMsgSchema = z.object({
   lead_id: z.coerce.number().int(),
   channel: z.enum(["whatsapp", "email"]).default("whatsapp"),
-  tone: z.enum(["consultivo", "direto", "amigavel", "premium"]).default("consultivo"),
+  tone: z.enum(MSG_TONES).optional(),
   offer: z.string().optional(),
   force: z.coerce.boolean().optional().default(false),
 });
+
+/** Anexa assinatura do consultor / link de agendamento ao rascunho (opcional). */
+function withSignature(message: string, s: { consultantName?: string; agencyName?: string; calendarLink?: string }): string {
+  let out = message.trimEnd();
+  const name = (s.consultantName || "").trim();
+  const agency = (s.agencyName || "").trim();
+  const link = (s.calendarLink || "").trim();
+  const sign = name && agency ? `${name} — ${agency}` : name || agency;
+  if (sign && !out.includes(sign)) out += `\n\n${sign}`;
+  if (link && !out.includes(link)) out += `\nAgende um horário: ${link}`;
+  return out;
+}
 
 /** Gera RASCUNHO de mensagem (WhatsApp/e-mail) — nunca envia. */
 app.post("/api/ai/generate-message", async (req, res) => {
@@ -984,22 +1001,28 @@ app.post("/api/ai/generate-message", async (req, res) => {
     res.status(404).json({ error: `Lead #${parsed.data.lead_id} não encontrado.` });
     return;
   }
+  const settings = getSettings() as Record<string, string>;
+  const rawTone = settings.messageTone ?? "";
+  const tone: MsgTone = parsed.data.tone
+    ?? ((MSG_TONES as readonly string[]).includes(rawTone) ? (rawTone as MsgTone) : "consultivo");
   const r = await generateMessage({
     leadId: lead.id,
     lead: leadToAiInput(lead),
     channel: parsed.data.channel,
-    tone: parsed.data.tone,
-    offer: parsed.data.offer,
+    tone,
+    offer: parsed.data.offer || settings.agencyServices || undefined,
   });
   if (!r.enabled) {
     res.json({ enabled: false, error: r.error, requires_human_approval: true });
     return;
   }
+  const message = r.ok ? withSignature(r.message, settings) : r.message;
   res.json({
     enabled: true,
     ok: r.ok,
     channel: r.channel,
-    message: r.message,
+    tone,
+    message,
     subject: r.subject,
     lead_id: lead.id,
     based_on_analysis_id: r.based_on_analysis_id,
@@ -1048,7 +1071,7 @@ app.post("/api/ai/generate-dashboard", async (req, res) => {
   // A IA só interpreta o agregado (não recebe a base inteira).
   let executive_summary = "";
   let daily_recommendations: string[] = [];
-  if (openaiEnabled() && total > 0) {
+  if (geminiEnabled() && total > 0) {
     const s = await summarizeDay(
       {
         total_leads: total,
@@ -1067,7 +1090,7 @@ app.post("/api/ai/generate-dashboard", async (req, res) => {
     }
   }
 
-  res.json({ enabled: openaiEnabled(), ...stats, executive_summary, daily_recommendations });
+  res.json({ enabled: geminiEnabled(), ...stats, executive_summary, daily_recommendations });
 });
 
 const reportSchema = z.object({
@@ -1113,10 +1136,10 @@ app.post("/api/ai/daily-report", async (req, res) => {
   const totalFound = dayLeads.length;
   const top10 = dayLeads.slice().sort((a, b) => b.score - a.score).slice(0, 10).map(slimLead);
 
-  if (!openaiEnabled()) {
+  if (!geminiEnabled()) {
     res.json({
       enabled: false,
-      error: "Recursos de IA desativados. Configure OPENAI_API_KEY para habilitar.",
+      error: "Recursos de IA desativados. Configure GEMINI_API_KEY para habilitar.",
       report_date: reportDate,
       total_found: totalFound,
       top_10_leads: top10,
@@ -1197,8 +1220,8 @@ app.post("/api/ai/analyze-leads-batch", async (req, res) => {
     res.status(400).json({ error: parsed.error.flatten().fieldErrors });
     return;
   }
-  if (!openaiEnabled()) {
-    res.json({ enabled: false, error: "Recursos de IA desativados. Configure OPENAI_API_KEY para habilitar." });
+  if (!geminiEnabled()) {
+    res.json({ enabled: false, error: "Recursos de IA desativados. Configure GEMINI_API_KEY para habilitar." });
     return;
   }
   const ids = parsed.data.lead_ids.slice(0, config.AI_BATCH_MAX);
@@ -1233,9 +1256,102 @@ app.post("/api/ai/analyze-leads-batch", async (req, res) => {
   res.json({ enabled: true, processed, skipped, failed, limit: config.AI_BATCH_MAX, results });
 });
 
+/** Status barato da IA (sem consumir tokens) — para gate/exibição na UI. */
+app.get("/api/ai/status", (_req, res) => {
+  res.json({
+    enabled: geminiEnabled(),
+    provider: "Gemini",
+    model: geminiEnabled() ? config.GEMINI_MODEL : null,
+    keyConfigured: geminiEnabled(),
+  });
+});
+
+/** Teste de conexão real com a IA (Configurações → "Testar conexão"). */
+app.post("/api/ai/ping", async (_req, res) => {
+  res.json(await pingAi());
+});
+
+// ---- Central de Automações: filas acionáveis calculadas no banco ----
+function daysSince(iso: string | null): number | null {
+  if (!iso) return null;
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return null;
+  return Math.floor((Date.now() - t) / (24 * 3600 * 1000));
+}
+const CLOSED_STAGES = new Set(["ganho", "ganhou", "perdido", "fechado", "cliente"]);
+function isOpenStage(stage: string | null): boolean {
+  return !CLOSED_STAGES.has((stage || "").trim().toLowerCase());
+}
+function slimAutoLead(l: ReturnType<typeof getAllLeadRecords>[number]) {
+  return {
+    id: l.id,
+    company_name: l.companyName,
+    niche: l.niche || "",
+    city: l.city || "",
+    uf: l.region || "",
+    score: l.score || 0,
+    temperature: l.temperature || "",
+    whatsapp: l.whatsapp || l.phone || "",
+    stage: l.stage || "Novo",
+    last_contact_at: l.lastContactAt,
+    days_since_contact: daysSince(l.lastContactAt),
+  };
+}
+
+/**
+ * Visão geral das automações: filas de leads acionáveis (não analisados,
+ * follow-up atrasado, leads frios, quentes sem contato, prioridades do dia).
+ * Tudo calculado a partir do banco — a IA só age sob demanda (rascunhos).
+ */
+app.get("/api/automations/overview", (_req, res) => {
+  const settings = getSettings() as Record<string, string>;
+  const followupDays = Math.max(1, Number(settings.followupDays) || 3);
+  const leads = getAllLeadRecords();
+  const analyzed = analyzedLeadIdSet();
+  const open = leads.filter((l) => isOpenStage(l.stage));
+  const byScore = (a: { score: number }, b: { score: number }) => b.score - a.score;
+  const cap = (arr: typeof leads, n = 100) => arr.slice(0, n).map(slimAutoLead);
+
+  const notAnalyzed = leads.filter((l) => !analyzed.has(l.id)).sort(byScore);
+  const followup = open
+    .filter((l) => {
+      const d = daysSince(l.lastContactAt);
+      return d === null || d >= followupDays;
+    })
+    .sort(byScore);
+  const cold = open
+    .filter((l) => l.temperature === "Frio" || l.score < 40)
+    .sort(byScore);
+  const hotNoContact = open
+    .filter((l) => (l.temperature === "Quente" || l.score >= 85))
+    .filter((l) => {
+      const d = daysSince(l.lastContactAt);
+      return d === null || d >= 2;
+    })
+    .sort(byScore);
+  const todayTop = open
+    .filter((l) => (daysSince(l.lastContactAt) ?? 999) >= 1)
+    .sort(byScore)
+    .slice(0, 10);
+
+  res.json({
+    ai_enabled: geminiEnabled(),
+    provider: "Gemini",
+    followup_days: followupDays,
+    total_leads: leads.length,
+    queues: {
+      not_analyzed: { count: notAnalyzed.length, leads: cap(notAnalyzed) },
+      followup: { count: followup.length, leads: cap(followup) },
+      cold: { count: cold.length, leads: cap(cold) },
+      hot_no_contact: { count: hotNoContact.length, leads: cap(hotNoContact) },
+      today_top: { count: todayTop.length, leads: todayTop.map(slimAutoLead) },
+    },
+  });
+});
+
 const PORT = Number(process.env.PORT ?? 3000);
 app.listen(PORT, () => {
   logger.success(`🌐 Painel rodando em http://localhost:${PORT}`);
   logger.info(`   Provedor: ${config.SEARCH_PROVIDER}`);
-  logger.info(`   IA Comercial: ${openaiEnabled() ? `ativa (${config.OPENAI_MODEL})` : "desativada (sem OPENAI_API_KEY)"}`);
+  logger.info(`   IA Comercial: ${geminiEnabled() ? `ativa (${config.GEMINI_MODEL})` : "desativada (sem GEMINI_API_KEY)"}`);
 });

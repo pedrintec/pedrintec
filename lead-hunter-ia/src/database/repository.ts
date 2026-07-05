@@ -12,6 +12,7 @@ import {
 import { leadsAreDuplicate } from "../normalization/dedup.js";
 import { logger } from "../utils/logger.js";
 import { fireStageChangeWebhook } from "../integrations/n8nWebhook.js";
+import { analyzeLeadPain, buildPainAnalysisInputFromLead } from "../prospecting/painAnalyzer.js";
 
 // Camada de acesso a dados + lógica de deduplicação.
 
@@ -28,6 +29,45 @@ export function createSearch(input: SearchInput, provider: string): number {
     })
     .run();
   return Number(res.lastInsertRowid);
+}
+
+export function createScrapingJob(input: {
+  mode: string;
+  niche?: string;
+  city?: string;
+  region?: string;
+  keyword?: string;
+  totalUrls?: number;
+}): number {
+  const now = new Date().toISOString();
+  const res = db
+    .insert(schema.scrapingJobs)
+    .values({
+      mode: input.mode,
+      niche: input.niche ?? null,
+      city: input.city ?? null,
+      region: input.region ?? null,
+      keyword: input.keyword ?? null,
+      totalUrls: input.totalUrls ?? 0,
+      status: "running",
+      startedAt: now,
+    })
+    .run();
+  return Number(res.lastInsertRowid);
+}
+
+export function updateScrapingJob(
+  id: number,
+  patch: {
+    status?: string;
+    totalUrls?: number;
+    analyzedUrls?: number;
+    savedLeads?: number;
+    failedUrls?: number;
+    finishedAt?: string;
+  },
+): void {
+  db.update(schema.scrapingJobs).set(patch).where(eq(schema.scrapingJobs.id, id)).run();
 }
 
 export function recordSource(
@@ -74,6 +114,44 @@ function persistEvidences(leadId: number, evidences?: ScoreEvidence[]): void {
   }
 }
 
+function generatePainDiagnostic(lead: Lead) {
+  return analyzeLeadPain(buildPainAnalysisInputFromLead(lead));
+}
+
+function buildDuplicateLeadPatch(
+  existing: typeof schema.leads.$inferSelect,
+  incoming: Lead,
+  painDiagnostic: ReturnType<typeof generatePainDiagnostic>,
+  now: string,
+): Record<string, unknown> {
+  const patch: Record<string, unknown> = {
+    lastSeenAt: now,
+    lastCheckedAt: now,
+    painDiagnostic: JSON.stringify(painDiagnostic),
+  };
+  const setIfBlank = (key: string, current: unknown, next: unknown) => {
+    if ((current == null || current === "") && next != null && next !== "") patch[key] = next;
+  };
+
+  setIfBlank("phone", existing.phone, incoming.phone);
+  setIfBlank("whatsapp", existing.whatsapp, incoming.whatsapp);
+  setIfBlank("email", existing.email, incoming.email);
+  setIfBlank("instagram", existing.instagram, incoming.instagram);
+  setIfBlank("publicContactName", existing.publicContactName, incoming.publicContactName);
+  setIfBlank("publicContactRole", existing.publicContactRole, incoming.publicContactRole);
+  setIfBlank("outreachMessage", existing.outreachMessage, incoming.outreachMessage);
+  setIfBlank("commercialHook", existing.commercialHook, incoming.commercialHook);
+  if (!existing.painSignals && incoming.painSignals?.length) patch.painSignals = JSON.stringify(incoming.painSignals);
+  if (incoming.score > existing.score) {
+    patch.score = incoming.score;
+    patch.finalScore = incoming.finalScore ?? incoming.score;
+    patch.temperature = incoming.temperature;
+    patch.commercialPriority = incoming.commercialPriority ?? existing.commercialPriority;
+    patch.scoreEvidences = incoming.scoreEvidences ? JSON.stringify(incoming.scoreEvidences) : existing.scoreEvidences;
+  }
+  return patch;
+}
+
 /** Persiste leads, evitando duplicados contra o que já está no banco. */
 export function saveLeads(searchId: number, leads: Lead[]): Lead[] {
   const existingRows = db.select().from(schema.leads).all();
@@ -81,11 +159,12 @@ export function saveLeads(searchId: number, leads: Lead[]): Lead[] {
 
   const saved: Lead[] = [];
   for (const lead of leads) {
+    const painDiagnostic = generatePainDiagnostic(lead);
     // Procura linha duplicada (com id) para mesclar em vez de duplicar.
     const dupRow = existingRows.find((r) => leadsAreDuplicate(lead, rowToLead(r)));
     if (dupRow) {
       db.update(schema.leads)
-        .set({ lastSeenAt: now, lastCheckedAt: now })
+        .set(buildDuplicateLeadPatch(dupRow, lead, painDiagnostic, now))
         .where(eq(schema.leads.id, dupRow.id))
         .run();
       logger.debug(`Já existe no banco (atualizado lastSeenAt): ${lead.companyName}`);
@@ -108,6 +187,8 @@ export function saveLeads(searchId: number, leads: Lead[]): Lead[] {
         instagram: lead.instagram,
         linkedin: lead.linkedin,
         address: lead.address,
+        publicContactName: lead.publicContactName ?? null,
+        publicContactRole: lead.publicContactRole ?? null,
         sourceUrl: lead.sourceUrl,
         evidence: lead.evidence,
         opportunities: JSON.stringify(lead.opportunities),
@@ -137,6 +218,8 @@ export function saveLeads(searchId: number, leads: Lead[]): Lead[] {
         commercialHook: lead.commercialHook ?? null,
         outreachMessage: lead.outreachMessage ?? null,
         roiEstimate: lead.roiEstimate ? JSON.stringify(lead.roiEstimate) : null,
+        painDiagnostic: JSON.stringify(painDiagnostic),
+        painSignals: lead.painSignals ? JSON.stringify(lead.painSignals) : null,
         firstSeenAt: lead.firstSeenAt ?? now,
         lastSeenAt: lead.lastSeenAt ?? now,
         lastCheckedAt: lead.lastCheckedAt ?? now,
@@ -148,7 +231,7 @@ export function saveLeads(searchId: number, leads: Lead[]): Lead[] {
     // Mantém a lista em memória atualizada para deduplicar dentro do mesmo lote.
     const insertedRow = db.select().from(schema.leads).where(eq(schema.leads.id, newId)).get();
     if (insertedRow) existingRows.push(insertedRow);
-    saved.push(lead);
+    saved.push({ ...lead, painDiagnostic });
   }
   return saved;
 }
@@ -175,6 +258,8 @@ function rowToLead(r: typeof schema.leads.$inferSelect): Lead {
     instagram: r.instagram ?? undefined,
     linkedin: r.linkedin ?? undefined,
     address: r.address ?? undefined,
+    publicContactName: r.publicContactName ?? undefined,
+    publicContactRole: r.publicContactRole ?? undefined,
     sourceUrl: r.sourceUrl ?? "",
     evidence: r.evidence ?? "",
     opportunities: r.opportunities ? JSON.parse(r.opportunities) : [],
@@ -205,6 +290,8 @@ function rowToLead(r: typeof schema.leads.$inferSelect): Lead {
     commercialHook: r.commercialHook ?? undefined,
     outreachMessage: r.outreachMessage ?? undefined,
     roiEstimate: parseJson<Lead["roiEstimate"]>(r.roiEstimate),
+    painDiagnostic: parseJson<Lead["painDiagnostic"]>(r.painDiagnostic),
+    painSignals: parseJson<Lead["painSignals"]>(r.painSignals),
     firstSeenAt: r.firstSeenAt ?? undefined,
     lastSeenAt: r.lastSeenAt ?? undefined,
     lastCheckedAt: r.lastCheckedAt ?? undefined,
@@ -528,6 +615,29 @@ export function getLeadById(id: number): LeadRecord | undefined {
   return buildRecord(r, notes, tasks);
 }
 
+function refreshLeadPainDiagnostic(leadId: number): LeadRecord | undefined {
+  const row = db.select().from(schema.leads).where(eq(schema.leads.id, leadId)).get();
+  if (!row) return undefined;
+  const diagnostic = generatePainDiagnostic(rowToLead(row));
+  db.update(schema.leads)
+    .set({ painDiagnostic: JSON.stringify(diagnostic), lastCheckedAt: diagnostic.updated_at })
+    .where(eq(schema.leads.id, leadId))
+    .run();
+  return getLeadById(leadId);
+}
+
+export function reanalyzeLeadPain(leadId: number): LeadRecord | undefined {
+  const lead = refreshLeadPainDiagnostic(leadId);
+  if (lead?.painDiagnostic) {
+    addLeadActivity(leadId, "pain_analysis", "Diagnóstico de dor atualizado", {
+      author: "Sistema",
+      painScore: lead.painDiagnostic.pain_score,
+      mainPain: lead.painDiagnostic.main_pain,
+    });
+  }
+  return lead;
+}
+
 // ---------------------------------------------------------------------
 // CRM: etapa do funil, valor, responsável, notas e tarefas (persistência)
 // ---------------------------------------------------------------------
@@ -611,7 +721,7 @@ export function updateLeadCrm(
     });
   }
 
-  return getLeadById(leadId);
+  return refreshLeadPainDiagnostic(leadId) ?? getLeadById(leadId);
 }
 
 /** Salva o relatório do Pesquisador no lead (JSON) e registra a atividade. */
@@ -860,6 +970,26 @@ export function createLeadManual(input: ManualLeadInput): LeadRecord | undefined
   const now = new Date().toISOString();
   const score = Math.max(0, Math.min(100, Number(input.score ?? 50)));
   const temperature: Lead["temperature"] = score >= 70 ? "Quente" : score >= 40 ? "Morno" : "Frio";
+  const painDiagnostic = generatePainDiagnostic({
+    companyName: input.companyName,
+    site: input.site ?? "",
+    city: input.city ?? "",
+    region: input.region ?? "",
+    niche: input.niche ?? "",
+    phone: input.phone,
+    whatsapp: input.whatsapp,
+    email: input.email,
+    instagram: input.instagram,
+    linkedin: input.linkedin,
+    sourceUrl: input.site ?? "",
+    evidence: "Lead criado manualmente",
+    opportunities: [],
+    score,
+    temperature,
+    collectedAt: now,
+    sourceProvider: "manual",
+    dataOrigin: "manual",
+  });
   const res = db
     .insert(schema.leads)
     .values({
@@ -894,6 +1024,7 @@ export function createLeadManual(input: ManualLeadInput): LeadRecord | undefined
       normalizedWhatsapp: input.whatsapp ? normalizePhone(input.whatsapp) : null,
       normalizedEmail: input.email ? normalizeEmail(input.email) : null,
       normalizedInstagram: input.instagram ? normalizeInstagram(input.instagram) : null,
+      painDiagnostic: JSON.stringify(painDiagnostic),
       firstSeenAt: now,
       lastSeenAt: now,
       lastCheckedAt: now,
@@ -920,32 +1051,39 @@ export function deleteLead(leadId: number): boolean {
 
 const DEFAULT_SETTINGS = {
   agencyName: "Gravity",
+  consultantName: "",
   message:
     "Olá, tudo bem? Aqui é da {agencia}. Vi a {empresa} em {cidade} e percebi uma oportunidade real de melhorar a captação e o acompanhamento de contatos comerciais no segmento de {nicho}.\n\nMuitos negócios recebem interessados mas perdem vendas por falta de processo, follow-up e organização. Quero te convidar para um diagnóstico gratuito — em poucos minutos identificamos gargalos de atendimento, oportunidades de automação e próximos passos para vender mais com clareza.\n\nPosso te enviar duas opções de horário?",
   niches: "Clínica Odontológica, Estética, Energia Solar, Advocacia, Imobiliária",
+  // Serviços da agência — usados pela IA como base de "oferta recomendada".
+  agencyServices: "Tráfego pago, automação de WhatsApp, landing pages, funil de vendas, CRM e SDR",
+  // Tom padrão dos rascunhos gerados pela IA.
+  messageTone: "consultivo",
+  // Link de agendamento anexado aos rascunhos (opcional).
+  calendarLink: "",
+  // Dias sem contato para um lead entrar na fila de follow-up.
+  followupDays: "3",
   theme: "dark",
 };
 
 export type Settings = typeof DEFAULT_SETTINGS;
+const SETTINGS_KEYS = Object.keys(DEFAULT_SETTINGS) as Array<keyof Settings>;
 
-/** Lê todas as settings (com defaults). */
+/** Lê todas as settings (com defaults aplicados por chave conhecida). */
 export function getSettings(): Settings {
   const rows = db.select().from(schema.settings).all();
   const map: Record<string, string> = {};
   for (const r of rows) if (r.value != null) map[r.key] = r.value;
-  return {
-    agencyName: map.agencyName ?? DEFAULT_SETTINGS.agencyName,
-    message: map.message ?? DEFAULT_SETTINGS.message,
-    niches: map.niches ?? DEFAULT_SETTINGS.niches,
-    theme: map.theme ?? DEFAULT_SETTINGS.theme,
-  };
+  const out = { ...DEFAULT_SETTINGS };
+  for (const k of SETTINGS_KEYS) if (map[k] != null) out[k] = map[k];
+  return out;
 }
 
-/** Grava settings parciais (faz upsert key/value). */
+/** Grava settings parciais (upsert key/value); ignora chaves desconhecidas. */
 export function setSettings(patch: Partial<Settings>): Settings {
   const now = new Date().toISOString();
   for (const [k, v] of Object.entries(patch)) {
-    if (v == null) continue;
+    if (v == null || !SETTINGS_KEYS.includes(k as keyof Settings)) continue;
     db.delete(schema.settings).where(eq(schema.settings.key, k)).run();
     db.insert(schema.settings).values({ key: k, value: String(v), updatedAt: now }).run();
   }

@@ -19,6 +19,7 @@
     "pomodoro": "tsx src/workflow/pomodoro.js"
   },
   "dependencies": {
+    "@google/genai": "^2.10.0",
     "@inquirer/prompts": "^7.2.0",
     "axios": "^1.7.9",
     "better-sqlite3": "^12.11.1",

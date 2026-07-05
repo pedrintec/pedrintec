@@ -1,4 +1,5 @@
-import { openaiEnabled, openaiJson } from "../integrations/openaiService.js";
+import { geminiEnabled, geminiJson } from "../integrations/geminiService.js";
+import { config } from "../config/index.js";
 import {
   ANALYZE_LEAD_SYSTEM,
   analyzeLeadUser,
@@ -26,7 +27,7 @@ import {
 // Orquestração do "cérebro comercial". Toda IA passa por aqui: validação,
 // cache por input_hash, persistência, logs e fallback. Nunca lança.
 
-export { openaiEnabled };
+export { geminiEnabled };
 
 const NAO_ID = "não identificado";
 const orNaoId = (v: unknown): string => {
@@ -109,8 +110,8 @@ export async function analyzeLead(input: AnalyzeLeadInput, force = false): Promi
     }
   }
 
-  if (!openaiEnabled()) {
-    return { enabled: false, ok: false, cached: false, error: "Recursos de IA desativados. Configure OPENAI_API_KEY para habilitar.", input_hash: inputHash };
+  if (!geminiEnabled()) {
+    return { enabled: false, ok: false, cached: false, error: "Recursos de IA desativados. Configure GEMINI_API_KEY para habilitar.", input_hash: inputHash };
   }
 
   const leadJson = JSON.stringify(
@@ -128,7 +129,7 @@ export async function analyzeLead(input: AnalyzeLeadInput, force = false): Promi
     2,
   );
 
-  const result = await openaiJson(ANALYZE_LEAD_SYSTEM, analyzeLeadUser(leadJson), { temperature: 0.3 });
+  const result = await geminiJson(ANALYZE_LEAD_SYSTEM, analyzeLeadUser(leadJson), { temperature: 0.3 });
   logAiCall({
     endpoint: "/api/ai/analyze-lead",
     operation: "analyze_lead",
@@ -212,15 +213,15 @@ export interface MessageResult {
 
 export async function generateMessage(input: GenerateMessageInput): Promise<MessageResult> {
   const base: MessageResult = {
-    enabled: openaiEnabled(),
+    enabled: geminiEnabled(),
     ok: false,
     channel: input.channel,
     message: "",
     based_on_analysis_id: null,
     requires_human_approval: true,
   };
-  if (!openaiEnabled()) {
-    return { ...base, error: "Recursos de IA desativados. Configure OPENAI_API_KEY para habilitar." };
+  if (!geminiEnabled()) {
+    return { ...base, error: "Recursos de IA desativados. Configure GEMINI_API_KEY para habilitar." };
   }
   const analysis = getLatestLeadAiAnalysis(input.leadId);
   const context = {
@@ -235,7 +236,7 @@ export async function generateMessage(input: GenerateMessageInput): Promise<Mess
     recommended_offer: input.offer || analysis?.recommended_offer || NAO_ID,
     score: analysis?.score ?? null,
   };
-  const result = await openaiJson(
+  const result = await geminiJson(
     messageSystem(input.channel, input.tone),
     `Gere o rascunho com base neste contexto (não invente dados marcados como "${NAO_ID}"):\n${JSON.stringify(context, null, 2)}`,
     { temperature: 0.6 },
@@ -266,10 +267,10 @@ export async function generateMessage(input: GenerateMessageInput): Promise<Mess
 
 // ---- Buscas públicas (Caçador IA) ----
 export async function generateSearchQueries(niche: string, city: string, clientType?: string) {
-  if (!openaiEnabled()) {
-    return { enabled: false, ok: false, queries: [] as string[], error: "Recursos de IA desativados. Configure OPENAI_API_KEY para habilitar." };
+  if (!geminiEnabled()) {
+    return { enabled: false, ok: false, queries: [] as string[], error: "Recursos de IA desativados. Configure GEMINI_API_KEY para habilitar." };
   }
-  const result = await openaiJson(SEARCH_QUERIES_SYSTEM, searchQueriesUser(niche, city, clientType), { temperature: 0.5 });
+  const result = await geminiJson(SEARCH_QUERIES_SYSTEM, searchQueriesUser(niche, city, clientType), { temperature: 0.5 });
   logAiCall({
     endpoint: "/api/ai/generate-search-queries",
     operation: "search_queries",
@@ -298,10 +299,10 @@ export interface DaySummaryResult {
 }
 
 export async function summarizeDay(stats: unknown, operation: string, endpoint: string): Promise<DaySummaryResult> {
-  if (!openaiEnabled()) {
-    return { enabled: false, ok: false, summary: null, raw: "", model: "", error: "Recursos de IA desativados. Configure OPENAI_API_KEY para habilitar." };
+  if (!geminiEnabled()) {
+    return { enabled: false, ok: false, summary: null, raw: "", model: "", error: "Recursos de IA desativados. Configure GEMINI_API_KEY para habilitar." };
   }
-  const result = await openaiJson(
+  const result = await geminiJson(
     DAY_SUMMARY_SYSTEM,
     `Estatísticas agregadas do período:\n${JSON.stringify(stats, null, 2)}`,
     { temperature: 0.4 },
@@ -321,4 +322,26 @@ export async function summarizeDay(stats: unknown, operation: string, endpoint: 
     return { enabled: true, ok: false, summary: null, raw: result.raw, model: result.model, error: result.error || "Interpretação de IA indisponível." };
   }
   return { enabled: true, ok: true, summary: parsed.data, raw: result.raw, model: result.model };
+}
+
+// ---- Teste de conexão da IA (usado nas Configurações) ----
+export async function pingAi(): Promise<{
+  enabled: boolean;
+  ok: boolean;
+  provider: "Gemini";
+  model: string;
+  latencyMs: number;
+  error?: string;
+}> {
+  const model = config.GEMINI_MODEL;
+  if (!geminiEnabled()) {
+    return { enabled: false, ok: false, provider: "Gemini", model, latencyMs: 0, error: "Sem GEMINI_API_KEY configurada no backend." };
+  }
+  const started = Date.now();
+  const r = await geminiJson<{ ok?: boolean }>(
+    "Você é um verificador de conexão. Responda apenas com JSON.",
+    'Retorne exatamente {"ok":true}.',
+    { temperature: 0, maxTokens: 20 },
+  );
+  return { enabled: true, ok: r.ok, provider: "Gemini", model, latencyMs: Date.now() - started, error: r.ok ? undefined : r.error };
 }

@@ -97,6 +97,14 @@ export function getAnalysisById(id: number): LeadAiAnalysisRow | undefined {
     | undefined;
 }
 
+/** Conjunto de lead_ids que já possuem ao menos uma análise de IA bem-sucedida. */
+export function analyzedLeadIdSet(): Set<number> {
+  const rows = sqlite
+    .prepare(`SELECT DISTINCT lead_id FROM lead_ai_analysis WHERE status = 'success' AND lead_id IS NOT NULL`)
+    .all() as Array<{ lead_id: number }>;
+  return new Set(rows.map((r) => r.lead_id));
+}
+
 /** Ofertas mais recomendadas pela IA (agregado, para o Dashboard IA). */
 export function topRecommendedOffers(limit = 5): Array<{ offer: string; count: number }> {
   return sqlite
