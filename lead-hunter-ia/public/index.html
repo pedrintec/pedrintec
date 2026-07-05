@@ -1517,27 +1517,22 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
                   <option>Restaurante</option><option>Arquitetura</option><option>Marcenaria</option><option>Clínica médica</option>
                 </datalist>
               </div>
-              <div class="field"><label>Preset de praça</label>
-                <select id="lhPreset">
-                  <option value="">Selecionar cidade rapidamente</option>
-                  <optgroup label="GO"><option value="Goiânia|GO">Goiânia / GO</option><option value="Aparecida de Goiânia|GO">Aparecida de Goiânia / GO</option><option value="Anápolis|GO">Anápolis / GO</option></optgroup>
-                  <optgroup label="SP"><option value="São Paulo|SP">São Paulo / SP</option><option value="Ribeirão Preto|SP">Ribeirão Preto / SP</option><option value="Campinas|SP">Campinas / SP</option><option value="Santos|SP">Santos / SP</option></optgroup>
-                  <optgroup label="RJ"><option value="Rio de Janeiro|RJ">Rio de Janeiro / RJ</option><option value="Niterói|RJ">Niterói / RJ</option><option value="Petrópolis|RJ">Petrópolis / RJ</option></optgroup>
-                  <optgroup label="MG"><option value="Belo Horizonte|MG">Belo Horizonte / MG</option><option value="Uberlândia|MG">Uberlândia / MG</option><option value="Juiz de Fora|MG">Juiz de Fora / MG</option></optgroup>
-                  <optgroup label="Sul"><option value="Curitiba|PR">Curitiba / PR</option><option value="Florianópolis|SC">Florianópolis / SC</option><option value="Porto Alegre|RS">Porto Alegre / RS</option></optgroup>
-                  <optgroup label="Nordeste"><option value="Salvador|BA">Salvador / BA</option><option value="Recife|PE">Recife / PE</option><option value="Fortaleza|CE">Fortaleza / CE</option></optgroup>
-                </select>
+              <div class="local-form row">
+                <div class="field"><label>Estado (UF)</label>
+                  <select id="lhRegion" onchange="populateLocalCities()"><option value="">Selecione o estado</option></select>
+                </div>
+                <div class="field"><label>Cidade</label>
+                  <input id="lhCity" list="lhCityList" autocomplete="off" placeholder="Selecione o estado e escolha a cidade" />
+                  <datalist id="lhCityList"></datalist>
+                </div>
               </div>
-              <div class="local-presets" aria-label="Presets rápidos">
+              <div class="local-presets" aria-label="Praças rápidas">
                 <button class="local-preset" data-city="Goiânia" data-region="GO">Goiânia</button>
-                <button class="local-preset" data-city="Ribeirão Preto" data-region="SP">Ribeirão Preto</button>
                 <button class="local-preset" data-city="São Paulo" data-region="SP">São Paulo</button>
+                <button class="local-preset" data-city="Rio de Janeiro" data-region="RJ">Rio de Janeiro</button>
                 <button class="local-preset" data-city="Belo Horizonte" data-region="MG">Belo Horizonte</button>
                 <button class="local-preset" data-city="Curitiba" data-region="PR">Curitiba</button>
-              </div>
-              <div class="local-form row">
-                <div class="field"><label>Cidade</label><input id="lhCity" placeholder="Ex.: Goiânia" /></div>
-                <div class="field"><label>UF</label><input id="lhRegion" placeholder="GO" maxlength="2" /></div>
+                <button class="local-preset" data-city="Salvador" data-region="BA">Salvador</button>
               </div>
               <div class="field"><label>Palavra-chave opcional</label><input id="lhKeyword" placeholder="Ex.: implante, orçamento, estética" /></div>
               <div class="local-form row">
@@ -2297,22 +2292,44 @@ function insightCard(ico,title,text,kind){
 function emptyHtml(msg,ico){ return '<div class="empty"><div class="em-ico">'+(ico||'∅')+'</div><p>'+msg+'</p></div>'; }
 
 // Principais municípios por UF — cidade é escolhida numa lista (não digitada).
+// UF -> nome do estado (todos os 27, em ordem alfabética de sigla).
+const BR_STATES = [
+  ['AC','Acre'],['AL','Alagoas'],['AP','Amapá'],['AM','Amazonas'],['BA','Bahia'],['CE','Ceará'],
+  ['DF','Distrito Federal'],['ES','Espírito Santo'],['GO','Goiás'],['MA','Maranhão'],['MT','Mato Grosso'],
+  ['MS','Mato Grosso do Sul'],['MG','Minas Gerais'],['PA','Pará'],['PB','Paraíba'],['PR','Paraná'],
+  ['PE','Pernambuco'],['PI','Piauí'],['RJ','Rio de Janeiro'],['RN','Rio Grande do Norte'],['RS','Rio Grande do Sul'],
+  ['RO','Rondônia'],['RR','Roraima'],['SC','Santa Catarina'],['SP','São Paulo'],['SE','Sergipe'],['TO','Tocantins'],
+];
+// Principais cidades por estado (capitais + maiores municípios). A cidade é um
+// combobox: estas são sugestões, mas qualquer cidade pode ser digitada.
 const CITIES_BY_UF = {
-  SP:['São Paulo','Guarulhos','Campinas','São Bernardo do Campo','Santo André','Osasco','Ribeirão Preto','Sorocaba','Santos','São José dos Campos','Bauru','Piracicaba','Jundiaí'],
-  RJ:['Rio de Janeiro','São Gonçalo','Duque de Caxias','Nova Iguaçu','Niterói','Campos dos Goytacazes','Petrópolis','Volta Redonda','Macaé','Cabo Frio'],
-  MG:['Belo Horizonte','Uberlândia','Contagem','Juiz de Fora','Betim','Montes Claros','Uberaba','Governador Valadares','Ipatinga','Divinópolis'],
-  PR:['Curitiba','Londrina','Maringá','Ponta Grossa','Cascavel','São José dos Pinhais','Foz do Iguaçu','Colombo','Guarapuava'],
-  RS:['Porto Alegre','Caxias do Sul','Canoas','Pelotas','Santa Maria','Gravataí','Novo Hamburgo','Passo Fundo','Rio Grande'],
-  SC:['Florianópolis','Joinville','Blumenau','São José','Chapecó','Itajaí','Criciúma','Jaraguá do Sul','Lages','Balneário Camboriú'],
-  BA:['Salvador','Feira de Santana','Vitória da Conquista','Camaçari','Itabuna','Juazeiro','Ilhéus','Lauro de Freitas','Barreiras'],
-  DF:['Brasília','Ceilândia','Taguatinga','Gama','Sobradinho','Planaltina','Águas Claras'],
-  GO:['Goiânia','Aparecida de Goiânia','Anápolis','Rio Verde','Luziânia','Águas Lindas de Goiás','Valparaíso de Goiás','Trindade','Catalão'],
-  ES:['Vitória','Vila Velha','Serra','Cariacica','Cachoeiro de Itapemirim','Linhares','Colatina','Guarapari'],
-  CE:['Fortaleza','Caucaia','Juazeiro do Norte','Maracanaú','Sobral','Crato','Itapipoca'],
-  PE:['Recife','Jaboatão dos Guararapes','Olinda','Caruaru','Petrolina','Paulista','Cabo de Santo Agostinho','Camaragibe'],
-  PA:['Belém','Ananindeua','Santarém','Marabá','Parauapebas','Castanhal','Abaetetuba'],
-  MT:['Cuiabá','Várzea Grande','Rondonópolis','Sinop','Tangará da Serra','Cáceres','Sorriso'],
-  MS:['Campo Grande','Dourados','Três Lagoas','Corumbá','Ponta Porã','Naviraí','Nova Andradina'],
+  AC:['Rio Branco','Cruzeiro do Sul','Sena Madureira','Tarauacá','Feijó','Brasiléia','Senador Guiomard','Plácido de Castro'],
+  AL:['Maceió','Arapiraca','Palmeira dos Índios','Rio Largo','Penedo','União dos Palmares','São Miguel dos Campos','Coruripe'],
+  AP:['Macapá','Santana','Laranjal do Jari','Oiapoque','Mazagão','Porto Grande','Pedra Branca do Amapari'],
+  AM:['Manaus','Parintins','Itacoatiara','Manacapuru','Coari','Tefé','Tabatinga','Maués','Humaitá'],
+  BA:['Salvador','Feira de Santana','Vitória da Conquista','Camaçari','Itabuna','Juazeiro','Ilhéus','Lauro de Freitas','Barreiras','Porto Seguro','Alagoinhas','Jequié','Teixeira de Freitas'],
+  CE:['Fortaleza','Caucaia','Juazeiro do Norte','Maracanaú','Sobral','Crato','Itapipoca','Maranguape','Iguatu','Quixadá'],
+  DF:['Brasília','Ceilândia','Taguatinga','Gama','Sobradinho','Planaltina','Águas Claras','Guará','Samambaia'],
+  ES:['Vitória','Vila Velha','Serra','Cariacica','Cachoeiro de Itapemirim','Linhares','Colatina','Guarapari','São Mateus','Aracruz'],
+  GO:['Goiânia','Aparecida de Goiânia','Anápolis','Rio Verde','Luziânia','Águas Lindas de Goiás','Valparaíso de Goiás','Trindade','Catalão','Jataí','Itumbiara','Formosa','Senador Canedo'],
+  MA:['São Luís','Imperatriz','São José de Ribamar','Timon','Caxias','Codó','Paço do Lumiar','Açailândia','Bacabal','Balsas'],
+  MT:['Cuiabá','Várzea Grande','Rondonópolis','Sinop','Tangará da Serra','Cáceres','Sorriso','Primavera do Leste','Lucas do Rio Verde','Barra do Garças'],
+  MS:['Campo Grande','Dourados','Três Lagoas','Corumbá','Ponta Porã','Naviraí','Nova Andradina','Aquidauana','Sidrolândia'],
+  MG:['Belo Horizonte','Uberlândia','Contagem','Juiz de Fora','Betim','Montes Claros','Uberaba','Governador Valadares','Ipatinga','Divinópolis','Sete Lagoas','Poços de Caldas','Patos de Minas','Pouso Alegre','Varginha','Barbacena'],
+  PA:['Belém','Ananindeua','Santarém','Marabá','Parauapebas','Castanhal','Abaetetuba','Itaituba','Cametá','Bragança','Altamira'],
+  PB:['João Pessoa','Campina Grande','Santa Rita','Patos','Bayeux','Sousa','Cajazeiras','Cabedelo','Guarabira','Sapé'],
+  PR:['Curitiba','Londrina','Maringá','Ponta Grossa','Cascavel','São José dos Pinhais','Foz do Iguaçu','Colombo','Guarapuava','Paranaguá','Toledo','Apucarana','Araucária','Campo Largo'],
+  PE:['Recife','Jaboatão dos Guararapes','Olinda','Caruaru','Petrolina','Paulista','Cabo de Santo Agostinho','Camaragibe','Garanhuns','Vitória de Santo Antão','Igarassu'],
+  PI:['Teresina','Parnaíba','Picos','Floriano','Piripiri','Campo Maior','Barras','União','Altos','Pedro II'],
+  RJ:['Rio de Janeiro','São Gonçalo','Duque de Caxias','Nova Iguaçu','Niterói','Belford Roxo','São João de Meriti','Campos dos Goytacazes','Petrópolis','Volta Redonda','Macaé','Cabo Frio','Angra dos Reis','Teresópolis','Nova Friburgo','Itaboraí','Maricá'],
+  RN:['Natal','Mossoró','Parnamirim','São Gonçalo do Amarante','Ceará-Mirim','Caicó','Currais Novos','Açu','Santa Cruz'],
+  RS:['Porto Alegre','Caxias do Sul','Canoas','Pelotas','Santa Maria','Gravataí','Novo Hamburgo','Passo Fundo','Rio Grande','Viamão','Alvorada','São Leopoldo','Bento Gonçalves','Bagé','Uruguaiana'],
+  RO:['Porto Velho','Ji-Paraná','Ariquemes','Vilhena','Cacoal','Rolim de Moura','Guajará-Mirim','Jaru','Pimenta Bueno'],
+  RR:['Boa Vista','Rorainópolis','Caracaraí','Alto Alegre','Mucajaí','Pacaraima','Cantá','Bonfim'],
+  SC:['Florianópolis','Joinville','Blumenau','São José','Chapecó','Itajaí','Criciúma','Jaraguá do Sul','Lages','Balneário Camboriú','Palhoça','Brusque','Tubarão','Concórdia'],
+  SP:['São Paulo','Guarulhos','Campinas','São Bernardo do Campo','Santo André','Osasco','São José dos Campos','Ribeirão Preto','Sorocaba','Santos','Mauá','São José do Rio Preto','Mogi das Cruzes','Diadema','Bauru','Piracicaba','Jundiaí','Franca','Carapicuíba','Limeira','Taubaté','Barueri','Marília','Americana','Araraquara','Presidente Prudente'],
+  SE:['Aracaju','Nossa Senhora do Socorro','Lagarto','Itabaiana','São Cristóvão','Estância','Tobias Barreto','Simão Dias'],
+  TO:['Palmas','Araguaína','Gurupi','Porto Nacional','Paraíso do Tocantins','Colinas do Tocantins','Guaraí','Tocantinópolis'],
 };
 /** Preenche a lista de cidades conforme o estado selecionado (preserva a escolha se ainda existir). */
 function populateCities(){
@@ -3238,11 +3255,25 @@ function collectLocalHuntInput(){
     urls:get('lhUrls').trim(),
   };
 }
+// Preenche o select de UF com os 27 estados (uma vez).
+function populateLocalUFs(){
+  const sel = document.getElementById('lhRegion');
+  if(!sel || sel.options.length > 1) return;
+  sel.insertAdjacentHTML('beforeend', BR_STATES.map(([uf,nome])=>'<option value="'+uf+'">'+uf+' — '+escapeHtml(nome)+'</option>').join(''));
+}
+// Preenche as sugestões de cidade conforme o estado selecionado.
+function populateLocalCities(){
+  const sel = document.getElementById('lhRegion');
+  const dl = document.getElementById('lhCityList');
+  if(!sel || !dl) return;
+  const list = CITIES_BY_UF[sel.value] || [];
+  dl.innerHTML = list.map(c=>'<option value="'+escapeHtml(c)+'"></option>').join('');
+}
 function setLocalPreset(city, region){
-  const c = document.getElementById('lhCity');
-  const r = document.getElementById('lhRegion');
-  if(c) c.value = city || '';
-  if(r) r.value = region || '';
+  populateLocalUFs();
+  const r = document.getElementById('lhRegion'); if(r) r.value = region || '';
+  populateLocalCities();
+  const c = document.getElementById('lhCity'); if(c) c.value = city || '';
   renderLocalHunt();
 }
 function hydrateLocalDefaults(){
@@ -3254,7 +3285,10 @@ function hydrateLocalDefaults(){
   if(region && !region.value && document.getElementById('hEstado')) region.value = document.getElementById('hEstado').value || '';
 }
 function renderLocalHunt(){
+  populateLocalUFs();
   hydrateLocalDefaults();
+  const dl = document.getElementById('lhCityList');
+  if(dl && !dl.children.length) populateLocalCities();
   const mode = document.getElementById('lhMode')?.value || 'advanced';
   const warning = document.getElementById('lhWarning');
   if(warning) warning.classList.toggle('show', mode==='fast');
