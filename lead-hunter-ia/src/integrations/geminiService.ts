@@ -79,8 +79,12 @@ export function friendlyGeminiError(raw: string): string {
   if (m.includes("api key not valid") || m.includes("api_key_invalid") || m.includes("invalid_argument") && m.includes("api key"))
     return "Chave da API Gemini inválida. Gere uma chave válida em aistudio.google.com/apikey (começa com AIza) e atualize GEMINI_API_KEY.";
   if (m.includes("api_key_invalid")) return "Chave da API Gemini inválida. Verifique GEMINI_API_KEY.";
+  if (m.includes("referer") || m.includes("referrer") || m.includes("api_key_http_referrer_blocked"))
+    return "Chave da Gemini restrita a referrers HTTP (uso em navegador). Para uso no servidor, edite a chave e defina 'Application restrictions' = None (ou IP). A Gemini API está ok — o bloqueio é da chave.";
+  if (m.includes("api_key_service_blocked") || m.includes("service_blocked"))
+    return "Chave da Gemini com restrição de API. Nas 'API restrictions' da chave, permita a Generative Language API (ou 'Don't restrict key').";
   if (m.includes("permission_denied") || m.includes("permission denied") || m.includes("403"))
-    return "Acesso negado pela Gemini. Habilite a Generative Language API para esta chave.";
+    return "Acesso negado pela Gemini: a chave está restrita. Ajuste 'Application restrictions' (None/IP) e 'API restrictions' (Generative Language API) no Google AI Studio.";
   if (m.includes("resource_exhausted") || m.includes("quota") || m.includes("429") || m.includes("rate limit"))
     return "Limite/quota da Gemini atingido. Verifique os limites da sua chave no Google AI Studio.";
   if (m.includes("timeout")) return "Tempo esgotado ao chamar a IA (Gemini). Tente novamente.";
