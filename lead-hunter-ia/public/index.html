@@ -334,6 +334,9 @@ tbody tr:hover td:first-child{box-shadow:inset 3px 0 0 var(--indigo)}
    LEADS — guias de data + paginação + skeleton de carregamento
    ============================================================ */
 /* Abas internas (Lançamentos: Tabela | Funil) */
+.lq-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.lq-header h2{margin:0 0 4px;font-size:19px;font-weight:800;letter-spacing:-.01em}
+.lq-header p{margin:0;font-size:13px;color:var(--text-dim);max-width:640px;line-height:1.5}
 .lq-tabs{display:flex;gap:8px;margin:16px 0}
 .lq-tab{padding:9px 16px;border-radius:11px;font-size:13px;font-weight:600;background:var(--surface-2);border:1px solid var(--line);color:var(--text-dim);cursor:pointer;transition:.18s all}
 .lq-tab:hover{background:var(--surface-3);color:var(--text)}
@@ -907,6 +910,11 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
   transition:.16s background,.16s color,.16s border-color,.16s transform;
 }
 .local-preset:hover{background:var(--surface-3);color:var(--text);border-color:var(--line-2);transform:translateY(-1px)}
+.local-results-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:12px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px}
+.local-results-bar .lrb-count{font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap}
+.local-results-bar .lrb-search{flex:1;min-width:160px}
+.local-results-bar input,.local-results-bar select{background:var(--surface-3);border:1px solid var(--line);border-radius:9px;color:var(--text);padding:7px 10px;font-size:12.5px}
+.local-results-bar select{cursor:pointer}
 .local-help{
   font-size:11.5px;
   color:var(--text-mute);
@@ -1500,7 +1508,15 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
           <div class="local-panel">
             <div class="section-head"><h2><span class="dot"></span> Alvo e intensidade</h2></div>
             <div class="local-form">
-              <div class="field"><label>Nicho</label><input id="lhNiche" placeholder="Ex.: Odontologia" value="Odontologia" /></div>
+              <div class="field"><label>Nicho</label><input id="lhNiche" list="lhNicheList" placeholder="Ex.: Odontologia" value="Odontologia" />
+                <datalist id="lhNicheList">
+                  <option>Odontologia</option><option>Estética</option><option>Harmonização facial</option><option>Dermatologia</option>
+                  <option>Advocacia</option><option>Contabilidade</option><option>Energia solar</option><option>Imobiliária</option>
+                  <option>Academia</option><option>Nutrição</option><option>Fisioterapia</option><option>Psicologia</option>
+                  <option>Pet shop</option><option>Veterinária</option><option>Barbearia</option><option>Salão de beleza</option>
+                  <option>Restaurante</option><option>Arquitetura</option><option>Marcenaria</option><option>Clínica médica</option>
+                </datalist>
+              </div>
               <div class="field"><label>Preset de praça</label>
                 <select id="lhPreset">
                   <option value="">Selecionar cidade rapidamente</option>
@@ -1557,6 +1573,13 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
               <div class="section-head"><h2><span class="dot"></span> Execução ao vivo</h2><span class="badge badge-mute" id="lhStatus">Parado</span></div>
               <div class="local-progress"><span id="lhProgress"></span></div>
               <div class="local-log" id="lhLog">Aguardando início da caça local.</div>
+            </div>
+            <div class="local-results-bar" id="lhResultsBar" style="display:none">
+              <div class="lrb-count" id="lhResultsCount"></div>
+              <input id="lhrSearch" class="lrb-search" placeholder="Filtrar por empresa, cidade ou contato…" />
+              <select id="lhrTemp"><option value="">Todas temperaturas</option><option>Quente</option><option>Morno</option><option>Frio</option></select>
+              <select id="lhrSort"><option value="score">Maior score</option><option value="name">Nome A-Z</option><option value="wa">Com WhatsApp</option></select>
+              <button class="btn btn-sm btn-ghost" id="lhClear">Limpar resultados</button>
             </div>
             <div class="local-results" id="lhResults"></div>
           </div>
@@ -1747,26 +1770,34 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
 
       <!-- =============== LANÇAMENTOS =============== -->
       <section class="section" id="view-launches">
+        <!-- Header -->
+        <div class="lq-header">
+          <div>
+            <h2>Radar de Lançamentos</h2>
+            <p>Mapeie experts e lançamentos digitais, acompanhe o funil e não perca a janela de carrinho aberto.</p>
+          </div>
+          <button class="btn btn-primary" id="btnNewLaunch">Novo lançamento</button>
+        </div>
+
         <!-- Cards de indicadores -->
         <div class="stats" id="launchStats" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
 
         <!-- Filtros -->
         <div class="toolbar" style="margin-top:18px">
-          <input class="grow" id="lqSearch" placeholder="🔍 Buscar por nome do lançamento ou expert…" />
+          <input class="grow" id="lqSearch" placeholder="Buscar por lançamento ou expert…" />
           <select id="lqNiche"><option value="">Todos os nichos</option></select>
           <select id="lqStatus"><option value="">Todos os status</option></select>
           <select id="lqResp"><option value="">Todos responsáveis</option></select>
           <select id="lqPlat"><option value="">Todas plataformas</option></select>
           <select id="lqTemp"><option value="">Todas temperaturas</option><option>Quente</option><option>Morno</option><option>Frio</option></select>
-          <button class="btn btn-ghost btn-sm" id="lqExport">⬇ CSV</button>
-          <button class="btn btn-ghost btn-sm" id="lqImport">⬆ Importar</button>
-          <button class="btn btn-primary" id="btnNewLaunch">＋ Novo Lançamento</button>
+          <button class="btn btn-ghost btn-sm" id="lqExport">Exportar CSV</button>
+          <button class="btn btn-ghost btn-sm" id="lqImport">Importar</button>
         </div>
 
         <!-- Abas: Tabela | Funil -->
         <div class="lq-tabs">
-          <button class="lq-tab active" data-lqtab="table">📋 Tabela</button>
-          <button class="lq-tab" data-lqtab="kanban">🧭 Funil</button>
+          <button class="lq-tab active" data-lqtab="table">Tabela</button>
+          <button class="lq-tab" data-lqtab="kanban">Funil</button>
         </div>
 
         <!-- Tabela -->
@@ -1780,7 +1811,7 @@ body.light .modal{background:linear-gradient(160deg,#fff,#F7F9FE)}
               </tr></thead>
               <tbody id="launchBody"></tbody>
             </table>
-            <div id="launchEmpty" style="display:none"><div class="empty"><div class="em-ico">🚀</div><h3>Nenhum lançamento</h3><p>Cadastre um lançamento ou ajuste os filtros.</p></div></div>
+            <div id="launchEmpty" style="display:none"><div class="empty"><div class="em-ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 8-10c1.5 1.5 2.5 5 2.5 7A22 22 0 0 1 12 15z"/></svg></div><h3>Nenhum lançamento ainda</h3><p>Clique em “Novo lançamento” para cadastrar o primeiro e começar a acompanhar o funil.</p><button class="btn btn-primary btn-sm" onclick="openLaunchModal()" style="margin-top:12px">Cadastrar lançamento</button></div></div>
           </div>
         </div>
 
@@ -2372,7 +2403,7 @@ function aiSpinner(msg){ return '<div class="empty state-loading"><div class="em
 function aiDisabledCard(extra){
   return '<div class="card"><div class="ai-disabled"><div class="ai-disabled-ico">'+svgIco('bot',22)+'</div>'+
     '<div><h3 style="margin:0 0 4px;font-size:14px">IA Comercial desativada</h3>'+
-    '<p style="margin:0;font-size:12.5px;color:var(--text-dim);line-height:1.5">Configure <code>OPENAI_API_KEY</code> no <code>.env</code> do backend para habilitar. '+(extra||'')+'</p></div></div></div>';
+    '<p style="margin:0;font-size:12.5px;color:var(--text-dim);line-height:1.5">Configure <code>GEMINI_API_KEY</code> no <code>.env</code> do backend para habilitar. '+(extra||'')+'</p></div></div></div>';
 }
 
 const IA_TABS = { dashboard:renderIaDashboard, report:renderIaReport, hunter:renderIaHunter };
@@ -2408,9 +2439,11 @@ async function renderIaDashboard(){
   const top = (d.top_10_leads_today||[]);
   const summary = d.executive_summary
     ? '<div class="ai-summary"><div class="ai-summary-k">Resumo executivo</div><p>'+escapeHtml(d.executive_summary)+'</p></div>'
-    : (state.aiCommercial
-        ? '<div class="ai-note">A IA não retornou resumo (verifique billing da OpenAI). As estatísticas abaixo vêm direto do banco.</div>'
-        : '<div class="ai-note">IA desativada: as estatísticas abaixo vêm do banco. Configure OPENAI_API_KEY para o resumo executivo e recomendações.</div>');
+    : (d.ai_error
+        ? '<div class="ai-note">'+escapeHtml(d.ai_error)+'</div>'
+        : (state.aiCommercial
+        ? '<div class="ai-note">A IA não retornou resumo (verifique a configuração da Gemini). As estatísticas abaixo vêm direto do banco.</div>'
+        : '<div class="ai-note">IA desativada: as estatísticas abaixo vêm do banco. Configure GEMINI_API_KEY para o resumo executivo e recomendações.</div>'));
   const recs = (d.daily_recommendations||[]);
   el.innerHTML =
     '<div class="stats" style="grid-template-columns:repeat(4,minmax(0,1fr))">'+
@@ -2521,7 +2554,7 @@ function iaCopyAllQueries(){ navigator.clipboard.writeText((state.ia.queries||[]
 
 /* ---- Análise por lead (usada no modal do lead) ---- */
 async function aiAnalyzeLead(id, force){
-  if(!state.aiCommercial){ toast('warn','IA desativada','Configure OPENAI_API_KEY no backend.'); return; }
+  if(!state.aiCommercial){ toast('warn','IA desativada','Configure GEMINI_API_KEY no backend.'); return; }
   toast('info','Analisando com IA…','O cérebro comercial está avaliando o lead.');
   try{
     const r = await api('/api/ai/analyze-lead','POST',{ lead_id:id, force:!!force });
@@ -2534,7 +2567,7 @@ async function aiAnalyzeLead(id, force){
   }catch(e){ toast('error','Erro', e.message); }
 }
 async function aiGenMessage(id, channel){
-  if(!state.aiCommercial){ toast('warn','IA desativada','Configure OPENAI_API_KEY no backend.'); return; }
+  if(!state.aiCommercial){ toast('warn','IA desativada','Configure GEMINI_API_KEY no backend.'); return; }
   toast('info','Gerando rascunho…', channel==='email'?'E-mail para aprovação humana':'WhatsApp para aprovação humana');
   try{
     const r = await api('/api/ai/generate-message','POST',{ lead_id:id, channel });
@@ -2562,7 +2595,7 @@ function aiLeadPanelHtml(l){
       (a.score_reason?'<div style="color:var(--text-dim)"><b style="color:var(--text)">Motivo do score:</b> '+escapeHtml(a.score_reason)+'</div>':'')+
     '</div>';
   } else {
-    bodyHtml = '<div style="font-size:12px;color:var(--text-mute)">'+(disabled?'IA desativada. Configure OPENAI_API_KEY no backend para analisar este lead.':'Nenhuma análise ainda. Clique em "Analisar com IA".')+'</div>';
+    bodyHtml = '<div style="font-size:12px;color:var(--text-mute)">'+(disabled?'IA desativada. Configure GEMINI_API_KEY no backend para analisar este lead.':'Nenhuma análise ainda. Clique em "Analisar com IA".')+'</div>';
   }
   const btns = '<div class="ai-lead-actions">'+
     '<button class="btn btn-sm btn-primary" '+(disabled?'disabled':'')+' onclick="aiAnalyzeLead('+l.id+','+(a?'true':'false')+')">'+(a?'Reanalisar':'Analisar com IA')+'</button>'+
@@ -3235,9 +3268,50 @@ function renderLocalHunt(){
   if(log && !state.localHunt.logs.length) log.textContent = 'Aguardando início da caça local.';
   const grid = document.getElementById('lhResults');
   if(!grid) return;
-  grid.innerHTML = state.localHunt.results.length
-    ? state.localHunt.results.map(localCard).join('')
-    : '<div class="empty"><div class="em-ico">—</div><h3>Nenhum lead local ainda</h3><p>Informe um alvo ou cole URLs públicas e inicie a caça.</p></div>';
+  const R = state.localHunt.results;
+  const bar = document.getElementById('lhResultsBar');
+  if(bar) bar.style.display = R.length ? 'flex' : 'none';
+  if(!R.length){
+    grid.innerHTML = '<div class="empty"><div class="em-ico">—</div><h3>Nenhum lead local ainda</h3><p>Informe um alvo ou cole URLs públicas e inicie a caça.</p></div>';
+    return;
+  }
+  // Filtro/ordenação preservando o índice original (para copiar/salvar/detalhes).
+  const q = (document.getElementById('lhrSearch')?.value||'').toLowerCase().trim();
+  const ft = document.getElementById('lhrTemp')?.value||'';
+  const sort = document.getElementById('lhrSort')?.value||'score';
+  let items = R.map((l,idx)=>({l,idx}));
+  if(q) items = items.filter(({l})=>((l.companyName||'')+' '+(l.city||'')+' '+(l.whatsapp||'')+' '+(l.email||'')+' '+(l.publicContactName||'')).toLowerCase().includes(q));
+  if(ft) items = items.filter(({l})=>(l.temperature==='Fraco'?'Frio':l.temperature)===ft);
+  if(sort==='name') items.sort((a,b)=>(a.l.companyName||'').localeCompare(b.l.companyName||''));
+  else if(sort==='wa') items.sort((a,b)=>((b.l.whatsapp?1:0)-(a.l.whatsapp?1:0))||((Number(b.l.score)||0)-(Number(a.l.score)||0)));
+  else items.sort((a,b)=>(Number(b.l.score)||0)-(Number(a.l.score)||0));
+  const cnt = document.getElementById('lhResultsCount');
+  if(cnt) cnt.textContent = items.length===R.length ? (R.length+' lead(s)') : (items.length+' de '+R.length);
+  grid.innerHTML = items.length
+    ? items.map(({l,idx})=>localCard(l, idx)).join('')
+    : '<div class="empty"><div class="em-ico">—</div><h3>Nenhum resultado no filtro</h3><p>Ajuste a busca ou a temperatura.</p></div>';
+}
+function clearLocalResults(){
+  if(state.localHunt.es) state.localHunt.es.close();
+  state.localHunt.results = []; state.localHunt.running=false; state.localHunt.progress=0;
+  const s=document.getElementById('lhrSearch'); if(s) s.value='';
+  renderLocalHunt();
+  toast('info','Resultados limpos');
+}
+async function saveOneLocal(i){
+  const l = state.localHunt.results[i]; if(!l){ return; }
+  const meta = collectLocalHuntInput();
+  try{
+    const r = await api('/api/local-hunt/save','POST',{ leads:[l], city:meta.city, region:meta.region, niche:meta.niche, keyword:meta.keyword, jobId: state.localHunt.jobId });
+    if(r.saved){ toast('success','Salvo no CRM', l.companyName); state.localHunt.saved += r.saved; await refreshAll(); }
+    else { toast('info','Já existe no CRM', l.companyName); }
+  }catch(e){ toast('error','Erro ao salvar', e.message); }
+}
+function openLocalWa(i){
+  const l = state.localHunt.results[i]; if(!l) return;
+  const wa = String(l.whatsapp||'').replace(/\D/g,'');
+  if(!wa){ toast('warn','Sem WhatsApp'); return; }
+  window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(localMessage(l)),'_blank');
 }
 function localCard(l, i){
   const contacts = [
@@ -3255,9 +3329,11 @@ function localCard(l, i){
     '<div class="pain-service">'+escapeHtml(localService(l))+'</div>'+
     '<div class="local-message">'+escapeHtml(localMessage(l))+'</div>'+
     '<div class="local-card-actions">'+
-      '<button class="btn btn-sm btn-ghost" onclick="copyLocalMessage('+i+')">Copiar mensagem</button>'+
-      '<button class="btn btn-sm btn-outline" onclick="openLocalDetails('+i+')">Ver detalhes</button>'+
-      (l.site?'<a class="btn btn-sm btn-outline" target="_blank" href="'+escapeHtml(l.site)+'">Abrir site</a>':'')+
+      (l.whatsapp?'<button class="btn btn-sm btn-success" onclick="openLocalWa('+i+')">WhatsApp</button>':'')+
+      '<button class="btn btn-sm btn-primary" onclick="saveOneLocal('+i+')">Salvar no CRM</button>'+
+      '<button class="btn btn-sm btn-ghost" onclick="copyLocalMessage('+i+')">Copiar</button>'+
+      '<button class="btn btn-sm btn-outline" onclick="openLocalDetails('+i+')">Detalhes</button>'+
+      (l.site?'<a class="btn btn-sm btn-outline" target="_blank" href="'+escapeHtml(l.site)+'">Site</a>':'')+
     '</div>'+
   '</article>';
 }
@@ -3780,7 +3856,7 @@ async function submitNewTask(){
 /* ============================================================
    LANÇAMENTOS DIGITAIS (localStorage)
    ============================================================ */
-const LAUNCH_KEY = 'gravity_launches_v1';
+const LAUNCH_KEY = 'gravity_launches_v2';
 const LAUNCH_STAGES = ['Mapeado','Dono encontrado','Em contato','Reunião marcada','Proposta enviada','Em negociação','Fechado','Perdido'];
 const LAUNCH_PLATFORMS = ['Hotmart','Kiwify','Eduzz','Monetizze','Ticto','Kajabi','Próprio','Outra'];
 const LAUNCH_MESSAGES = [
@@ -3789,26 +3865,8 @@ const LAUNCH_MESSAGES = [
   { t:'Follow-up', m:'Passando para retomar nosso contato sobre o {lancamento}. A ideia é simples: organizar seus leads, automatizar os próximos passos e evitar que oportunidades quentes fiquem sem atendimento. Podemos avançar?' },
 ];
 
-function launchSeed(){
-  const today = new Date();
-  const iso = (d)=> d.toISOString().slice(0,10);
-  const ahead = (n)=>{ const d=new Date(); d.setDate(d.getDate()+n); return iso(d); };
-  return [
-    { id:'ln_novarun', name:'NOVA RUN', expert:'Joel Santti', instagram:'', whatsapp:'', email:'', niche:'Corrida / Esporte / Comunidade', salesPage:'', capturePage:'', groupLink:'', platform:'Próprio',
-      startDate: iso(today), cartOpen: ahead(7), cartClose: ahead(14), status:'Mapeado', temp:'Quente', potential:15000,
-      offer:'Automação para vender mais + follow-up + CRM', notes:'Organizar a estrutura comercial, automações, follow-up e oportunidades de venda do lançamento.',
-      nextAction:'Organizar base de leads e sequência de follow-up', nextFollowup: ahead(2), responsavel:'Joel Santti', createdAt: today.toISOString() },
-    { id:'ln_altaperf', name:'Método Alta Performance', expert:'', instagram:'', whatsapp:'', email:'', niche:'Desenvolvimento pessoal', salesPage:'', capturePage:'', groupLink:'', platform:'Hotmart',
-      startDate:'', cartOpen:'', cartClose:'', status:'Dono encontrado', temp:'Morno', potential:8000,
-      offer:'Página de captura + automação', notes:'', nextAction:'Mapear contato do dono', nextFollowup: ahead(3), responsavel:'Comercial', createdAt: today.toISOString() },
-    { id:'ln_mentpro', name:'Mentoria Empresarial Pro', expert:'', instagram:'', whatsapp:'', email:'', niche:'Negócios', salesPage:'', capturePage:'', groupLink:'', platform:'Kiwify',
-      startDate:'', cartOpen:'', cartClose:'', status:'Em contato', temp:'Quente', potential:12000,
-      offer:'CRM + automação comercial', notes:'', nextAction:'Enviar proposta', nextFollowup: ahead(1), responsavel:'Comercial', createdAt: today.toISOString() },
-    { id:'ln_desafio21', name:'Desafio 21 Dias Fit', expert:'', instagram:'', whatsapp:'', email:'', niche:'Saúde e fitness', salesPage:'', capturePage:'', groupLink:'', platform:'Eduzz',
-      startDate:'', cartOpen:'', cartClose:'', status:'Mapeado', temp:'Frio', potential:6000,
-      offer:'Automação de WhatsApp', notes:'', nextAction:'Validar interesse', nextFollowup:'', responsavel:'Comercial', createdAt: today.toISOString() },
-  ];
-}
+// Base de lançamentos começa vazia — cada usuário cadastra os seus.
+function launchSeed(){ return []; }
 function loadLaunches(){
   try{ const raw = localStorage.getItem(LAUNCH_KEY); if(raw){ state.launches = JSON.parse(raw); return; } }catch{}
   state.launches = launchSeed(); saveLaunches();
@@ -3832,14 +3890,10 @@ function launchStats(){
 function renderLaunchStats(){
   const s = launchStats();
   document.getElementById('launchStats').innerHTML = [
-    stat('Total de lançamentos', s.total, '🚀'),
-    stat('Ativos', s.active, '🟢', null, null, 'success'),
-    stat('Carrinhos abertos', s.cartOpen, '🛒', null, null, 'warm'),
-    stat('Em prospecção', s.prospect, '🔎', null, null, 'cool'),
-    stat('Donos encontrados', s.owners, '👤'),
-    stat('Oportunidades quentes', s.hot, '🔥', null, null, 'rose'),
-    stat('Follow-ups pendentes', s.fups, '⏰', null, null, 'warm'),
-    stat('Potencial de receita', brl(s.revenue), '💰', null, null, 'gold'),
+    stat('Lançamentos', s.total, svgIco('target')),
+    stat('Oportunidades quentes', s.hot, svgIco('flame'), null, null, 'rose'),
+    stat('Follow-ups pendentes', s.fups, svgIco('bell'), null, null, 'warm'),
+    stat('Potencial de receita', brl(s.revenue), svgIco('gauge'), null, null, 'gold'),
   ].join('');
 }
 function populateLaunchFilters(){
@@ -3865,9 +3919,9 @@ function filteredLaunches(){
 }
 function launchLinks(l){
   const a=[];
-  if(l.salesPage) a.push('<a target="_blank" onclick="event.stopPropagation()" href="'+escapeHtml(l.salesPage)+'">🛒 vendas</a>');
-  if(l.capturePage) a.push('<a target="_blank" onclick="event.stopPropagation()" href="'+escapeHtml(l.capturePage)+'">🎯 captura</a>');
-  if(l.groupLink) a.push('<a target="_blank" onclick="event.stopPropagation()" href="'+escapeHtml(l.groupLink)+'">👥 grupo</a>');
+  if(l.salesPage) a.push('<a target="_blank" onclick="event.stopPropagation()" href="'+escapeHtml(l.salesPage)+'">Vendas</a>');
+  if(l.capturePage) a.push('<a target="_blank" onclick="event.stopPropagation()" href="'+escapeHtml(l.capturePage)+'">Captura</a>');
+  if(l.groupLink) a.push('<a target="_blank" onclick="event.stopPropagation()" href="'+escapeHtml(l.groupLink)+'">Grupo</a>');
   return a.length? '<div class="cell-contacts">'+a.join('')+'</div>' : '<span style="color:var(--text-mute)">—</span>';
 }
 function launchStageBadge(s){ return '<span class="badge badge-stage"><span class="dot"></span>'+escapeHtml(s)+'</span>'; }
@@ -3882,7 +3936,7 @@ function renderLaunchTable(){
   document.getElementById('launchEmpty').style.display = rows.length?'none':'block';
   document.getElementById('launchBody').innerHTML = rows.map(l=>
     '<tr onclick="openLaunchDetails(\''+l.id+'\')">'+
-      '<td><div style="font-weight:700">'+escapeHtml(l.name)+'</div><div style="font-size:11px;color:var(--text-mute)">'+(l.cartOpen?('🛒 '+l.cartOpen+(l.cartClose?(' → '+l.cartClose):'')):'sem carrinho')+'</div></td>'+
+      '<td><div style="font-weight:700">'+escapeHtml(l.name)+'</div><div style="font-size:11px;color:var(--text-mute)">'+(l.cartOpen?('Carrinho '+l.cartOpen+(l.cartClose?(' → '+l.cartClose):'')):'sem carrinho')+'</div></td>'+
       '<td>'+(l.expert?escapeHtml(l.expert):'<span style="color:var(--text-mute)">—</span>')+'</td>'+
       '<td>'+escapeHtml(l.niche||'—')+'</td>'+
       '<td>'+escapeHtml(l.platform||'—')+'</td>'+
@@ -3892,7 +3946,7 @@ function renderLaunchTable(){
       '<td style="color:#FCD34D;font-weight:700">'+brl(l.potential)+'</td>'+
       '<td style="font-size:11px;color:var(--text-dim);max-width:160px">'+escapeHtml(l.nextAction||'—')+'</td>'+
       '<td onclick="event.stopPropagation()" style="text-align:right;white-space:nowrap"><button class="btn btn-sm btn-primary" onclick="openLaunchDetails(\''+l.id+'\')">Ver</button>'+
-        (l.whatsapp?' <a class="btn btn-sm btn-success" target="_blank" href="https://wa.me/'+escapeHtml(String(l.whatsapp).replace(/\D/g,''))+'">💬</a>':'')+
+        (l.whatsapp?' <a class="btn btn-sm btn-success" target="_blank" href="https://wa.me/'+escapeHtml(String(l.whatsapp).replace(/\D/g,''))+'">WhatsApp</a>':'')+
       '</td></tr>'
   ).join('');
 }
@@ -3928,7 +3982,7 @@ function launchCard(l){
   '</div>';
 }
 function launchMoveStage(id, stage){ const l=launchById(id); if(!l) return; l.status=stage; saveLaunches(); renderLaunches(); toast('success','Movido para '+stage); }
-function launchHot(id){ const l=launchById(id); if(!l) return; l.temp='Quente'; saveLaunches(); renderLaunches(); if(state.currentLaunchId===id) openLaunchDetails(id); toast('success','Marcado como oportunidade quente 🔥'); }
+function launchHot(id){ const l=launchById(id); if(!l) return; l.temp='Quente'; saveLaunches(); renderLaunches(); if(state.currentLaunchId===id) openLaunchDetails(id); toast('success','Marcado como oportunidade quente'); }
 
 /* ---- Formulário (novo / editar) ---- */
 function launchFormHtml(l){
@@ -3963,7 +4017,7 @@ function launchFormHtml(l){
 function openLaunchModal(id){
   const l = id ? launchById(id) : null;
   openModal({ title: l?'Editar lançamento':'Novo lançamento', sub: l?l.name:'Cadastro manual', body: launchFormHtml(l),
-    footer:'<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>'+(l?'<button class="btn btn-danger" onclick="deleteLaunch(\''+l.id+'\')">🗑 Excluir</button>':'')+'<button class="btn btn-primary" onclick="submitLaunch('+(l?('\''+l.id+'\''):'')+')">Salvar</button>' });
+    footer:'<button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>'+(l?'<button class="btn btn-danger" onclick="deleteLaunch(\''+l.id+'\')">Excluir</button>':'')+'<button class="btn btn-primary" onclick="submitLaunch('+(l?('\''+l.id+'\''):'')+')">Salvar</button>' });
   if(l){ const t=document.getElementById('lnTemp'); if(t) t.value=l.temp||'Frio'; }
 }
 function submitLaunch(id){
@@ -3993,13 +4047,13 @@ function openLaunchDetails(id){
     body:'<div class="sp" style="gap:8px;margin-bottom:14px">'+tempBadge(l.temp)+launchStageBadge(l.status)+'<span class="badge badge-gold">'+brl(l.potential)+'</span>'+(l.platform?'<span class="badge badge-mute">'+escapeHtml(l.platform)+'</span>':'')+'</div>'+
       '<div class="lead-grid"><div>'+
         '<div class="lead-section"><h4>Dados</h4><div class="box contact">'+
-          (l.expert?'<div>👤 '+escapeHtml(l.expert)+'</div>':'')+
-          (l.whatsapp?'<a target="_blank" href="https://wa.me/'+wa+'">💬 '+escapeHtml(l.whatsapp)+'</a>':'')+
-          (l.instagram?'<a target="_blank" href="'+escapeHtml(l.instagram.startsWith('http')?l.instagram:'https://instagram.com/'+l.instagram.replace(/^@/,''))+'">📸 Instagram</a>':'')+
-          (l.email?'<div>✉ '+escapeHtml(l.email)+'</div>':'')+
-          (l.salesPage?'<a target="_blank" href="'+escapeHtml(l.salesPage)+'">🛒 Página de vendas</a>':'')+
-          (l.capturePage?'<a target="_blank" href="'+escapeHtml(l.capturePage)+'">🎯 Página de captura</a>':'')+
-          (l.groupLink?'<a target="_blank" href="'+escapeHtml(l.groupLink)+'">👥 Grupo</a>':'')+
+          (l.expert?'<div><b>Expert:</b> '+escapeHtml(l.expert)+'</div>':'')+
+          (l.whatsapp?'<a target="_blank" href="https://wa.me/'+wa+'">WhatsApp: '+escapeHtml(l.whatsapp)+'</a>':'')+
+          (l.instagram?'<a target="_blank" href="'+escapeHtml(l.instagram.startsWith('http')?l.instagram:'https://instagram.com/'+l.instagram.replace(/^@/,''))+'">Instagram</a>':'')+
+          (l.email?'<div><b>E-mail:</b> '+escapeHtml(l.email)+'</div>':'')+
+          (l.salesPage?'<a target="_blank" href="'+escapeHtml(l.salesPage)+'">Página de vendas</a>':'')+
+          (l.capturePage?'<a target="_blank" href="'+escapeHtml(l.capturePage)+'">Página de captura</a>':'')+
+          (l.groupLink?'<a target="_blank" href="'+escapeHtml(l.groupLink)+'">Grupo</a>':'')+
         '</div>'+
         '<h4>Carrinho & datas</h4><div class="box" style="font-size:12.5px;line-height:1.7">'+
           '<div><b>Início:</b> '+(l.startDate||'—')+'</div><div><b>Abre:</b> '+(l.cartOpen||'—')+'</div><div><b>Fecha:</b> '+(l.cartClose||'—')+'</div><div><b>Próx. follow-up:</b> '+(l.nextFollowup||'—')+'</div>'+
@@ -4012,11 +4066,11 @@ function openLaunchDetails(id){
       '</div>'+
       '<h4>Mensagens prontas</h4>'+msgs,
     footer:'<button class="btn btn-ghost" onclick="closeModal()">Fechar</button>'+
-      (wa?'<a class="btn btn-success" target="_blank" href="https://wa.me/'+wa+'?text='+encodeURIComponent(buildLaunchMsg(l,0))+'">💬 WhatsApp</a>':'')+
-      (l.salesPage?'<a class="btn btn-ghost" target="_blank" href="'+escapeHtml(l.salesPage)+'">🔗 Abrir página</a>':'')+
-      '<button class="btn btn-warm" onclick="launchHot(\''+l.id+'\')">🔥 Quente</button>'+
-      '<button class="btn btn-ghost" onclick="launchToTask(\''+l.id+'\')">＋ Tarefa</button>'+
-      '<button class="btn btn-primary" onclick="openLaunchModal(\''+l.id+'\')">✏ Editar</button>'
+      (wa?'<a class="btn btn-success" target="_blank" href="https://wa.me/'+wa+'?text='+encodeURIComponent(buildLaunchMsg(l,0))+'">WhatsApp</a>':'')+
+      (l.salesPage?'<a class="btn btn-ghost" target="_blank" href="'+escapeHtml(l.salesPage)+'">Abrir página</a>':'')+
+      '<button class="btn btn-warm" onclick="launchHot(\''+l.id+'\')">Marcar quente</button>'+
+      '<button class="btn btn-ghost" onclick="launchToTask(\''+l.id+'\')">Criar tarefa</button>'+
+      '<button class="btn btn-primary" onclick="openLaunchModal(\''+l.id+'\')">Editar</button>'
   });
 }
 function copyLaunchMsg(id, idx){ const l=launchById(id); navigator.clipboard?.writeText(buildLaunchMsg(l, idx)); toast('success','Mensagem copiada'); }
@@ -4273,6 +4327,10 @@ function bindEvents(){
   document.getElementById('lhSave')&&document.getElementById('lhSave').addEventListener('click', saveLocalHuntLeads);
   document.getElementById('lhExport')&&document.getElementById('lhExport').addEventListener('click', exportLocalHuntCsv);
   document.getElementById('lhMode')&&document.getElementById('lhMode').addEventListener('change', renderLocalHunt);
+  document.getElementById('lhrSearch')&&document.getElementById('lhrSearch').addEventListener('input', renderLocalHunt);
+  document.getElementById('lhrTemp')&&document.getElementById('lhrTemp').addEventListener('change', renderLocalHunt);
+  document.getElementById('lhrSort')&&document.getElementById('lhrSort').addEventListener('change', renderLocalHunt);
+  document.getElementById('lhClear')&&document.getElementById('lhClear').addEventListener('click', clearLocalResults);
   document.getElementById('lhPreset')&&document.getElementById('lhPreset').addEventListener('change', e=>{
     const [city, region] = String(e.target.value||'').split('|');
     if(city && region) setLocalPreset(city, region);
