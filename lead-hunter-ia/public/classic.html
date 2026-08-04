@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Hunter IA — Painel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🎯</div>
+      <div>
+        <h1>Lead Hunter <span>IA</span></h1>
+        <p>Caçador local de leads com potencial para agentes de IA</p>
+      </div>
+    </div>
+    <div id="providerBadge" class="badge badge-muted">carregando…</div>
+  </header>
+
+  <main class="layout">
+    <!-- Painel de busca -->
+    <section class="card search-card">
+      <h2 class="card-title">🔍 Nova caça</h2>
+      <form id="searchForm" class="form-grid">
+        <label class="field">
+          <span>Cidade</span>
+          <input name="city" placeholder="Ex.: Goiânia" required />
+        </label>
+        <label class="field">
+          <span>Estado / País</span>
+          <input name="region" placeholder="Ex.: GO" />
+        </label>
+        <label class="field field-wide">
+          <span>Nicho</span>
+          <input name="niche" placeholder="Ex.: clínica odontológica" required />
+        </label>
+        <label class="field">
+          <span>Máx. de leads</span>
+          <input name="maxLeads" type="number" min="1" max="200" value="20" />
+        </label>
+        <label class="field">
+          <span>Tipo de busca</span>
+          <select name="searchType">
+            <option value="completa">Completa (mais ampla)</option>
+            <option value="rapida">Rápida (econômica)</option>
+            <option value="somente-sites">Somente sites</option>
+          </select>
+        </label>
+        <div class="form-actions field-wide">
+          <button type="button" id="previewBtn" class="btn btn-ghost">Ver consultas</button>
+          <button type="submit" id="searchBtn" class="btn btn-primary">
+            <span class="btn-label">Caçar leads</span>
+          </button>
+        </div>
+      </form>
+
+      <div id="queriesBox" class="queries-box hidden"></div>
+
+      <!-- Progresso ao vivo -->
+      <div id="progress" class="progress hidden">
+        <div class="progress-head">
+          <span id="progressMsg">Iniciando…</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+        <ul id="liveFeed" class="live-feed"></ul>
+      </div>
+    </section>
+
+    <!-- Estatísticas -->
+    <section class="stats">
+      <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total de leads</div></div>
+      <div class="stat stat-hot"><div class="stat-num" id="statHot">0</div><div class="stat-label">🔥 Quentes</div></div>
+      <div class="stat stat-warm"><div class="stat-num" id="statWarm">0</div><div class="stat-label">🌤️ Mornos</div></div>
+      <div class="stat stat-cold"><div class="stat-num" id="statCold">0</div><div class="stat-label">❄️ Frios</div></div>
+      <div class="stat stat-attack"><div class="stat-num" id="statAttack">0</div><div class="stat-label">⚡ Atacar hoje</div></div>
+      <div class="stat"><div class="stat-num" id="statWhats">0</div><div class="stat-label">💬 Com WhatsApp</div></div>
+    </section>
+
+    <!-- Resultados -->
+    <section class="card results-card">
+      <div class="results-toolbar">
+        <h2 class="card-title">📋 Leads</h2>
+        <div class="toolbar-actions">
+          <input id="filterInput" class="filter-input" placeholder="Filtrar por nome, cidade, nicho…" />
+          <div class="chips">
+            <button class="chip chip-active" data-temp="todos">Todos</button>
+            <button class="chip" data-temp="Quente">🔥</button>
+            <button class="chip" data-temp="Morno">🌤️</button>
+            <button class="chip" data-temp="Frio">❄️</button>
+          </div>
+          <select id="priorityFilter" class="filter-input" title="Prioridade comercial">
+            <option value="todos">Toda prioridade</option>
+            <option value="atacar_hoje">Atacar hoje</option>
+            <option value="validar_manual">Validar manual</option>
+            <option value="nutrir">Nutrir</option>
+            <option value="descartar">Descartar</option>
+          </select>
+          <input id="minScore" class="filter-input" type="number" min="0" max="100" placeholder="Score mín." style="width:90px" />
+          <div class="export-group">
+            <button class="btn btn-export" data-format="csv">CSV</button>
+            <button class="btn btn-export" data-format="xlsx">XLSX</button>
+            <button class="btn btn-export" data-format="json">JSON</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="leads-table">
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Contato</th>
+              <th>Redes</th>
+              <th class="th-score">Score</th>
+              <th>Prioridade</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="leadsBody"></tbody>
+        </table>
+        <div id="emptyState" class="empty-state hidden">
+          Nenhum lead ainda. Faça uma busca acima para começar a caçar. 🎯
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de detalhe do lead -->
+  <div id="leadModal" class="modal-overlay hidden">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

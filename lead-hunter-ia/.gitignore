@@ -1,0 +1,12 @@
+node_modules/
+dist/
+data/
+exports/
+# qualquer arquivo de env (ex.: .env, hermers.env) — nunca versionar chaves
+*.env
+!.env.example
+*.log
+.DS_Store
+drizzle/
+tmp.json
+*.tmp
